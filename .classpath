@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/commons"/>
+	<classpathentry kind="src" path="src/conf"/>
+	<classpathentry kind="src" path="src/configuration"/>
+	<classpathentry kind="src" path="src/module"/>
+	<classpathentry kind="src" path="src/mvc"/>
+	<classpathentry kind="src" path="src/persistence"/>
+	<classpathentry kind="src" path="src/plugin"/>
+	<classpathentry kind="src" path="src/validation"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5">
+		<attributes>
+			<attribute name="owner.project.facets" value="java"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/asm-4.0.jar"/>
+	<classpathentry kind="lib" path="lib/commons-fileupload-1.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/commons-io-1.4.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang-2.5.jar"/>
+	<classpathentry kind="lib" path="lib/freemarker-2.3.16.jar"/>
+	<classpathentry kind="lib" path="lib/jconfig-2.9.jar"/>
+	<classpathentry kind="lib" path="lib/jsp-api.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.14.jar"/>
+	<classpathentry kind="lib" path="lib/org.json_200912270120.jar"/>
+	<classpathentry kind="lib" path="lib/paranamer-2.3.jar"/>
+	<classpathentry kind="lib" path="lib/reflectasm-1.05.jar"/>
+	<classpathentry kind="lib" path="lib/servlet-api.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
