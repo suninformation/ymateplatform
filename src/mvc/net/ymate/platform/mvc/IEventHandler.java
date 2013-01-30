@@ -7,7 +7,6 @@
  */
 package net.ymate.platform.mvc;
 
-import java.util.EventObject;
 
 
 /**
@@ -45,12 +44,5 @@ public interface IEventHandler {
 	 * MVC框架销毁时将执行此事件回调
 	 */
 	public void onDestroyed();
-
-	/**
-	 * MVC框架迭代处理插件扩展对象时将执行此事件回调
-	 * 
-	 * @param event 事件对象
-	 */
-	public void onForEachPluginExtraObject(EventObject event);
 
 }

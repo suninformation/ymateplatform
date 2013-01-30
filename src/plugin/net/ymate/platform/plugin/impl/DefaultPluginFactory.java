@@ -13,7 +13,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.ymate.platform.commons.logger.Logs;
@@ -61,6 +63,27 @@ import org.apache.commons.lang.StringUtils;
  *          </table>
  */
 public class DefaultPluginFactory implements IPluginFactory {
+
+	/**
+	 * 排除的接口集合，被包含的接口将不被插件工厂管理
+	 */
+	protected static Set<String> __EXCLUDED_CLASS_NAME_SET;
+
+	static {
+		__EXCLUDED_CLASS_NAME_SET = new HashSet<String>();
+		__EXCLUDED_CLASS_NAME_SET.add(IPlugin.class.getName());
+	}
+
+	/**
+	 * 添加被排除的接口
+	 * 
+	 * @param interfaceClass 目标接口类对象
+	 */
+	public static void addExcludedInterfaceClass(Class<?> interfaceClass) {
+		if (interfaceClass.isInterface()) {
+			__EXCLUDED_CLASS_NAME_SET.add(interfaceClass.getName());
+		}
+	}
 
 	protected Map<String, PluginMeta> __PLUGINMETA_MAPS = new ConcurrentHashMap <String, PluginMeta>();
 
@@ -113,9 +136,10 @@ public class DefaultPluginFactory implements IPluginFactory {
 					//
 					String[] _interfaceNames = ClassUtils.getInterfaceNames(_pluginObj.getClass());
 					for (String _interfaceName : _interfaceNames) {
-						if (!_interfaceName.equals(IPlugin.class.getName())) {
-							__PLUGIN_INTERFACE_WITH_PID.put(_interfaceName, _pluginMeta.getId());
+						if (__EXCLUDED_CLASS_NAME_SET.contains(_interfaceName)) {
+							continue;
 						}
+						__PLUGIN_INTERFACE_WITH_PID.put(_interfaceName, _pluginMeta.getId());
 					}
 				}
 				return _pluginObj;

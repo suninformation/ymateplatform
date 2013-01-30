@@ -7,18 +7,16 @@
  */
 package net.ymate.platform.mvc;
 
-import java.util.EventObject;
 import java.util.Locale;
-
-import org.apache.commons.lang.StringUtils;
 
 import net.ymate.platform.mvc.context.IRequestContext;
 import net.ymate.platform.mvc.impl.DefaultRequestProcessor;
 import net.ymate.platform.mvc.support.RequestExecutor;
 import net.ymate.platform.plugin.IPluginFactory;
-import net.ymate.platform.plugin.PluginMeta;
 import net.ymate.platform.plugin.Plugins;
 import net.ymate.platform.plugin.impl.DefaultPluginConfig;
+
+import org.apache.commons.lang.StringUtils;
 
 
 
@@ -76,11 +74,6 @@ public abstract class MVC {
 			//
 			if (__MVC_CONFIG.getEventHandlerClassImpl() != null) {
 				__MVC_CONFIG.getEventHandlerClassImpl().onInitialized();
-				for (PluginMeta _meta : __PLUGIN_FACTORY.getPluginMetas()) {
-					if (_meta.getExtraObj() != null) {
-						__MVC_CONFIG.getEventHandlerClassImpl().onForEachPluginExtraObject(new EventObject(_meta.getExtraObj()));
-					}
-				}
 			}
 		}
 	}
@@ -112,6 +105,15 @@ public abstract class MVC {
 	 */
 	public static IPluginFactory getPluginFactory() {
 		return __PLUGIN_FACTORY;
+	}
+
+	/**
+	 * 注册控制器类
+	 * 
+	 * @param clazz 目标控制器类
+	 */
+	public static void registerController(Class<?> clazz) {
+		__META_PROCESSOR.addController(clazz);
 	}
 
 	/**
