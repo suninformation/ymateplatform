@@ -9,6 +9,10 @@ package net.ymate.platform.commons.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -37,9 +41,57 @@ import org.apache.commons.lang.StringUtils;
  *          </table>
  */
 public class DateTimeUtils {
-	
+
+	private static Map<String, String[]> __timeZoneIDs = new LinkedHashMap<String, String[]>(32);
+	static {
+		__timeZoneIDs.put("-12", new String[] { "GMT-12:00", "(GMT -12:00) Eniwetok, Kwajalein" });
+		__timeZoneIDs.put("-11", new String[] { "GMT-11:00", "(GMT -11:00) Midway Island, Samoa" });
+		__timeZoneIDs.put("-10", new String[] { "GMT-10:00", "(GMT -10:00) Hawaii" });
+		__timeZoneIDs.put("-9", new String[] { "GMT-09:00", "(GMT -09:00) Alaska" });
+		__timeZoneIDs.put("-8", new String[] { "GMT-08:00", "(GMT -08:00) Pacific Time (US &amp; Canada), Tijuana" });
+		__timeZoneIDs.put("-7", new String[] { "GMT-07:00", "(GMT -07:00) Mountain Time (US &amp; Canada), Arizona" });
+		__timeZoneIDs.put("-6", new String[] { "GMT-06:00", "(GMT -06:00) Central Time (US &amp; Canada), Mexico City" });
+		__timeZoneIDs.put("-5", new String[] { "GMT-05:00", "(GMT -05:00) Eastern Time (US &amp; Canada), Bogota, Lima, Quito" });
+		__timeZoneIDs.put("-4", new String[] { "GMT-04:00", "(GMT -04:00) Atlantic Time (Canada), Caracas, La Paz" });
+		__timeZoneIDs.put("-3.5", new String[] { "GMT-03:30", "(GMT -03:30) Newfoundland" });
+		__timeZoneIDs.put("-3", new String[] { "GMT-03:00", "(GMT -03:00) Brassila, Buenos Aires, Georgetown, Falkland Is" });
+		__timeZoneIDs.put("-2", new String[] { "GMT-02:00", "(GMT -02:00) Mid-Atlantic, Ascension Is., St. Helena" });
+		__timeZoneIDs.put("-1", new String[] { "GMT-01:00", "(GMT -01:00) Azores, Cape Verde Islands" });
+		__timeZoneIDs.put("0", new String[] { "GMT", "(GMT) Casablanca, Dublin, Edinburgh, London, Lisbon, Monrovia" });
+		__timeZoneIDs.put("1", new String[] { "GMT+01:00", "(GMT +01:00) Amsterdam, Berlin, Brussels, Madrid, Paris, Rome" });
+		__timeZoneIDs.put("2", new String[] { "GMT+02:00", "(GMT +02:00) Cairo, Helsinki, Kaliningrad, South Africa" });
+		__timeZoneIDs.put("3", new String[] { "GMT+03:00", "(GMT +03:00) Baghdad, Riyadh, Moscow, Nairobi" });
+		__timeZoneIDs.put("3.5", new String[] { "GMT+03:30", "(GMT +03:30) Tehran" });
+		__timeZoneIDs.put("4", new String[] { "GMT+04:00", "(GMT +04:00) Abu Dhabi, Baku, Muscat, Tbilisi" });
+		__timeZoneIDs.put("4.5", new String[] { "GMT+04:30", "(GMT +04:30) Kabul" });
+		__timeZoneIDs.put("5", new String[] { "GMT+05:00", "(GMT +05:00) Ekaterinburg, Islamabad, Karachi, Tashkent" });
+		__timeZoneIDs.put("5.5", new String[] { "GMT+05:30", "(GMT +05:30) Bombay, Calcutta, Madras, New Delhi" });
+		__timeZoneIDs.put("5.75", new String[] { "GMT+05:45", "(GMT +05:45) Katmandu" });
+		__timeZoneIDs.put("6", new String[] { "GMT+06:00", "(GMT +06:00) Almaty, Colombo, Dhaka, Novosibirsk" });
+		__timeZoneIDs.put("6.5", new String[] { "GMT+06:30", "(GMT +06:30) Rangoon" });
+		__timeZoneIDs.put("7", new String[] { "GMT+07:00", "(GMT +07:00) Bangkok, Hanoi, Jakarta" });
+		__timeZoneIDs.put("8", new String[] { "GMT+08:00", "(GMT +08:00) Beijing, Hong Kong, Perth, Singapore, Taipei" });
+		__timeZoneIDs.put("9", new String[] { "GMT+09:00", "(GMT +09:00) Osaka, Sapporo, Seoul, Tokyo, Yakutsk" });
+		__timeZoneIDs.put("9.5", new String[] { "GMT+09:30", "(GMT +09:30) Adelaide, Darwin" });
+		__timeZoneIDs.put("10", new String[] { "GMT+10:00", "(GMT +10:00) Canberra, Guam, Melbourne, Sydney, Vladivostok" });
+		__timeZoneIDs.put("11", new String[] { "GMT+11:00", "(GMT +11:00) Magadan, New Caledonia, Solomon Islands" });
+		__timeZoneIDs.put("12", new String[] { "GMT+12:00", "(GMT +12:00) Auckland, Wellington, Fiji, Marshall Island" });
+	}
+
+	public static Map<String, String[]> getTimeZoneIDs() {
+		return __timeZoneIDs;
+	}
+
+	public static SimpleDateFormat getSimpleDateFormat(String format, String timeoffset) {
+		SimpleDateFormat _format = new SimpleDateFormat(format, Locale.ENGLISH);
+		if (StringUtils.isNotBlank(timeoffset) && __timeZoneIDs.containsKey(timeoffset)) {
+			_format.setTimeZone(TimeZone.getTimeZone(__timeZoneIDs.get(timeoffset)[0]));
+		}
+		return _format;
+	}
+
 	/** 时间修正 */
-	private static long timeMillisOffset;
+	private static String timeOffset;
 
 	/**
 	 * 私有构造器， 防止被实例化
@@ -53,17 +105,17 @@ public class DateTimeUtils {
 	 * @param timeMillisOffset
 	 * @return
 	 */
-	public static void setTimeMillisOffset(long timeMillisOffset) {
-		DateTimeUtils.timeMillisOffset = timeMillisOffset;
+	public static void setTimeOffset(String timeOffset) {
+		DateTimeUtils.timeOffset = timeOffset;
 	}
 
 	/**
-	 * 统一的获取当前时间的方法，可以使用各种方式进行修正，获得的是一个相对稳定的时间源
+	 * 统一的获取当前时间的方法
 	 *
 	 * @return
 	 */
 	public static long currentTimeMillis() {
-		return System.currentTimeMillis() + timeMillisOffset;
+		return System.currentTimeMillis();
 	}
 
 	/**
@@ -125,7 +177,17 @@ public class DateTimeUtils {
 		if (StringUtils.isBlank(pattern)) {
 			pattern = "yyyy-MM-dd HH:mm:ss.SSS";
 		}
-		return new SimpleDateFormat(pattern).format(new Date(time));
+		return getSimpleDateFormat(pattern, timeOffset).format(new Date(time));
+	}
+
+	public static String formatTime(long time, String pattern, String timeoffset) {
+		if (time < 0) {
+			time = 0;
+		}
+		if (StringUtils.isBlank(pattern)) {
+			pattern = "yyyy-MM-dd HH:mm:ss.SSS";
+		}
+		return getSimpleDateFormat(pattern, timeoffset).format(new Date(time));
 	}
 
 }

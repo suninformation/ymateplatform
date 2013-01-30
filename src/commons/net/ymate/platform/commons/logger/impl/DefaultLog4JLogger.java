@@ -70,6 +70,7 @@ public class DefaultLog4JLogger extends AbstractLogger implements ILogger {
 		System.out.println("[信息: 初始化Log4J日志记录器 \"" + loggerName + "\"" + (!isPrintConsole ? ", 已将命令行输出关闭，请从日志文件查看日志记录信息]" : "]"));
 		logger = Logger.getLogger(loggerName);
 //		logger.setLevel(defaultLevel.toLevel());
+		logger.info("-------------------- 在 " + DateTimeUtils.formatTime(DateTimeUtils.currentTimeMillis(), null) + " 重新开启日志系统 --------------------");
 	}
 
 	/* (non-Javadoc)
