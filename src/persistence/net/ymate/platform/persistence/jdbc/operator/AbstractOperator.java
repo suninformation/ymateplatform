@@ -131,16 +131,21 @@ public abstract class AbstractOperator implements IOperator {
 					_time.stop();
 					this.setExpenseTime(_time.getTime());
 					if (JDBC.isShowSQL) {
-						Logs.debug("执行SQL语句: " + this.getSql() + "，参数：" + this.getParameters() + (_recordSize >= 0 ? "，影响/记录数：" + _recordSize : "") + "， 耗时: " + this.getExpenseTime() + "ms");
+						Logs.debug("执行SQL语句: " + this.getSql() + "，参数：" + __parametersToString() + (_recordSize >= 0 ? "，影响/记录数：" + _recordSize : "") + "， 耗时: " + this.getExpenseTime() + "ms");
 					}
 				} catch (SQLException e) {
-					throw new OperatorException("操作执行时异常, [" + this.getSql() + ", " + this.getParameters() + "]", RuntimeUtils.unwrapThrow(e));
+					throw new OperatorException("操作执行时异常, [" + this.getSql() + ", " + __parametersToString() + "]", RuntimeUtils.unwrapThrow(e));
 				} finally {
 					this.__isExecuted = true;
 				}
 			}
 		}
 	}
+
+	/**
+	 * @return 将参数以字符串方式输出
+	 */
+	protected abstract String __parametersToString();
 
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.operator.IOperator#execute(net.ymate.platform.persistence.jdbc.connection.ConnectionHolder)

@@ -89,6 +89,13 @@ public class QueryOperator<T> extends AbstractOperator implements IQueryOperator
 	}
 
 	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.jdbc.operator.AbstractOperator#__parametersToString()
+	 */
+	protected String __parametersToString() {
+		return this.getParameters().toString();
+	}
+
+	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.operator.IQueryOperator#getResultSet()
 	 */
 	public List<T> getResultSet() {

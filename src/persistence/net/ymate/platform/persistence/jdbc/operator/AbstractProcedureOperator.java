@@ -113,6 +113,13 @@ public class AbstractProcedureOperator extends AbstractOperator implements IProc
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.jdbc.operator.AbstractOperator#__parametersToString()
+	 */
+	protected String __parametersToString() {
+		return this.getParameters().toString();
+	}
+
 	/**
 	 * @return 构建存储过程Call语句(根据不同的数据库，可由子类重新实现)
 	 */

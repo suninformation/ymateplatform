@@ -89,6 +89,13 @@ public class UpdateBatchOperator extends AbstractOperator implements IUpdateBatc
 	}
 
 	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.jdbc.operator.AbstractOperator#__parametersToString()
+	 */
+	protected String __parametersToString() {
+		return this.getBatchParameters().toString();
+	}
+
+	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.operator.IUpdateBatchOperator#addBatchParameter(net.ymate.platform.persistence.jdbc.base.SqlBatchParameter)
 	 */
 	public void addBatchParameter(SqlBatchParameter parameter) {

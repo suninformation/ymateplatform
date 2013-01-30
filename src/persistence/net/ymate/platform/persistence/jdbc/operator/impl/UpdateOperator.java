@@ -80,6 +80,13 @@ public class UpdateOperator extends AbstractOperator implements IUpdateOperator 
 	}
 
 	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.jdbc.operator.AbstractOperator#__parametersToString()
+	 */
+	protected String __parametersToString() {
+		return this.getParameters().toString();
+	}
+
+	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.operator.IUpdateOperator#getEffectCounts()
 	 */
 	public int getEffectCounts() {
