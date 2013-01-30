@@ -39,7 +39,7 @@ public class ForwardView extends AbstractWebView {
 	/**
 	 * 重定向URL
 	 */
-	private String path;
+	protected String path;
 
 	/**
 	 * 构造器

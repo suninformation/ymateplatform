@@ -12,7 +12,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Map.Entry;
 
-import net.ymate.platform.mvc.web.WebMVC;
 import net.ymate.platform.mvc.web.context.WebContext;
 import net.ymate.platform.mvc.web.view.AbstractWebView;
 
@@ -50,7 +49,7 @@ public class FreeMarkerView extends AbstractWebView {
 
 	public static final String FREEMARKER_CONFIG = "__freemarker_config";
 
-	private String path;
+	protected String path;
 
 	/**
 	 * 构造器
@@ -84,7 +83,7 @@ public class FreeMarkerView extends AbstractWebView {
 		if (_freemarkerCfg == null) {
 			_freemarkerCfg = new Configuration();
 			_freemarkerCfg.setDefaultEncoding("UTF-8");
-			_freemarkerCfg.setServletContextForTemplateLoading(WebContext.getServletContext(), WebMVC.getConfig().getViewPath());
+			_freemarkerCfg.setServletContextForTemplateLoading(WebContext.getServletContext(), this.getBaseViewPath());
 	        _freemarkerCfg.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
 			WebContext.getServletContext().setAttribute(FREEMARKER_CONFIG, _freemarkerCfg);
 		}
@@ -96,19 +95,15 @@ public class FreeMarkerView extends AbstractWebView {
 			WebContext.getRequest().setAttribute(entry.getKey(), entry.getValue());
 		}
 		//
-		String _viewBasePath = this.getBaseViewPath();
 		if (StringUtils.isBlank(this.path)) {
 			String _mapping = WebContext.getWebRequestContext().getRequestMapping();
-			if (_mapping.charAt(0) == '/') {
-				_mapping = _mapping.substring(1);
-			}
 			if (_mapping.endsWith("/")) {
 				_mapping.substring(0, _mapping.length() - 1);
 			}
-			this.path = _viewBasePath + _mapping + ".ftl";
+			this.path = _mapping + ".ftl";
 		} else {
-			if (!this.path.startsWith("/")) {
-				this.path = _viewBasePath + this.path;
+			if (this.path.startsWith(this.getBaseViewPath())) {
+				this.path = StringUtils.substringAfter(this.path, this.getBaseViewPath());
 			}
 			if (!this.path.endsWith(".ftl")) {
 				this.path += ".ftl";

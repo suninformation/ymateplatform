@@ -42,7 +42,7 @@ public class TextView extends AbstractWebView {
 	/**
 	 * 文本内容
 	 */
-	private String text;
+	protected String text;
 
 	/**
 	 * 构造器

@@ -50,8 +50,8 @@ import org.apache.commons.lang.StringUtils;
  */
 public class BinaryView extends AbstractWebView {
 
-	private String fileName;
-	private Object data;
+	protected String fileName;
+	protected Object data;
 
 	/**
 	 * 构造器

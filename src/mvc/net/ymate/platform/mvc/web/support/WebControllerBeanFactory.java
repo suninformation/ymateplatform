@@ -10,6 +10,7 @@ package net.ymate.platform.mvc.web.support;
 import java.util.List;
 
 import net.ymate.platform.commons.beans.IBeanMeta;
+import net.ymate.platform.commons.beans.IBeanMetaLoader;
 import net.ymate.platform.mvc.support.impl.ControllerBeanFactory;
 
 /**
@@ -52,6 +53,13 @@ public class WebControllerBeanFactory extends ControllerBeanFactory {
 	 */
 	protected List<IBeanMeta> loadBeanMetas() {
 		return new WebControllerBeanMetaLoader(this.packageNames).loadBeanMetas();
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.mvc.support.impl.ControllerBeanFactory#getBeanMetaLoader(java.lang.Class)
+	 */
+	protected IBeanMetaLoader getBeanMetaLoader(Class<?> clazz) {
+		return new WebControllerBeanMetaLoader(clazz);
 	}
 
 }

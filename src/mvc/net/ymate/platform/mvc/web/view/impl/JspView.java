@@ -52,7 +52,7 @@ public class JspView extends AbstractWebView {
 	/**
 	 * JSP文件路径
 	 */
-	private String path;
+	protected String path;
 
 	/**
 	 * 构造器

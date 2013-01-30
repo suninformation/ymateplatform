@@ -70,12 +70,20 @@ public class ControllerBeanFactory extends AnnotationBeanFactory implements ICon
 		return new ControllerBeanMetaLoader(this.packageNames).loadBeanMetas();
 	}
 
+	/**
+	 * @param clazz 目标类对象
+	 * @return 返回对象元描述加载器接口实现
+	 */
+	protected IBeanMetaLoader getBeanMetaLoader(Class<?> clazz) {
+		return new ControllerBeanMetaLoader(clazz);
+	}
+
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.commons.beans.impl.AnnotationBeanFactory#add(java.lang.Class)
 	 */
 	public IBeanMeta add(Class<?> clazz) {
 		if (clazz.isAnnotationPresent(Controller.class)) {
-			IBeanMetaLoader _loader = new ControllerBeanMetaLoader(clazz);
+			IBeanMetaLoader _loader = this.getBeanMetaLoader(clazz);
 			for (IBeanMeta _meta : _loader.loadBeanMetas()) {
 				if (!this.beanMap.containsKey(_meta.getClassName())) {
 					this.beanMetaList.add(_meta);

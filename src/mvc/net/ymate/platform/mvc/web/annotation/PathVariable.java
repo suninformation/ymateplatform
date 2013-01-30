@@ -45,7 +45,7 @@ public @interface PathVariable {
 	/**
 	 * @return 参数名称
 	 */
-	String value() default "";;
+	String value() default "";
 
 	/**
 	 * @return 是否为必须，参数不允许空

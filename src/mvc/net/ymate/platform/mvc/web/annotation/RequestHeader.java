@@ -42,7 +42,7 @@ import java.lang.annotation.Target;
 @Documented
 public @interface RequestHeader {
 
-	String value() default "";;
+	String value() default "";
 
 	boolean required() default true;
 

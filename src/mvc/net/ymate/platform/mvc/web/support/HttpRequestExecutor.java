@@ -81,25 +81,28 @@ public class HttpRequestExecutor extends RequestExecutor {
 	}
 
 	protected Object parseCookieValueAnnotation(String paramName, String defaultValue, boolean required, Class<?> type, String defaultParamName) {
-		String _value = StringUtils.defaultIfEmpty(CookieHelper.create().getCookie(StringUtils.defaultIfEmpty(paramName, defaultParamName)).toStringValue(), defaultValue);
+		String _paramName = StringUtils.defaultIfEmpty(paramName, defaultParamName);
+		String _value = StringUtils.defaultIfEmpty(CookieHelper.create().getCookie(_paramName).toStringValue(), defaultValue);
 		if (required && StringUtils.isBlank(_value)) {
-			throw new NullPointerException("方法参数" + StringUtils.defaultIfEmpty(paramName, defaultParamName) + "值为空");
+			throw new NullPointerException("方法参数" + _paramName + "值为空");
 		}
 		return new BlurObject(_value).toObjectValue(type);
 	}
 
 	protected Object parsePathVariableAnnotation(String paramName, String defaultValue, boolean required, Class<?> type, String defaultParamName) {
-		String _value = StringUtils.defaultIfEmpty((String) WebContext.getContext().get(StringUtils.defaultIfEmpty(paramName, defaultParamName)), defaultValue);
+		String _paramName = StringUtils.defaultIfEmpty(paramName, defaultParamName);
+		String _value = StringUtils.defaultIfEmpty((String) WebContext.getContext().get(_paramName), defaultValue);
 		if (required && StringUtils.isBlank(_value)) {
-			throw new NullPointerException("方法参数" + StringUtils.defaultIfEmpty(paramName, defaultParamName) + "值为空");
+			throw new NullPointerException("方法参数" + _paramName + "值为空");
 		}
 		return new BlurObject(_value).toObjectValue(type);
 	}
 
 	protected Object parseRequestHeaderAnnotation(String paramName, String defaultValue, boolean required, Class<?> type, String defaultParamName) {
-		String _value = StringUtils.defaultIfEmpty(WebContext.getRequest().getHeader(StringUtils.defaultIfEmpty(paramName, defaultParamName)), defaultValue);
+		String _paramName = StringUtils.defaultIfEmpty(paramName, defaultParamName);
+		String _value = StringUtils.defaultIfEmpty(WebContext.getRequest().getHeader(_paramName), defaultValue);
 		if (required && StringUtils.isBlank(_value)) {
-			throw new NullPointerException("方法参数" + StringUtils.defaultIfEmpty(paramName, defaultParamName) + "值为空");
+			throw new NullPointerException("方法参数" + _paramName + "值为空");
 		}
 		return new BlurObject(_value).toObjectValue(type);
 	}
@@ -125,7 +128,7 @@ public class HttpRequestExecutor extends RequestExecutor {
 				}
 				return _tempParams;
 			} else if (required) {
-				throw new NullPointerException("方法参数" + StringUtils.defaultIfEmpty(paramName, defaultParamName) + "值为空");
+				throw new NullPointerException("方法参数" + _paramName + "值为空");
 			}
 		}
 		if (type.equals(IUploadFileWrapper.class)) {
@@ -134,9 +137,9 @@ public class HttpRequestExecutor extends RequestExecutor {
 			}
 			return null;
 		}
-		String _value = StringUtils.defaultIfEmpty(WebContext.getRequest().getParameter(_paramName), defaultParamName);
+		String _value = StringUtils.defaultIfEmpty(WebContext.getRequest().getParameter(_paramName), defaultValue);
 		if (required && StringUtils.isBlank(_value)) {
-			throw new NullPointerException("方法参数" + StringUtils.defaultIfEmpty(paramName, defaultParamName) + "值为空");
+			throw new NullPointerException("方法参数" + _paramName + "值为空");
 		}
 		return new BlurObject(_value).toObjectValue(type);
 	}

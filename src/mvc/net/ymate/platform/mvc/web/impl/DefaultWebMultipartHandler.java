@@ -18,8 +18,6 @@ import net.ymate.platform.mvc.web.context.WebContext;
 import net.ymate.platform.mvc.web.support.FileUploadHelper;
 import net.ymate.platform.mvc.web.support.FileUploadHelper.UploadFormWrapper;
 
-import org.apache.commons.fileupload.ProgressListener;
-
 /**
  * <p>
  * DefaultWebMultipartHandler
@@ -58,30 +56,7 @@ public class DefaultWebMultipartHandler implements IWebMultipartHandler {
 				.setFileSizeMax(upload.totalSizeMax() > -1 ? upload.totalSizeMax() : WebMVC.getConfig().getUploadTotalSizeMax())
 				.setSizeMax(upload.sizeMax() > -1 ? upload.sizeMax() : WebMVC.getConfig().getUploadFileSizeMax())
 				.setSizeThreshold(upload.sizeThreshold() > -1 ? upload.sizeThreshold() : WebMVC.getConfig().getUploadSizeThreshold())
-				.setFileUploadListener(new ProgressListener() {
-					// TODO 计算文件上传进度的代码优化
-					private double megaBytes = -1; 
-					public void update(long pBytesRead, long pContentLength, int pItems) {
-						double mBytes = pBytesRead / 1000000;
-						double total = pContentLength / 1000000;
-						if (megaBytes == mBytes) {
-							return;
-						}
-						System.out.println("total====>" + total);
-						System.out.println("mBytes====>" + mBytes);
-						megaBytes = mBytes;
-						System.out.println("megaBytes====>" + megaBytes);
-						System.out.println("We are currently reading item " + pItems);
-						if (pContentLength == -1) {
-							System.out.println("So far, " + pBytesRead + " bytes have been read.");
-						} else {
-							System.out.println("So far, " + pBytesRead + " of " + pContentLength + " bytes have been read.");
-							double read = (mBytes / total);
-							System.out.println("read===>" + read);// 生成读取的百分比并放入session中
-							WebContext.getContext().getSession().put(FILE_UPLOAD_STATUS, read);
-						}
-					}
-				}).processUpload();
+				.processUpload();
 	}
 
 	/* (non-Javadoc)

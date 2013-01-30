@@ -46,7 +46,8 @@ public class JsonView extends AbstractWebView {
 
 	public static final String JSON_CONTENT_TYPE = "application/json;charset=utf-8";
 
-	private Object jsonObj;
+	protected Object jsonObj;
+	protected boolean withJsonContent;
 
 	/**
 	 * 构造器
@@ -79,6 +80,14 @@ public class JsonView extends AbstractWebView {
 		}
 	}
 
+	/**
+	 * @return 设置ContentType为"application/json"，默认为空
+	 */
+	public JsonView withJsonContentType() {
+		this.withJsonContent = true;
+		return this;
+	}
+
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.mvc.web.view.AbstractWebView#renderView()
 	 */
@@ -86,7 +95,7 @@ public class JsonView extends AbstractWebView {
 		HttpServletResponse response = WebContext.getResponse();
 		if (StringUtils.isNotBlank(getContentType())) {
 			response.setContentType(getContentType());
-		} else {
+		} else if (withJsonContent) {
 			response.setContentType(JSON_CONTENT_TYPE);
 		}
 		IOUtils.write(jsonObj.toString(), response.getOutputStream());
