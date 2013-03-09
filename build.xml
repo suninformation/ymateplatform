@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="ymateplatform" basedir="." default="build-jar">
-	<property name="CONFIGURATION_HOME" value="D:/99.yMateWorkDisk/yMateHome" />
+	<property name="CONFIGURATION_HOME" value="../ymateplatform-libs" />
 
 	<property name="DIST_DIR" value="${CONFIGURATION_HOME}/dist/${ant.project.name}"/>
 	<property name="SRC_DIR" value="src"/>
