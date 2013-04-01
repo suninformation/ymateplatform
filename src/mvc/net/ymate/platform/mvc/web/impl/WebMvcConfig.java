@@ -49,6 +49,7 @@ public class WebMvcConfig extends DefaultMvcConfig implements IWebMvcConfig {
 	private IWebMultipartHandler __multipartHandler;
 	private List<Class<IFilter>> __extraFilters;
 	private boolean __restfulModel;
+	private boolean __conventionModel;
 	private String __urlSuffix;
 	private String __viewPath;
 	private String __uploadTempDir;
@@ -139,6 +140,22 @@ public class WebMvcConfig extends DefaultMvcConfig implements IWebMvcConfig {
 	 */
 	public void setRestfulModel(boolean restfulModel) {
 		this.__restfulModel = restfulModel;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.mvc.web.IWebMvcConfig#isConventionModel()
+	 */
+	public boolean isConventionModel() {
+		return __conventionModel;
+	}
+
+	/**
+	 * 设置是否采用约定优于配置模式
+	 * 
+	 * @param conventionModel true/false
+	 */
+	public void setConventionModel(boolean conventionModel) {
+		this.__conventionModel = conventionModel;
 	}
 
 	/* (non-Javadoc)

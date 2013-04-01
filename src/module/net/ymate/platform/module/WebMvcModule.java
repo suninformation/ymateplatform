@@ -103,6 +103,7 @@ public class WebMvcModule implements IModule {
 		//
 		_config.setMultipartHandlerClassImpl(_multipartHandler);
 		_config.setRestfulModel(new BlurObject(StringUtils.defaultIfEmpty(moduleCfgs.get("base.restful_model"), "false")).toBooleanValue());
+		_config.setConventionModel(new BlurObject(StringUtils.defaultIfEmpty(moduleCfgs.get("base.convention_model"), "true")).toBooleanValue());
 		_config.setUrlSuffix(StringUtils.defaultIfEmpty(moduleCfgs.get("base.url_suffix"), ""));
 		_config.setViewPath(StringUtils.defaultIfEmpty(moduleCfgs.get("base.view_path"), ""));
 		_config.setExtraFilters(_extraFilters);

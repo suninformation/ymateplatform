@@ -64,6 +64,11 @@ public interface IWebMvcConfig extends IMvcConfig {
 	public boolean isRestfulModel();
 
 	/**
+	 * @return 是否采用约定优于配置模式，默认true
+	 */
+	public boolean isConventionModel();
+
+	/**
 	 * @return 返回请求的URL后缀名，如：.do
 	 */
 	public String getUrlSuffix();

@@ -7,6 +7,7 @@
  */
 package net.ymate.platform.mvc.web;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -23,13 +24,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.ymate.platform.commons.logger.Logs;
+import net.ymate.platform.commons.util.RuntimeUtils;
 import net.ymate.platform.mvc.support.RequestExecutor;
 import net.ymate.platform.mvc.view.IView;
 import net.ymate.platform.mvc.web.context.IWebRequestContext;
 import net.ymate.platform.mvc.web.context.WebContext;
 import net.ymate.platform.mvc.web.context.impl.WebRequestContext;
 import net.ymate.platform.mvc.web.support.HttpMethodRequestWrapper;
+import net.ymate.platform.mvc.web.view.impl.FreeMarkerView;
 import net.ymate.platform.mvc.web.view.impl.HttpStatusView;
+import net.ymate.platform.mvc.web.view.impl.JspView;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
@@ -77,6 +81,8 @@ public class DispatcherFilter implements Filter {
 
 	private FilterConfig __filterConfig;
 
+	private String baseViewFilePath;
+
 	/* (non-Javadoc)
 	 * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
 	 */
@@ -100,6 +106,7 @@ public class DispatcherFilter implements Filter {
         }
         prefix = StringUtils.defaultIfEmpty(__filterConfig.getInitParameter("prefix"), "");
         methodParam = StringUtils.defaultIfEmpty(__filterConfig.getInitParameter("methodParam"), DEFAULT_METHOD_PARAM);
+        baseViewFilePath = buildViewFilePath();
 	}
 
 	/* (non-Javadoc)
@@ -119,12 +126,39 @@ public class DispatcherFilter implements Filter {
 			WebContext.setContext(new WebContext(WebContext.createWebContextMap(__filterConfig.getServletContext(), _httpRequest, (HttpServletResponse) response, null), _context));
 			try {
 				RequestExecutor _executor = WebMVC.processRequestMapping(_context);
-				IView _view = (_executor != null) ? _executor.execute() : new HttpStatusView(HttpServletResponse.SC_NOT_FOUND);
-				if (_view != null) {
-					_view.render();
-				} else {
-					new HttpStatusView(HttpServletResponse.SC_NOT_FOUND).render();
+				if (_executor != null) {
+					IView _view = _executor.execute();
+					if (_view != null) {
+						_view.render();
+						return;
+					}
+				} else if (WebMVC.getConfig().isConventionModel()) {
+					// 先尝试调用自定义的约定优于配置的URL请求映射处理过程
+					if (WebMVC.getConfig().getErrorHandlerClassImpl() != null) {
+						IView _view = WebMVC.getConfig().getErrorHandlerClassImpl().onConvention(_context.getRequestMapping());
+						if (_view != null) {
+							_view.render();
+							return;
+						}
+					}
+					// 采用系统默认方式处理约定优于配置的URL请求映射
+					String[] _fileTypes = { ".jsp", ".ftl" };
+					File _targetFile = null;
+					for (String _fileType : _fileTypes) {
+						_targetFile = new File(baseViewFilePath, _context.getRequestMapping() + _fileType);
+						if (_targetFile != null && _targetFile.exists()) {
+							if (".jsp".equals(_fileType)) {
+								new JspView().render();
+								return;
+							} else if (".ftl".equals(_fileType)) {
+								new FreeMarkerView().render();
+								return;
+							}
+						}
+					}
 				}
+				// 真能404了
+				new HttpStatusView(HttpServletResponse.SC_NOT_FOUND).render();
 			} catch (Exception e) {
 				IWebErrorHandler _errorHandler = WebMVC.getConfig().getErrorHandlerClassImpl();
 				if (_errorHandler != null) {
@@ -137,7 +171,6 @@ public class DispatcherFilter implements Filter {
 				_stopWatch.stop();
 				Logs.info("控制器[" + _context.getRequestMapping() + "][" + _httpRequest.getMethod() + "]请求处理完毕，耗时" + _stopWatch.getTime() + "ms");
 			}
-			return;
         } else if (__useRewrite && !rewriteIgnoreSuffixs.contains(_context.getSuffix().toLowerCase()) && !StringUtils.equals(_httpRequest.getServletPath(), rewriteUrl)) {
         	request.getRequestDispatcher(rewriteUrl + _context.getUrl()).forward(request, response);
         } else {
@@ -154,6 +187,16 @@ public class DispatcherFilter implements Filter {
 			}
 		}
 		return request;
+	}
+
+	protected String buildViewFilePath() {
+		String _viewBasePath = StringUtils.trimToNull(WebMVC.getConfig().getViewPath());
+		if (_viewBasePath == null || !_viewBasePath.startsWith("/WEB-INF/")) {
+			_viewBasePath = "/WEB-INF/templates/";
+		} else if (!_viewBasePath.endsWith("/")) {
+			_viewBasePath += "/";
+		}
+		return RuntimeUtils.getRootPath() + StringUtils.substringAfter(_viewBasePath, "/WEB-INF/");
 	}
 
 	/* (non-Javadoc)

@@ -8,6 +8,7 @@
 package net.ymate.platform.mvc.web;
 
 import net.ymate.platform.mvc.IErrorHandler;
+import net.ymate.platform.mvc.view.IView;
 
 /**
  * <p>
@@ -34,5 +35,13 @@ import net.ymate.platform.mvc.IErrorHandler;
  *          </table>
  */
 public interface IWebErrorHandler extends IErrorHandler {
+
+	/**
+	 * 自定义处理URL请求过程
+	 * 
+	 * @param requestMapping URL请求路径
+	 * @return 可用视图对象，若为空则采用系统默认
+	 */
+	public IView onConvention(String requestMapping);
 
 }
