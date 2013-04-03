@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.ymate.platform.commons.logger.Logs;
 import net.ymate.platform.commons.util.RuntimeUtils;
+import net.ymate.platform.module.base.YMP;
 import net.ymate.platform.mvc.support.RequestExecutor;
 import net.ymate.platform.mvc.view.IView;
 import net.ymate.platform.mvc.web.context.IWebRequestContext;
@@ -121,8 +122,11 @@ public class DispatcherFilter implements Filter {
 		HttpServletRequest _httpRequest = this.wrapperRequest((HttpServletRequest) request);
 		IWebRequestContext _context = new WebRequestContext(_httpRequest, prefix);
 		if (null == ignorePatern || !ignorePatern.matcher(_context.getUrl()).find()) {
-			StopWatch _stopWatch = new StopWatch();
-			_stopWatch.start();
+			StopWatch _stopWatch = null;
+			if (YMP.IS_DEV_MODEL) {
+				_stopWatch = new StopWatch();
+				_stopWatch.start();
+			}
 			WebContext.setContext(new WebContext(WebContext.createWebContextMap(__filterConfig.getServletContext(), _httpRequest, (HttpServletResponse) response, null), _context));
 			try {
 				RequestExecutor _executor = WebMVC.processRequestMapping(_context);
@@ -132,7 +136,8 @@ public class DispatcherFilter implements Filter {
 						_view.render();
 						return;
 					}
-				} else if (WebMVC.getConfig().isConventionModel()) {
+				} else if (WebMVC.getConfig().isConventionModel()
+						&& StringUtils.trimToEmpty(WebMVC.getConfig().getUrlSuffix()).endsWith(WebContext.getWebRequestContext().getSuffix())) {
 					// 先尝试调用自定义的约定优于配置的URL请求映射处理过程
 					if (WebMVC.getConfig().getErrorHandlerClassImpl() != null) {
 						IView _view = WebMVC.getConfig().getErrorHandlerClassImpl().onConvention(_context.getRequestMapping());
@@ -157,7 +162,7 @@ public class DispatcherFilter implements Filter {
 						}
 					}
 				}
-				// 真能404了
+				// 到这儿就只能404了
 				new HttpStatusView(HttpServletResponse.SC_NOT_FOUND).render();
 			} catch (Exception e) {
 				IWebErrorHandler _errorHandler = WebMVC.getConfig().getErrorHandlerClassImpl();
@@ -168,8 +173,10 @@ public class DispatcherFilter implements Filter {
 				}
 			} finally {
 				WebContext.setContext(null);
-				_stopWatch.stop();
-				Logs.info("控制器[" + _context.getRequestMapping() + "][" + _httpRequest.getMethod() + "]请求处理完毕，耗时" + _stopWatch.getTime() + "ms");
+				if (YMP.IS_DEV_MODEL) {
+					_stopWatch.stop();
+					Logs.info("控制器[" + _context.getRequestMapping() + "][" + _httpRequest.getMethod() + "]请求处理完毕，耗时" + _stopWatch.getTime() + "ms");
+				}
 			}
         } else if (__useRewrite && !rewriteIgnoreSuffixs.contains(_context.getSuffix().toLowerCase()) && !StringUtils.equals(_httpRequest.getServletPath(), rewriteUrl)) {
         	request.getRequestDispatcher(rewriteUrl + _context.getUrl()).forward(request, response);
