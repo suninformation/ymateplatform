@@ -81,7 +81,7 @@ public class HttpStatusView extends AbstractWebView {
 	 * @see net.ymate.platform.mvc.web.view.AbstractWebView#renderView()
 	 */
 	protected void renderView() throws Exception {
-		if (StringUtils.isBlank(msg)) {
+		if (StringUtils.isNotBlank(msg)) {
 			WebContext.getResponse().sendError(status, msg);
 		} else {
 			if (__error) {
