@@ -119,7 +119,7 @@ public class EntitySupport {
 		List<String> _pkFieldFilter = new ArrayList<String>();
 		for (String _pkField : _meta.getPrimaryKeys()) {
 			if (_meta.isCompositeKey()) {
-				Object _pkFieldValue = ClassUtils.wrapper(id).getValue(_pkField);
+				Object _pkFieldValue = ClassUtils.wrapper(id).getValue(_meta.getClassAttributeMap().get(_pkField));
 				// 仅处理主键值不为NULL的字段
 				if (_pkFieldValue != null) {
 					_opt.addParameter(_pkFieldValue);
@@ -331,7 +331,7 @@ public class EntitySupport {
 				if (_wrapperId == null) {
 					_wrapperId = ClassUtils.wrapper(_wrapperEntity.getValue("id"));
 				}
-				Object _pkFieldValue = _wrapperId.getValue( _pkField);
+				Object _pkFieldValue = _wrapperId.getValue( _meta.getClassAttributeMap().get(_pkField));
 				// 仅处理主键值不为NULL的字段
 				if (_pkFieldValue != null) {
 					_update.addParameter(_pkFieldValue);
@@ -394,7 +394,7 @@ public class EntitySupport {
 					if (_wrapperId == null) {
 						_wrapperId = ClassUtils.wrapper(_wrapperEntity.getValue("id"));
 					}
-					Object _pkFieldValue = _wrapperId.getValue( _pkField);
+					Object _pkFieldValue = _wrapperId.getValue( _meta.getClassAttributeMap().get(_pkField));
 					// 仅处理主键值不为NULL的字段
 					if (_pkFieldValue != null) {
 						_batchParam.addParameter(_pkFieldValue);
@@ -452,7 +452,7 @@ public class EntitySupport {
                     if (_wrapperId == null) {
                         _wrapperId = ClassUtils.wrapper(_idObj);
                     }
-					Object _pkFieldValue = _wrapperId.getValue( _pkField);
+					Object _pkFieldValue = _wrapperId.getValue( _meta.getClassAttributeMap().get(_pkField));
 					// 仅处理主键值不为NULL的字段
 					if (_pkFieldValue != null) {
 						_batchParam.addParameter(_pkFieldValue);
@@ -497,7 +497,7 @@ public class EntitySupport {
 				if (_wrapperId == null) {
 					_wrapperId = ClassUtils.wrapper(id);
 				}
-				Object _pkFieldValue = _wrapperId.getValue( _pkField);
+				Object _pkFieldValue = _wrapperId.getValue( _meta.getClassAttributeMap().get(_pkField));
 				// 仅处理主键值不为NULL的字段
 				if (_pkFieldValue != null) {
 					_update.addParameter(_pkFieldValue);
