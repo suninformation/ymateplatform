@@ -7,6 +7,7 @@
  */
 package net.ymate.platform.commons.util;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -188,6 +189,13 @@ public class DateTimeUtils {
 			pattern = "yyyy-MM-dd HH:mm:ss.SSS";
 		}
 		return getSimpleDateFormat(pattern, timeoffset).format(new Date(time));
+	}
+
+	public static Date parseDateTime(String dateTime, String pattern) throws ParseException {
+		if (StringUtils.isBlank(pattern)) {
+			pattern = "yyyy-MM-dd HH:mm:ss";
+		}
+		return getSimpleDateFormat(pattern, timeOffset).parse(dateTime);
 	}
 
 }
