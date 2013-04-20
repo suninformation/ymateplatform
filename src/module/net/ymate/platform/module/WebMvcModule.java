@@ -67,6 +67,7 @@ public class WebMvcModule implements IModule {
 		IWebMultipartHandler _multipartHandler = ClassUtils.impl(moduleCfgs.get("base.multipart_handler_class"), IWebMultipartHandler.class, WebMvcModule.class);
 		//
 		Locale _locale = MVC.localeFromStr(moduleCfgs.get("base.locale"), null);
+		boolean _i18n = new BlurObject(StringUtils.defaultIfEmpty(moduleCfgs.get("base.i18n"), "false")).toBooleanValue();
 		String _charsetEncoding = StringUtils.defaultIfEmpty(moduleCfgs.get("base.charset_encoding"), "UTF-8");
 		//
 		List<Class<IFilter>> _extraFilters = new ArrayList<Class<IFilter>>();
@@ -99,7 +100,7 @@ public class WebMvcModule implements IModule {
 //			}
 		}
 		//
-		WebMvcConfig _config = new WebMvcConfig(_eventHandler, _extraParser, _errorHandler, _locale, _charsetEncoding, _pluginHome,  _extendParams, StringUtils.split(moduleCfgs.get("base.controller_packages"), '|'));
+		WebMvcConfig _config = new WebMvcConfig(_eventHandler, _extraParser, _errorHandler, _locale, _i18n, _charsetEncoding, _pluginHome,  _extendParams, StringUtils.split(moduleCfgs.get("base.controller_packages"), '|'));
 		//
 		_config.setMultipartHandlerClassImpl(_multipartHandler);
 		_config.setRestfulModel(new BlurObject(StringUtils.defaultIfEmpty(moduleCfgs.get("base.restful_model"), "false")).toBooleanValue());

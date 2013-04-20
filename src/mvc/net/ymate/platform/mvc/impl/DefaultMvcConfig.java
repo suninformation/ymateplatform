@@ -51,6 +51,8 @@ public class DefaultMvcConfig implements IMvcConfig {
 
 	private Locale __locale;
 
+	private boolean __i18n;
+
 	private String __charsetEncoding;
 
 	private IPluginExtraParser __extraParser;
@@ -65,6 +67,7 @@ public class DefaultMvcConfig implements IMvcConfig {
 	 * @param extraParser
 	 * @param errorHandler
 	 * @param locale
+	 * @param isI18n
 	 * @param charsetEncoding
 	 * @param pluginHome
 	 * @param extendParams
@@ -72,11 +75,12 @@ public class DefaultMvcConfig implements IMvcConfig {
 	 */
 	public DefaultMvcConfig(IEventHandler handler,
 			IPluginExtraParser extraParser, IErrorHandler errorHandler,
-			Locale locale, String charsetEncoding, String pluginHome, Map<String, String> extendParams, String[] controllerPackages) {
+			Locale locale, boolean i18n, String charsetEncoding, String pluginHome, Map<String, String> extendParams, String[] controllerPackages) {
 		this.__eventHandler = handler;
 		this.__extraParser = extraParser;
 		this.__errorHandler = errorHandler;
 		this.__locale = locale;
+		this.__i18n = i18n;
 		this.__charsetEncoding = charsetEncoding;
 		if (extendParams != null && !extendParams.isEmpty()) {
 			this.__extendParams.putAll(extendParams);
@@ -111,6 +115,13 @@ public class DefaultMvcConfig implements IMvcConfig {
 	 */
 	public Locale getLocale() {
 		return __locale;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.mvc.IMvcConfig#isI18n()
+	 */
+	public boolean isI18n() {
+		return __i18n;
 	}
 
 	/* (non-Javadoc)

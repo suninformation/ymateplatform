@@ -9,6 +9,7 @@ package net.ymate.platform.mvc;
 
 import java.util.Locale;
 
+import net.ymate.platform.commons.i18n.I18N;
 import net.ymate.platform.mvc.context.IRequestContext;
 import net.ymate.platform.mvc.impl.DefaultRequestProcessor;
 import net.ymate.platform.mvc.support.RequestExecutor;
@@ -71,6 +72,10 @@ public abstract class MVC {
 			//
 			__PLUGIN_FACTORY = Plugins.createPluginFactory(new DefaultPluginConfig(__MVC_CONFIG.getPluginExtraParser(), __MVC_CONFIG.getPluginHome()));
 			__IS_INITED = true;
+			if (__MVC_CONFIG.isI18n()) {
+				// 初始化国际化资源管理器
+				I18N.initialize(__MVC_CONFIG.getLocale());
+			}
 			//
 			if (__MVC_CONFIG.getEventHandlerClassImpl() != null) {
 				__MVC_CONFIG.getEventHandlerClassImpl().onInitialized();
@@ -83,6 +88,9 @@ public abstract class MVC {
 			__PLUGIN_FACTORY.destroy();
 			__META_PROCESSOR.destroy();
 			__IS_INITED = false;
+			if (__MVC_CONFIG.isI18n()) {
+				I18N.destroy();
+			}
 		}
 	}
 

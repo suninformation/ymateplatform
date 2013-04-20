@@ -56,10 +56,6 @@ public class YMP {
 		if (!IS_INITED) {
 			Properties _configs = new Properties();
 			InputStream _in = YMP.class.getClassLoader().getResourceAsStream("ymp-conf.properties");
-			if (_in == null) {
-				System.err.println("[警告：未找到框架配置文件ymp-conf.properties，尝试加载默认配置]");
-				_in = YMP.class.getClassLoader().getResourceAsStream("META-INF/ymp-default-conf.properties");
-			}
 			if (_in != null) {
 				try {
 					_configs.load(_in);

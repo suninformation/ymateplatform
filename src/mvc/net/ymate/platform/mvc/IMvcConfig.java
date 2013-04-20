@@ -56,6 +56,11 @@ public interface IMvcConfig {
 	public Locale getLocale();
 
 	/**
+	 * @return 是否开启国际化支持，默认false
+	 */
+	public boolean isI18n();
+
+	/**
 	 * @return 返回默认编码字符集
 	 */
 	public String getCharsetEncoding();

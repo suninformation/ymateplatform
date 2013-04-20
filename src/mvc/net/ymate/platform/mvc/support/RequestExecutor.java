@@ -7,8 +7,19 @@
  */
 package net.ymate.platform.mvc.support;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import net.ymate.platform.commons.lang.PairObject;
 import net.ymate.platform.mvc.filter.IFilterChain;
 import net.ymate.platform.mvc.view.IView;
+import net.ymate.platform.mvc.web.WebMVC;
+import net.ymate.platform.validation.ValidateResult;
+import net.ymate.platform.validation.Validates;
+import net.ymate.platform.validation.ValidationException;
+import net.ymate.platform.validation.annotation.ValidateRule;
+import net.ymate.platform.validation.annotation.Validation;
 
 /**
  * <p>
@@ -40,13 +51,22 @@ public class RequestExecutor {
 	protected final IFilterChain chain;
 
 	/**
+	 * 当前方法包含的参数验证规则配置
+	 */
+	protected PairObject<Validation, Map<String, ValidateRule[]>> validateRuleConf;
+	
+	/**
+	 * 所有子类若想正确使用参数验证特性，必须在处理请求参数时将参数名与值手工添加到此映射中，映射中的值对象种类有：null与String、String[]和IUploadFileWrapper、IUploadFileWrapper[]
+	 */
+	protected Map<String, Object> validateFieldValues = new HashMap<String, Object>();
+
+	/**
 	 * 构造器
 	 * 
 	 * @param meta MVC请求元数据描述对象
 	 */
 	public RequestExecutor(RequestMeta meta) {
-		this.requestMeta = meta;
-		this.chain = null;
+		this(meta, null);
 	}
 
 	/**
@@ -58,6 +78,7 @@ public class RequestExecutor {
 	public RequestExecutor(RequestMeta meta, IFilterChain chain) {
 		this.requestMeta = meta;
 		this.chain = chain;
+		validateRuleConf = Validates.loadValidateRule(meta.getMethod(), meta.getMethodParamNames());
 	}
 
 	/**
@@ -86,10 +107,35 @@ public class RequestExecutor {
 			_view = chain.doChain(this.requestMeta);
 		}
 		if (_view == null) {
-			Object _result = this.requestMeta.getMethod().invoke(this.requestMeta.getTarget(), this.getMethodParams());
-			_view = this.processMethodResultToView(_result);
+			try {
+				Object[] _params = this.getMethodParams();
+				if (hasValidation()) {
+					Set<ValidateResult> _results = Validates.execute(validateRuleConf.getKey(), validateRuleConf.getValue(), validateFieldValues);
+					if (!_results.isEmpty()) {
+						if (WebMVC.getConfig().getErrorHandlerClassImpl() != null) {
+							_view = WebMVC.getConfig().getErrorHandlerClassImpl().onValidation(_results);
+						}
+						if (_view == null) {
+							throw new ValidationException(_results.toString());
+						}
+					}
+				}
+				if (_view == null) {
+					Object _result = this.requestMeta.getMethod().invoke(this.requestMeta.getTarget(), _params);
+					_view = this.processMethodResultToView(_result);
+				}
+			} finally {
+				validateFieldValues.clear();
+			}
 		}
 		return _view;
+	}
+
+	/**
+	 * @return 判断当前方法是否包含参数验证注解
+	 */
+	protected boolean hasValidation() {
+		return validateRuleConf.getKey() != null;
 	}
 
 }

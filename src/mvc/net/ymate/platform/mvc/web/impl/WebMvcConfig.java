@@ -68,6 +68,7 @@ public class WebMvcConfig extends DefaultMvcConfig implements IWebMvcConfig {
 	 * @param extraParser
 	 * @param errorHandler
 	 * @param locale
+	 * @param i18n
 	 * @param charsetEncoding
 	 * @param pluginHome
 	 * @param extendParams
@@ -75,8 +76,8 @@ public class WebMvcConfig extends DefaultMvcConfig implements IWebMvcConfig {
 	 */
 	public WebMvcConfig(IWebEventHandler handler,
 			IPluginExtraParser extraParser, IWebErrorHandler errorHandler,
-			Locale locale, String charsetEncoding, String pluginHome, Map<String, String> extendParams, String[] controllerPackages) {
-		super(handler, extraParser, errorHandler, locale, charsetEncoding, pluginHome, extendParams, controllerPackages);
+			Locale locale, boolean i18n, String charsetEncoding, String pluginHome, Map<String, String> extendParams, String[] controllerPackages) {
+		super(handler, extraParser, errorHandler, locale, i18n, charsetEncoding, pluginHome, extendParams, controllerPackages);
 	}
 
 	/* (non-Javadoc)

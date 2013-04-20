@@ -33,9 +33,7 @@
 		</manifest>
 		<jar destfile="${DIST_DIR}/ymate-platform-${version.num}.jar" manifest="MANIFEST.MF">
 			<fileset dir="bin">
-				<!--
-				<exclude name="**/*.properties"/>
-				-->
+				<exclude name="**/ymp-*.properties"/>
 				<exclude name="**/*.html"/>
 				<exclude name="**/*.xml"/>
 			</fileset>

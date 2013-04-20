@@ -7,6 +7,15 @@
  */
 package net.ymate.platform.mvc.web;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Locale;
+
+import net.ymate.platform.commons.i18n.I18N;
+import net.ymate.platform.commons.i18n.II18NEventHandler;
+import net.ymate.platform.configuration.Cfgs;
 import net.ymate.platform.mvc.MVC;
 import net.ymate.platform.mvc.web.impl.WebRequestProcessor;
 
@@ -46,6 +55,33 @@ public class WebMVC extends MVC {
 	 */
 	public static void initialize(IWebMvcConfig config) {
 		__doInitialize(config, new WebRequestProcessor());
+		if (config.isI18n()) {
+			I18N.setEventHandler(new II18NEventHandler() {
+
+				@Override
+				public Locale loadCurrentLocale() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+
+				@Override
+				public void onLocaleChanged(Locale locale) {
+					// TODO Auto-generated method stub
+				}
+
+				@Override
+				public InputStream onLoadProperties(String resourceName) throws IOException {
+					if (Cfgs.isInited()) {
+						File _resourcefile = Cfgs.search("i18n/" + resourceName);
+						if (_resourcefile != null) {
+							return new FileInputStream(_resourcefile);
+						}
+					}
+					return null;
+				}
+
+			});
+		}
 	}
 
 	/**

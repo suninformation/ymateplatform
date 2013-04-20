@@ -61,6 +61,7 @@ import org.apache.commons.lang.StringUtils;
  */
 public class HttpRequestExecutor extends RequestExecutor {
 
+
 	/**
 	 * 构造器
 	 * 
@@ -83,27 +84,31 @@ public class HttpRequestExecutor extends RequestExecutor {
 	protected Object parseCookieValueAnnotation(String paramName, String defaultValue, boolean required, Class<?> type, String defaultParamName) {
 		String _paramName = StringUtils.defaultIfEmpty(paramName, defaultParamName);
 		String _value = StringUtils.defaultIfEmpty(CookieHelper.create().getCookie(_paramName).toStringValue(), defaultValue);
-		if (required && StringUtils.isBlank(_value)) {
+		// 若方法存在参数验证注解则放弃此项
+		if (!hasValidation() && required && StringUtils.isBlank(_value)) {
 			throw new NullPointerException("方法参数" + _paramName + "值为空");
 		}
+		validateFieldValues.put(_paramName, _value);
 		return new BlurObject(_value).toObjectValue(type);
 	}
 
 	protected Object parsePathVariableAnnotation(String paramName, String defaultValue, boolean required, Class<?> type, String defaultParamName) {
 		String _paramName = StringUtils.defaultIfEmpty(paramName, defaultParamName);
 		String _value = StringUtils.defaultIfEmpty((String) WebContext.getContext().get(_paramName), defaultValue);
-		if (required && StringUtils.isBlank(_value)) {
+		if (!hasValidation() && required && StringUtils.isBlank(_value)) {
 			throw new NullPointerException("方法参数" + _paramName + "值为空");
 		}
+		validateFieldValues.put(_paramName, _value);
 		return new BlurObject(_value).toObjectValue(type);
 	}
 
 	protected Object parseRequestHeaderAnnotation(String paramName, String defaultValue, boolean required, Class<?> type, String defaultParamName) {
 		String _paramName = StringUtils.defaultIfEmpty(paramName, defaultParamName);
 		String _value = StringUtils.defaultIfEmpty(WebContext.getRequest().getHeader(_paramName), defaultValue);
-		if (required && StringUtils.isBlank(_value)) {
+		if (!hasValidation() && required && StringUtils.isBlank(_value)) {
 			throw new NullPointerException("方法参数" + _paramName + "值为空");
 		}
+		validateFieldValues.put(_paramName, _value);
 		return new BlurObject(_value).toObjectValue(type);
 	}
 
@@ -112,8 +117,11 @@ public class HttpRequestExecutor extends RequestExecutor {
 		if (type.isArray()) {
 			if (type.equals(IUploadFileWrapper[].class)) {
 				if (WebContext.getRequest() instanceof MultipartRequestWrapper) {
+					IUploadFileWrapper[] _value = ((MultipartRequestWrapper) WebContext.getRequest()).getFiles(_paramName);
+					validateFieldValues.put(_paramName, _value);
 					return ((MultipartRequestWrapper) WebContext.getRequest()).getFiles(_paramName);
 				}
+				validateFieldValues.put(_paramName, null);
 				return null;
 			}
 			String[] _values = (String[]) WebContext.getRequest().getParameterMap().get(_paramName);
@@ -126,21 +134,27 @@ public class HttpRequestExecutor extends RequestExecutor {
 				for (int _tempIdx = 0; _tempIdx < _values.length; _tempIdx++) {
 					_tempParams[_tempIdx] = new BlurObject(_values[_tempIdx]).toObjectValue(_arrayClassType);
 				}
+				validateFieldValues.put(_paramName, _tempParams);
 				return _tempParams;
-			} else if (required) {
+			} else if (!hasValidation() && required) {
 				throw new NullPointerException("方法参数" + _paramName + "值为空");
 			}
-		}
-		if (type.equals(IUploadFileWrapper.class)) {
+			validateFieldValues.put(_paramName, null);
+			return null;
+		} else if (type.equals(IUploadFileWrapper.class)) {
 			if (WebContext.getRequest() instanceof MultipartRequestWrapper) {
-				return ((MultipartRequestWrapper) WebContext.getRequest()).getFile(_paramName);
+				IUploadFileWrapper _value = ((MultipartRequestWrapper) WebContext.getRequest()).getFile(_paramName);
+				validateFieldValues.put(_paramName, _value);
+				return _value;
 			}
+			validateFieldValues.put(_paramName, null);
 			return null;
 		}
 		String _value = StringUtils.defaultIfEmpty(WebContext.getRequest().getParameter(_paramName), defaultValue);
-		if (required && StringUtils.isBlank(_value)) {
+		if (!hasValidation() && required && StringUtils.isBlank(_value)) {
 			throw new NullPointerException("方法参数" + _paramName + "值为空");
 		}
+		validateFieldValues.put(_paramName, _value);
 		return new BlurObject(_value).toObjectValue(type);
 	}
 
@@ -151,19 +165,23 @@ public class HttpRequestExecutor extends RequestExecutor {
 			for (Annotation _annotation : _fieldAnnotations) {
 				if (_annotation instanceof CookieValue) {
 					CookieValue _anno = (CookieValue) _annotation;
-					_wrapper.setValue(_fName, this.parseCookieValueAnnotation(_anno.value(), _anno.defaultValue(), _anno.required(), _wrapper.getFieldType(_fName), _fName));
+					Object _value = this.parseCookieValueAnnotation(_anno.value(), _anno.defaultValue(), _anno.required(), _wrapper.getFieldType(_fName), _fName);
+					_wrapper.setValue(_fName, _value);
 					break;
 				} else if (_annotation instanceof PathVariable) {
 					PathVariable _anno = (PathVariable) _annotation;
-					_wrapper.setValue(_fName, this.parsePathVariableAnnotation(_anno.value(), _anno.defaultValue(), _anno.required(), _wrapper.getFieldType(_fName), _fName));
+					Object _value = this.parsePathVariableAnnotation(_anno.value(), _anno.defaultValue(), _anno.required(), _wrapper.getFieldType(_fName), _fName);
+					_wrapper.setValue(_fName, _value);
 					break;
 				} else if (_annotation instanceof RequestHeader) {
 					RequestHeader _anno = (RequestHeader) _annotation;
-					_wrapper.setValue(_fName, this.parseRequestHeaderAnnotation(_anno.value(), _anno.defaultValue(), _anno.required(), _wrapper.getFieldType(_fName), _fName));
+					Object _value = this.parseRequestHeaderAnnotation(_anno.value(), _anno.defaultValue(), _anno.required(), _wrapper.getFieldType(_fName), _fName);
+					_wrapper.setValue(_fName, _value);
 					break;
 				} else if (_annotation instanceof RequestParam) {
 					RequestParam _anno = (RequestParam) _annotation;
-					_wrapper.setValue(_fName, this.parseRequestParamAnnotation(_anno.prefix(), _anno.value(), _anno.defaultValue(), _anno.required(), _wrapper.getFieldType(_fName), _fName));
+					Object _value = this.parseRequestParamAnnotation(_anno.prefix(), _anno.value(), _anno.defaultValue(), _anno.required(), _wrapper.getFieldType(_fName), _fName);
+					_wrapper.setValue(_fName, _value);
 					break;
 				} else if (_annotation instanceof ModelBind) {
 					_wrapper.setValue(_fName, this.parseModelBindAnnotation(_wrapper.getFieldType(_fName)));
@@ -186,19 +204,19 @@ public class HttpRequestExecutor extends RequestExecutor {
 				Annotation[] _annotations = _paramAnnotations[_idx];
 				for (Annotation _annotation : _annotations) {
 					if (_annotation instanceof CookieValue) {
-						CookieValue _anno = (CookieValue) _annotations[0];
+						CookieValue _anno = (CookieValue) _annotation;
 						_params[_idx] = this.parseCookieValueAnnotation(_anno.value(), _anno.defaultValue(), _anno.required(), _paramTypes[_idx], this.requestMeta.getMethodParamNames()[_idx]);
 						break;
 					} else if (_annotation instanceof PathVariable) {
-						PathVariable _anno = (PathVariable) _annotations[0];
+						PathVariable _anno = (PathVariable) _annotation;
 						_params[_idx] = this.parsePathVariableAnnotation(_anno.value(), _anno.defaultValue(), _anno.required(), _paramTypes[_idx], this.requestMeta.getMethodParamNames()[_idx]);
 						break;
 					} else if (_annotation instanceof RequestHeader) {
-						RequestHeader _anno = (RequestHeader) _annotations[0];
+						RequestHeader _anno = (RequestHeader) _annotation;
 						_params[_idx] = this.parseRequestHeaderAnnotation(_anno.value(), _anno.defaultValue(), _anno.required(), _paramTypes[_idx], this.requestMeta.getMethodParamNames()[_idx]);
 						break;
 					} else if (_annotation instanceof RequestParam) {
-						RequestParam _anno = (RequestParam) _annotations[0];
+						RequestParam _anno = (RequestParam) _annotation;
 						_params[_idx] = this.parseRequestParamAnnotation(_anno.prefix(), _anno.value(), _anno.defaultValue(), _anno.required(), _paramTypes[_idx], this.requestMeta.getMethodParamNames()[_idx]);
 						break;
 					} else if (_annotation instanceof ModelBind) {

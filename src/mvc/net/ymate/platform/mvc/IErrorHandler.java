@@ -7,6 +7,11 @@
  */
 package net.ymate.platform.mvc;
 
+import java.util.Set;
+
+import net.ymate.platform.mvc.view.IView;
+import net.ymate.platform.validation.ValidateResult;
+
 /**
  * <p>
  * IErrorHandler
@@ -39,5 +44,11 @@ public interface IErrorHandler {
 	 * @param e
 	 */
 	public void onError(Throwable e);
+
+	/**
+	 * @param results 验证器执行结果集合
+	 * @return 处理结果数据并返回视图对象，若返回null则由框架默认处理
+	 */
+	public IView onValidation(Set<ValidateResult> results);
 
 }
