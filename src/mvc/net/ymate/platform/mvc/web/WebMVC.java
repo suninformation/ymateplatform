@@ -15,9 +15,12 @@ import java.util.Locale;
 
 import net.ymate.platform.commons.i18n.I18N;
 import net.ymate.platform.commons.i18n.II18NEventHandler;
+import net.ymate.platform.commons.lang.BlurObject;
 import net.ymate.platform.configuration.Cfgs;
 import net.ymate.platform.mvc.MVC;
+import net.ymate.platform.mvc.web.context.WebContext;
 import net.ymate.platform.mvc.web.impl.WebRequestProcessor;
+import net.ymate.platform.mvc.web.support.CookieHelper;
 
 
 
@@ -60,13 +63,25 @@ public class WebMVC extends MVC {
 
 				@Override
 				public Locale loadCurrentLocale() {
-					// TODO Auto-generated method stub
-					return null;
+					// 先尝试取URL参数变量
+					String _langStr = (String) WebContext.getContext().get("lang");
+					if (_langStr == null) {
+						// 再尝试从请求参数中获取
+						_langStr = WebContext.getRequest().getParameter("lang");
+						if (_langStr == null) {
+							// 最后一次机会，尝试读取Cookies
+							BlurObject _langCookie = CookieHelper.create().getCookie("lang");
+							if (_langCookie != null) {
+								_langStr = _langCookie.toStringValue();
+							}
+						}
+					}
+					return MVC.localeFromStr(_langStr, MVC.getConfig().getLocale());
 				}
 
 				@Override
 				public void onLocaleChanged(Locale locale) {
-					// TODO Auto-generated method stub
+					CookieHelper.create().setCookie("lang", locale.toString());
 				}
 
 				@Override
