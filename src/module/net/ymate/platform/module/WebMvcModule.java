@@ -16,8 +16,10 @@ import java.util.Map;
 
 import net.ymate.platform.commons.lang.BlurObject;
 import net.ymate.platform.commons.util.ClassUtils;
+import net.ymate.platform.commons.util.ExpressionUtils;
 import net.ymate.platform.commons.util.ResourceUtils;
 import net.ymate.platform.commons.util.RuntimeUtils;
+import net.ymate.platform.configuration.Cfgs;
 import net.ymate.platform.module.base.IModule;
 import net.ymate.platform.mvc.MVC;
 import net.ymate.platform.mvc.filter.IFilter;
@@ -86,18 +88,19 @@ public class WebMvcModule implements IModule {
 		}
 		//
 		String _pluginHome = moduleCfgs.get("base.plugin_home");
-		if (StringUtils.isNotBlank(_pluginHome) && _pluginHome.startsWith("/WEB-INF/")) {
-			File _pluginHomeFile = new File(RuntimeUtils.getRootPath(), StringUtils.substringAfter(_pluginHome, "/WEB-INF/"));
-			if (_pluginHomeFile.exists() && _pluginHomeFile.isDirectory()) {
-				_pluginHome = _pluginHomeFile.getPath();
+		if (StringUtils.isNotBlank(_pluginHome)) {
+			if (_pluginHome.startsWith("/WEB-INF/")) {
+				File _pluginHomeFile = new File(RuntimeUtils.getRootPath(), StringUtils.substringAfter(_pluginHome, "/WEB-INF/"));
+				if (_pluginHomeFile.exists() && _pluginHomeFile.isDirectory()) {
+					_pluginHome = _pluginHomeFile.getPath();
+				}
+			} else if (_pluginHome.contains("${user.dir}")) {
+				if (Cfgs.isInited()) {
+					_pluginHome = ExpressionUtils.bind(_pluginHome).set("user.dir", Cfgs.getUserDir()).getResult();
+				} else {
+					_pluginHome = ExpressionUtils.bind(_pluginHome).set("user.dir", RuntimeUtils.getRootPath()).getResult();
+				}
 			}
-//			以下代码在百度的BAE中执行会抛出权限访问异常，反正也没必要就注掉吧
-//			if (_pluginHomeFile.exists() && _pluginHomeFile.isDirectory() && _pluginHomeFile.canRead()) {
-//				if (_pluginHomeFile.canWrite()) {
-//					FileUtils.fixAndMkDir(_pluginHomeFile.getPath() + "/.plugin");
-//				}
-//				_pluginHome = _pluginHomeFile.getPath();
-//			}
 		}
 		//
 		WebMvcConfig _config = new WebMvcConfig(_eventHandler, _extraParser, _errorHandler, _locale, _i18n, _charsetEncoding, _pluginHome,  _extendParams, StringUtils.split(moduleCfgs.get("base.controller_packages"), '|'));

@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 
+import org.apache.commons.lang.StringUtils;
+
 import net.ymate.platform.commons.i18n.I18N;
 import net.ymate.platform.commons.i18n.II18NEventHandler;
 import net.ymate.platform.commons.lang.BlurObject;
@@ -59,18 +61,19 @@ public class WebMVC extends MVC {
 	public static void initialize(IWebMvcConfig config) {
 		__doInitialize(config, new WebRequestProcessor());
 		if (config.isI18n()) {
+			final String _localKey = StringUtils.defaultIfEmpty(config.getExtendParams().get("i18n_language_key"), "lang");
 			I18N.setEventHandler(new II18NEventHandler() {
 
 				@Override
 				public Locale loadCurrentLocale() {
 					// 先尝试取URL参数变量
-					String _langStr = (String) WebContext.getContext().get("lang");
+					String _langStr = (String) WebContext.getContext().get(_localKey);
 					if (_langStr == null) {
 						// 再尝试从请求参数中获取
-						_langStr = WebContext.getRequest().getParameter("lang");
+						_langStr = WebContext.getRequest().getParameter(_localKey);
 						if (_langStr == null) {
 							// 最后一次机会，尝试读取Cookies
-							BlurObject _langCookie = CookieHelper.create().getCookie("lang");
+							BlurObject _langCookie = CookieHelper.create().getCookie(_localKey);
 							if (_langCookie != null) {
 								_langStr = _langCookie.toStringValue();
 							}
@@ -81,7 +84,7 @@ public class WebMVC extends MVC {
 
 				@Override
 				public void onLocaleChanged(Locale locale) {
-					CookieHelper.create().setCookie("lang", locale.toString());
+					CookieHelper.create().setCookie(_localKey, locale.toString());
 				}
 
 				@Override
