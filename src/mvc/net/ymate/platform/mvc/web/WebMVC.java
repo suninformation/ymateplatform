@@ -64,7 +64,6 @@ public class WebMVC extends MVC {
 			final String _localKey = StringUtils.defaultIfEmpty(config.getExtendParams().get("i18n_language_key"), "lang");
 			I18N.setEventHandler(new II18NEventHandler() {
 
-				@Override
 				public Locale loadCurrentLocale() {
 					// 先尝试取URL参数变量
 					String _langStr = (String) WebContext.getContext().get(_localKey);
@@ -82,12 +81,10 @@ public class WebMVC extends MVC {
 					return MVC.localeFromStr(_langStr, MVC.getConfig().getLocale());
 				}
 
-				@Override
 				public void onLocaleChanged(Locale locale) {
 					CookieHelper.create().setCookie(_localKey, locale.toString());
 				}
 
-				@Override
 				public InputStream onLoadProperties(String resourceName) throws IOException {
 					if (Cfgs.isInited()) {
 						File _resourcefile = Cfgs.search("i18n/" + resourceName);

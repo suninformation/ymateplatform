@@ -156,32 +156,26 @@ public class Validates {
 					if (_validator != null) {
 						String _result = _validator.validate(new IValidateContext() {
 	
-							@Override
 							public String getFieldName() {
 								return _fieldName;
 							}
 	
-							@Override
 							public Object getFieldValue() {
 								return fieldValues.get(_fieldName);
 							}
 	
-							@Override
 							public String[] getParams() {
 								return _rule.params();
 							}
 	
-							@Override
 							public Object getFieldValue(String fieldName) {
 								return fieldValues.get(fieldName);
 							}
 	
-							@Override
 							public boolean isI18n() {
 								return I18N.isInited();
 							}
 	
-							@Override
 							public String getMessage() {
 								return _rule.message();
 							}

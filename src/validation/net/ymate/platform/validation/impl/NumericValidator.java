@@ -46,7 +46,6 @@ public class NumericValidator extends AbstractValidator {
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.validation.IValidator#getName()
 	 */
-	@Override
 	public String getName() {
 		return NAME;
 	}

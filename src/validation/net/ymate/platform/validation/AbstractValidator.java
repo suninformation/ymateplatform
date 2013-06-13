@@ -100,7 +100,6 @@ public abstract class AbstractValidator implements IValidator {
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.validation.IValidator#validate(net.ymate.platform.validation.IValidateContext)
 	 */
-	@Override
 	public String validate(IValidateContext context) {
 		if (context.getFieldValue() != null) {
 			if (context.getFieldValue().getClass().isArray()) {

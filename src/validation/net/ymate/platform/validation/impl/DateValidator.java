@@ -47,7 +47,6 @@ public class DateValidator extends AbstractValidator {
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.validation.IValidator#getName()
 	 */
-	@Override
 	public String getName() {
 		return NAME;
 	}
