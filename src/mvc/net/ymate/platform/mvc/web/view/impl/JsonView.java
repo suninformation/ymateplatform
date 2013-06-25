@@ -48,6 +48,7 @@ public class JsonView extends AbstractWebView {
 
 	protected Object jsonObj;
 	protected boolean withJsonContent;
+	protected String jsonpCallback;
 
 	/**
 	 * 构造器
@@ -88,6 +89,15 @@ public class JsonView extends AbstractWebView {
 		return this;
 	}
 
+	/**
+	 * @param callback 回调方法名称
+	 * @return 设置并采用JSONP方式输出，回调方法名称由参数callback指定，若callback参数无效则不启用
+	 */
+	public JsonView withJsonpCallback(String callback) {
+		this.jsonpCallback = StringUtils.defaultIfEmpty(callback, null);
+		return this;
+	}
+
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.mvc.web.view.AbstractWebView#renderView()
 	 */
@@ -98,7 +108,11 @@ public class JsonView extends AbstractWebView {
 		} else if (withJsonContent) {
 			response.setContentType(JSON_CONTENT_TYPE);
 		}
-		IOUtils.write(jsonObj.toString(), response.getOutputStream());
+		StringBuilder _jsonStr = new StringBuilder(jsonObj.toString());
+		if (this.jsonpCallback != null) {
+			_jsonStr.insert(0, this.jsonpCallback + "(").append(");");
+		}
+		IOUtils.write(_jsonStr.toString(), response.getOutputStream());
 	}
 
 }
