@@ -11,11 +11,10 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import org.apache.commons.lang.StringUtils;
-
 import net.ymate.platform.mvc.view.AbstractView;
 import net.ymate.platform.mvc.web.WebMVC;
 import net.ymate.platform.mvc.web.context.WebContext;
+import net.ymate.platform.mvc.web.support.TemplateHelper;
 
 /**
  * <p>
@@ -87,13 +86,7 @@ public abstract class AbstractWebView extends AbstractView implements IWebView {
 	 * @return 返回修正过的模板基准路径并以'/WEB-INF'开始，以'/'结束
 	 */
 	protected String getBaseViewPath() {
-		String _viewBasePath = StringUtils.trimToNull(WebMVC.getConfig().getViewPath());
-		if (_viewBasePath == null || !_viewBasePath.startsWith("/WEB-INF/")) {
-			_viewBasePath = "/WEB-INF/templates/";
-		} else if (!_viewBasePath.endsWith("/")) {
-			_viewBasePath += "/";
-		}
-		return _viewBasePath;
+		return TemplateHelper.getRootViewPath();
 	}
 
 	/**

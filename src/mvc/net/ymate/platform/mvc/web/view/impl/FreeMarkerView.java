@@ -13,13 +13,13 @@ import java.io.OutputStreamWriter;
 import java.util.Map.Entry;
 
 import net.ymate.platform.mvc.web.context.WebContext;
+import net.ymate.platform.mvc.web.support.TemplateHelper;
 import net.ymate.platform.mvc.web.view.AbstractWebView;
 
 import org.apache.commons.lang.StringUtils;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import freemarker.template.TemplateExceptionHandler;
 
 /**
  * <p>
@@ -46,8 +46,6 @@ import freemarker.template.TemplateExceptionHandler;
  *          </table>
  */
 public class FreeMarkerView extends AbstractWebView {
-
-	public static final String FREEMARKER_CONFIG = "__freemarker_config";
 
 	protected String path;
 
@@ -79,22 +77,12 @@ public class FreeMarkerView extends AbstractWebView {
 	}
 
 	protected Configuration processPath() {
-		Configuration _freemarkerCfg = (Configuration) WebContext.getServletContext().getAttribute(FREEMARKER_CONFIG);
-		if (_freemarkerCfg == null) {
-			_freemarkerCfg = new Configuration();
-			_freemarkerCfg.setDefaultEncoding("UTF-8");
-			_freemarkerCfg.setServletContextForTemplateLoading(WebContext.getServletContext(), this.getBaseViewPath());
-	        _freemarkerCfg.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
-			WebContext.getServletContext().setAttribute(FREEMARKER_CONFIG, _freemarkerCfg);
-		}
-		//
 		if (StringUtils.isNotBlank(getContentType())) {
 			WebContext.getResponse().setContentType(getContentType());
 		}
 		for (Entry<String, Object> entry : getAttributes().entrySet()) {
 			WebContext.getRequest().setAttribute(entry.getKey(), entry.getValue());
 		}
-		//
 		if (StringUtils.isBlank(this.path)) {
 			String _mapping = WebContext.getWebRequestContext().getRequestMapping();
 			if (_mapping.endsWith("/")) {
@@ -109,8 +97,7 @@ public class FreeMarkerView extends AbstractWebView {
 				this.path += ".ftl";
 			}
 		}
-		//
-		return _freemarkerCfg;
+		return TemplateHelper.getFreemarkerConfiguration();
 	}
 
 	/* (non-Javadoc)

@@ -9,8 +9,6 @@ package net.ymate.platform.mvc.web;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -32,6 +30,7 @@ import net.ymate.platform.mvc.web.context.IWebRequestContext;
 import net.ymate.platform.mvc.web.context.WebContext;
 import net.ymate.platform.mvc.web.context.impl.WebRequestContext;
 import net.ymate.platform.mvc.web.support.HttpMethodRequestWrapper;
+import net.ymate.platform.mvc.web.support.TemplateHelper;
 import net.ymate.platform.mvc.web.view.impl.FreeMarkerView;
 import net.ymate.platform.mvc.web.view.impl.HttpStatusView;
 import net.ymate.platform.mvc.web.view.impl.JspView;
@@ -73,11 +72,6 @@ public class DispatcherFilter implements Filter {
 
 	private String methodParam;
 
-	private boolean __useRewrite;
-	
-	private String rewriteUrl;
-	private List<String> rewriteIgnoreSuffixs;
-
 	private String prefix;
 
 	private FilterConfig __filterConfig;
@@ -88,26 +82,15 @@ public class DispatcherFilter implements Filter {
 	 * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
 	 */
 	public void init(FilterConfig filterConfig) throws ServletException {
+		TemplateHelper.initialize(filterConfig.getServletContext());
 		__filterConfig = filterConfig;
 		String _regx = StringUtils.defaultIfEmpty(__filterConfig.getInitParameter("ignore"), IGNORE);
         if (!"false".equalsIgnoreCase(_regx)) {
         	ignorePatern = Pattern.compile(_regx, Pattern.CASE_INSENSITIVE);
         }
-        String _rewrite = StringUtils.defaultIfEmpty(__filterConfig.getInitParameter("rewrite"), "false");
-        if (!"false".equalsIgnoreCase(_rewrite)) {
-        	String[] _reParams = StringUtils.split(_rewrite, "^");
-        	rewriteUrl = _reParams[0];
-        	__useRewrite = true;
-        	if (_reParams.length > 1) {
-        		rewriteIgnoreSuffixs = Arrays.asList(StringUtils.split(_reParams[1], "|"));
-        	}
-        	if (rewriteIgnoreSuffixs == null || rewriteIgnoreSuffixs.isEmpty()) {
-        		rewriteIgnoreSuffixs = Arrays.asList(StringUtils.split("jsp|jspx", "|"));
-        	}
-        }
         prefix = StringUtils.defaultIfEmpty(__filterConfig.getInitParameter("prefix"), "");
         methodParam = StringUtils.defaultIfEmpty(__filterConfig.getInitParameter("methodParam"), DEFAULT_METHOD_PARAM);
-        baseViewFilePath = buildViewFilePath();
+        baseViewFilePath = RuntimeUtils.getRootPath() + StringUtils.substringAfter(TemplateHelper.getRootViewPath(), "/WEB-INF/");
 	}
 
 	/* (non-Javadoc)
@@ -178,8 +161,6 @@ public class DispatcherFilter implements Filter {
 					Logs.info("控制器[" + _context.getRequestMapping() + "][" + _httpRequest.getMethod() + "]请求处理完毕，耗时" + _stopWatch.getTime() + "ms");
 				}
 			}
-        } else if (__useRewrite && !rewriteIgnoreSuffixs.contains(_context.getSuffix().toLowerCase()) && !StringUtils.equals(_httpRequest.getServletPath(), rewriteUrl)) {
-        	request.getRequestDispatcher(rewriteUrl + _context.getUrl()).forward(request, response);
         } else {
         	chain.doFilter(request, response);
         }
@@ -194,16 +175,6 @@ public class DispatcherFilter implements Filter {
 			}
 		}
 		return request;
-	}
-
-	protected String buildViewFilePath() {
-		String _viewBasePath = StringUtils.trimToNull(WebMVC.getConfig().getViewPath());
-		if (_viewBasePath == null || !_viewBasePath.startsWith("/WEB-INF/")) {
-			_viewBasePath = "/WEB-INF/templates/";
-		} else if (!_viewBasePath.endsWith("/")) {
-			_viewBasePath += "/";
-		}
-		return RuntimeUtils.getRootPath() + StringUtils.substringAfter(_viewBasePath, "/WEB-INF/");
 	}
 
 	/* (non-Javadoc)
