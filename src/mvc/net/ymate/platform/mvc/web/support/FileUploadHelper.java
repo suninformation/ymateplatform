@@ -125,6 +125,8 @@ public class FileUploadHelper {
 			} else {
 				_form = this.UploadFileAsDiskBased();
 			}
+		} else {
+			_form = new UploadFormWrapper();
 		}
 		return _form;
 	}
