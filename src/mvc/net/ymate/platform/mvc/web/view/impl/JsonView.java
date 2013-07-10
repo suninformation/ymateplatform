@@ -44,10 +44,11 @@ import org.json.JSONObject;
  */
 public class JsonView extends AbstractWebView {
 
-	public static final String JSON_CONTENT_TYPE = "application/json;charset=utf-8";
+	public static final String JSON_CONTENT_TYPE = "application/json";
+	public static final String JAVASCRIPT_CONTENT_TYPE = "text/javascript";
 
 	protected Object jsonObj;
-	protected boolean withJsonContent;
+	protected boolean withContentType;
 	protected String jsonpCallback;
 
 	/**
@@ -82,10 +83,10 @@ public class JsonView extends AbstractWebView {
 	}
 
 	/**
-	 * @return 设置ContentType为"application/json"，默认为空
+	 * @return 设置ContentType为"application/json"或"text/javascript"，默认为空
 	 */
-	public JsonView withJsonContentType() {
-		this.withJsonContent = true;
+	public JsonView withContentType() {
+		this.withContentType = true;
 		return this;
 	}
 
@@ -105,8 +106,12 @@ public class JsonView extends AbstractWebView {
 		HttpServletResponse response = WebContext.getResponse();
 		if (StringUtils.isNotBlank(getContentType())) {
 			response.setContentType(getContentType());
-		} else if (withJsonContent) {
-			response.setContentType(JSON_CONTENT_TYPE);
+		} else if (this.withContentType) {
+			if (this.jsonpCallback != null) {
+				response.setContentType(JSON_CONTENT_TYPE);
+			} else {
+				response.setContentType(JAVASCRIPT_CONTENT_TYPE);
+			}
 		}
 		StringBuilder _jsonStr = new StringBuilder(jsonObj.toString());
 		if (this.jsonpCallback != null) {
