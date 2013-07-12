@@ -7,15 +7,17 @@
  */
 package net.ymate.platform.mvc.web.support;
 
-import javax.servlet.ServletContext;
+import java.io.File;
+import java.io.IOException;
 
+import net.ymate.platform.commons.util.RuntimeUtils;
 import net.ymate.platform.mvc.web.WebMVC;
 
 import org.apache.commons.lang.StringUtils;
 
+import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;
-import freemarker.cache.WebappTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;
 
@@ -45,24 +47,13 @@ import freemarker.template.TemplateExceptionHandler;
  */
 public class TemplateHelper {
 
-	public static final String FREEMARKER_CONFIG = "__freemarker_config";
-
-	private static ServletContext __SERVLET_CONTEXT;
+	private static Configuration __FREEMARKER_CONFIG;
 
 	private static String __ROOT_VIEW_PATH;
 
 	private static String __PLUGIN_VIEW_PATH;
 
 	private static Object __LOCKER = new Object();
-
-	/**
-	 * 模板助手初始化
-	 * 
-	 * @param context Servlet容器上下文对象
-	 */
-	public static void initialize(ServletContext context) {
-		__SERVLET_CONTEXT = context;
-	}
 
 	/**
 	 * @return 模板基准路径并以'/WEB-INF'开始，以'/'结束
@@ -94,23 +85,29 @@ public class TemplateHelper {
 		return __PLUGIN_VIEW_PATH;
 	}
 
+	/**
+	 * @return 获取Freemarker模板引擎配置对象, 若不存在则创建(全局唯一)
+	 */
 	public static Configuration getFreemarkerConfiguration() {
-		Configuration _freemarkerCfg = (Configuration) __SERVLET_CONTEXT.getAttribute(FREEMARKER_CONFIG);
-		if (_freemarkerCfg == null) {
+		if (__FREEMARKER_CONFIG == null) {
 			synchronized (__LOCKER) {
-				_freemarkerCfg = new Configuration();
-				_freemarkerCfg.setDefaultEncoding("UTF-8");
-				_freemarkerCfg.setServletContextForTemplateLoading(__SERVLET_CONTEXT, getRootViewPath());
-		        _freemarkerCfg.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
+				__FREEMARKER_CONFIG = new Configuration();
+				__FREEMARKER_CONFIG.setDefaultEncoding("UTF-8");
+				__FREEMARKER_CONFIG.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
 		        //
-				TemplateLoader[] _tmpLoaders = new TemplateLoader[] {
-						new WebappTemplateLoader(__SERVLET_CONTEXT, getPluginViewPath()),
-						new WebappTemplateLoader(__SERVLET_CONTEXT, getRootViewPath()) };
-		        _freemarkerCfg.setTemplateLoader(new MultiTemplateLoader(_tmpLoaders));
-		        __SERVLET_CONTEXT.setAttribute(FREEMARKER_CONFIG, _freemarkerCfg);
+				TemplateLoader[] _tmpLoaders;
+				try {
+					_tmpLoaders = new TemplateLoader[] {
+							new FileTemplateLoader(new File(RuntimeUtils.getRootPath(), "templates")),
+							new FileTemplateLoader(new File(RuntimeUtils.getRootPath(), "plugins"))
+						};
+				} catch (IOException e) {
+					throw new Error(RuntimeUtils.unwrapThrow(e));
+				}
+				__FREEMARKER_CONFIG.setTemplateLoader(new MultiTemplateLoader(_tmpLoaders));
 			}
 		}
-		return _freemarkerCfg;
+		return __FREEMARKER_CONFIG;
 	}
 
 }

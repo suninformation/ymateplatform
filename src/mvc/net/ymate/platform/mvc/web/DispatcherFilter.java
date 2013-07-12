@@ -82,7 +82,6 @@ public class DispatcherFilter implements Filter {
 	 * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
 	 */
 	public void init(FilterConfig filterConfig) throws ServletException {
-		TemplateHelper.initialize(filterConfig.getServletContext());
 		__filterConfig = filterConfig;
 		String _regx = StringUtils.defaultIfEmpty(__filterConfig.getInitParameter("ignore"), IGNORE);
         if (!"false".equalsIgnoreCase(_regx)) {
