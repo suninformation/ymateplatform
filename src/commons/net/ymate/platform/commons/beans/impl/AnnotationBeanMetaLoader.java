@@ -68,7 +68,6 @@ public class AnnotationBeanMetaLoader<T extends Annotation> extends AbstractBean
 	 */
 	public AnnotationBeanMetaLoader(Class<T> annotationClass, String...packageNames) {
 		this.annotationClass = annotationClass;
-		this.beanMetaList = new ArrayList<IBeanMeta>();
 		if (packageNames != null) {
 			Collection<Class<T>>  _results = ClassUtils.findClassByClazz(annotationClass, Arrays.asList(packageNames), getClass());
 			for (Class<T> _c : _results) {

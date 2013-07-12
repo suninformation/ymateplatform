@@ -7,6 +7,7 @@
  */
 package net.ymate.platform.commons.beans;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,7 +36,7 @@ import java.util.List;
  */
 public abstract class AbstractBeanMetaLoader implements IBeanMetaLoader {
 
-	protected List<IBeanMeta> beanMetaList;
+	protected List<IBeanMeta> beanMetaList = new ArrayList<IBeanMeta>();
 
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.commons.beans.IBeanMetaLoader#loadBeanMetas()
