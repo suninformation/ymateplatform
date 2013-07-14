@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -42,6 +44,8 @@ import org.apache.commons.lang.StringUtils;
  *          </table>
  */
 public class FileUtils {
+
+	private static final Log _LOG = LogFactory.getLog(FileUtils.class);
 
 	public static final Map<String, String> MIME_TYPE_MAPS = new HashMap<String, String>();
 	
@@ -205,7 +209,7 @@ public class FileUtils {
 			}
 			return new URL(filePath);
 		} catch (MalformedURLException e) {
-            // 忽略...
+			_LOG.warn("", RuntimeUtils.unwrapThrow(e));
         }
 		return null;
 	}

@@ -30,6 +30,8 @@ import java.util.jar.JarFile;
 import net.ymate.platform.commons.lang.PairObject;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.esotericsoftware.reflectasm.MethodAccess;
 import com.thoughtworks.paranamer.AdaptiveParanamer;
@@ -60,6 +62,8 @@ import com.thoughtworks.paranamer.AdaptiveParanamer;
  */
 public class ClassUtils {
 
+	private static final Log _LOG = LogFactory.getLog(ClassUtils.class);
+
 	/**
 	 * 在参数packageNames指定的包路径内，查找实现了由clazz指定的接口、注解或抽象类的类对象集合
 	 * 
@@ -83,6 +87,7 @@ public class ClassUtils {
 					} else if (_url.getProtocol().equalsIgnoreCase("jar") || _url.getProtocol().equalsIgnoreCase("zip") || _url.getProtocol().equalsIgnoreCase("wsjar")) {
 						// 暂时不对ZIP格式的文件包支持，直接跳过
 						if (_url.getProtocol().equalsIgnoreCase("zip")) {
+							_LOG.warn("暂时不对ZIP格式的文件包支持，直接跳过");
 							continue;
 						}
 						//
@@ -92,7 +97,7 @@ public class ClassUtils {
 				}
 			}
 		} catch (Exception e) {
-			// 忽略...
+			_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 		}
 		return _returnValue;
 	}
@@ -126,10 +131,10 @@ public class ClassUtils {
 						}
 					}
 				}
-			} catch (NoClassDefFoundError ee) {
-				// 忽略...
+			} catch (NoClassDefFoundError e) {
+				_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 			} catch (ClassNotFoundException e) {
-				// 忽略...
+				_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 			}
 		} else {
 			File[] _tmpfiles = packageFile.listFiles();
@@ -173,10 +178,10 @@ public class ClassUtils {
 								collections.add((Class<T>) _class);
 							}
 						}
-					} catch (NoClassDefFoundError ee) {
-						// 忽略...
+					} catch (NoClassDefFoundError e) {
+						_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 					} catch (ClassNotFoundException e) {
-						// 忽略...
+						_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 					}
 				}
 			}
@@ -201,13 +206,13 @@ public class ClassUtils {
 					try {
 						return (T) implClass.newInstance();
 					} catch (InstantiationException e) {
-						// 忽略...
+						_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 					} catch (IllegalAccessException e) {
-						// 忽略...
+						_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 					}
 				}
-			} catch (ClassNotFoundException e1) {
-				// 忽略...
+			} catch (ClassNotFoundException e) {
+				_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 			}
 		}
 		return null;
@@ -236,11 +241,6 @@ public class ClassUtils {
 			}
 		} while ((clazz != null && clazz != Object.class));
 		return _flag;
-//		Class<?> _super = clazz.getSuperclass();
-//		if (_super == null) {
-//			return false;
-//		}
-//		return _super.equals(superClass);
 	}
 
 	/**
@@ -346,60 +346,6 @@ public class ClassUtils {
 	 * @return 获取方法的参数名
 	 */
 	public static String[] getMethodParamNames(final Method method) {
-//		final String[] _paramNames = new String[method.getParameterTypes().length];
-//		try {
-//			new ClassReader(method.getDeclaringClass().getName()).accept(new ClassVisitor(Opcodes.ASM4, new ClassWriter(ClassWriter.COMPUTE_MAXS)) {
-//
-//				/**
-//				 * @param types
-//				 * @param clazzes
-//				 * @return 比较参数类型是否一致
-//				 */
-//				private boolean sameType(Type[] types, Class<?>[] clazzes) {
-//					if (types.length != clazzes.length) {
-//						return false;
-//					}
-//					for (int i = 0; i < types.length; i++) {
-//						if (!Type.getType(clazzes[i]).equals(types[i])) {
-//							return false;
-//						}
-//					}
-//					return true;
-//				}
-//
-//				/* (non-Javadoc)
-//				 * @see org.objectweb.asm.ClassVisitor#visitMethod(int, java.lang.String, java.lang.String, java.lang.String, java.lang.String[])
-//				 */
-//				public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-//					Type[] args = Type.getArgumentTypes(desc);
-//					if (!name.equals(method.getName()) || !sameType(args, method.getParameterTypes())) {
-//						return super.visitMethod(access, name, desc, signature, exceptions);
-//					}
-//					MethodVisitor v = cv.visitMethod(access, name, desc, signature, exceptions);
-//					return new MethodVisitor(Opcodes.ASM4, v) {
-//
-//						/* (non-Javadoc)
-//						 * @see org.objectweb.asm.MethodVisitor#visitLocalVariable(java.lang.String, java.lang.String, java.lang.String, org.objectweb.asm.Label, org.objectweb.asm.Label, int)
-//						 */
-//						public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
-//							int _paramStartPosition = index - 1;
-//							if (Modifier.isStatic(method.getModifiers())) {
-//								// 静态方法参数位置从1开始，非静态方法，位置0处为"this"
-//								_paramStartPosition = index;
-//							}
-//							if (_paramStartPosition >= 0 && _paramStartPosition < _paramNames.length) {
-//								_paramNames[_paramStartPosition] = name;
-//							}
-//							super.visitLocalVariable(name, desc, signature, start, end, index);
-//						}
-//
-//					};
-//				}
-//			}, 0);
-//		} catch (IOException e) {
-//			// ~~~
-//		}
-//		return _paramNames;
 		return new AdaptiveParanamer().lookupParameterNames(method);
 	}
 
@@ -411,7 +357,7 @@ public class ClassUtils {
 		try {
 			return Class.forName(StringUtils.substringBetween(clazz.getName(), "[L", ";"));
 		} catch (ClassNotFoundException e) {
-			// ~~~
+			_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 		}
 		return null;
 	}
@@ -424,6 +370,7 @@ public class ClassUtils {
 		try {
 			return wrapper(clazz.newInstance());
 		} catch (Exception e) {
+			_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 		}
 		return null;
 	}
@@ -462,14 +409,12 @@ public class ClassUtils {
 	 */
 	public static class ClassBeanWrapper<T> {
 
-//		protected static Map<Class<?>, FieldAccess> __fieldCache = new WeakHashMap<Class<?>, FieldAccess>();
 		protected static Map<Class<?>, MethodAccess> __methodCache = new WeakHashMap<Class<?>, MethodAccess>();
 
 		private T target;
 	
 		private Map<String, Field> _fields;
 
-//		private FieldAccess fieldAccess;
 		private MethodAccess methodAccess;
 
 		/**
@@ -486,11 +431,6 @@ public class ClassUtils {
 				this._fields.put(_field.getName(), _field);
 			}
 			//
-//			this.fieldAccess = __fieldCache.get(target.getClass());
-//			if (this.fieldAccess == null) {
-//				this.fieldAccess = FieldAccess.get(target.getClass());
-//				__fieldCache.put(target.getClass(), this.fieldAccess);
-//			}
 			this.methodAccess = __methodCache.get(target.getClass());
 			if (this.methodAccess == null) {
 				this.methodAccess = MethodAccess.get(target.getClass());

@@ -14,7 +14,6 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.ymate.platform.commons.logger.Logs;
 import net.ymate.platform.commons.util.RuntimeUtils;
 import net.ymate.platform.persistence.jdbc.IConnectionHolder;
 import net.ymate.platform.persistence.jdbc.JDBC;
@@ -25,6 +24,8 @@ import net.ymate.platform.persistence.jdbc.base.SqlParameter;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -51,6 +52,8 @@ import org.apache.commons.lang.time.StopWatch;
  *          </table>
  */
 public abstract class AbstractOperator implements IOperator {
+
+	private static final Log _LOG = LogFactory.getLog(AbstractOperator.class);
 
 	/**
 	 * 预执行的SQL语句串
@@ -131,7 +134,7 @@ public abstract class AbstractOperator implements IOperator {
 					_time.stop();
 					this.setExpenseTime(_time.getTime());
 					if (JDBC.isShowSQL) {
-						Logs.debug("执行SQL语句: " + this.getSql() + "，参数：" + __parametersToString() + (_recordSize >= 0 ? "，影响/记录数：" + _recordSize : "") + "， 耗时: " + this.getExpenseTime() + "ms");
+						_LOG.info("执行SQL语句: " + this.getSql() + "，参数：" + __parametersToString() + (_recordSize >= 0 ? "，影响/记录数：" + _recordSize : "") + "， 耗时: " + this.getExpenseTime() + "ms");
 					}
 				} catch (SQLException e) {
 					throw new OperatorException("操作执行时异常, [" + this.getSql() + ", " + __parametersToString() + "]", RuntimeUtils.unwrapThrow(e));

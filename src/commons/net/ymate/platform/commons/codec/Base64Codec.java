@@ -9,7 +9,11 @@ package net.ymate.platform.commons.codec;
 
 import java.io.UnsupportedEncodingException;
 
+import net.ymate.platform.commons.util.RuntimeUtils;
+
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 /**
@@ -37,6 +41,8 @@ import org.apache.commons.lang.StringUtils;
  *          </table>
  */
 public class Base64Codec {
+
+	private static final Log _LOG = LogFactory.getLog(Base64Codec.class);
 
 	/** 适配字符 */
 	protected static char[] alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".toCharArray();
@@ -78,7 +84,7 @@ public class Base64Codec {
 			try {
 				return new String(encode(dataStr.getBytes("utf-8")));
 			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
+				_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 			}
 		}
 		return new String(encode("".getBytes()));
@@ -99,7 +105,7 @@ public class Base64Codec {
 			try {
 				return new String(encode(dataStr.getBytes(charset)));
 			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
+				_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 			}
 		}
 		return new String(encode("".getBytes()));
@@ -150,7 +156,7 @@ public class Base64Codec {
 			try {
 				return new String(decode(base64Str.toCharArray()), "utf-8");
 			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
+				_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 			}
 		}
 		return "";
@@ -171,7 +177,7 @@ public class Base64Codec {
 			try {
 				return new String(decode(base64Str.toCharArray()), charset);
 			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
+				_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 			}
 		}
 		return "";

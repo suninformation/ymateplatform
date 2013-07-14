@@ -114,4 +114,18 @@ public class WebRequestContext implements IWebRequestContext {
 		return suffix;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder _tmpSB = new StringBuilder(128)
+				.append("[url=").append(this.url)
+				.append(", requestMapping=").append(this.requestMapping)
+				.append(", prefix=").append(this.prefix)
+				.append(", suffix=").append(this.suffix).append("]");
+		return _tmpSB.toString();
+	}
+
 }

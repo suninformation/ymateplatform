@@ -36,6 +36,8 @@ import net.ymate.platform.plugin.PluginNotFoundException;
 import net.ymate.platform.plugin.util.PluginUtils;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 /**
@@ -63,6 +65,8 @@ import org.apache.commons.lang.StringUtils;
  *          </table>
  */
 public class DefaultPluginFactory implements IPluginFactory {
+
+	private static final Log _LOG = LogFactory.getLog(DefaultPluginFactory.class);
 
 	/**
 	 * 排除的接口集合，被包含的接口将不被插件工厂管理
@@ -123,6 +127,7 @@ public class DefaultPluginFactory implements IPluginFactory {
 			if (_pluginMeta == null || StringUtils.isBlank(_pluginMeta.getInitClass())) {
 				throw new PluginInstanceException("插件 (Id = " + pluginId + ") 配置中未设置初始化启动类参数.");
 			} else {
+				_LOG.info("创建插件[" + pluginId + "]实例对象...");
 				IPlugin _pluginObj = (IPlugin) _pluginMeta.getClassLoader().loadClass(_pluginMeta.getInitClass()).newInstance();
 				if (_pluginObj != null) {
 					// 判断当前组件类是否实现了配置接口
@@ -130,7 +135,9 @@ public class DefaultPluginFactory implements IPluginFactory {
 						// 获取当前组件的配置对象并尝试直接加载组件配置
 						PluginUtils.fillCfg(((IConfigurable) _pluginObj).getConfig(), _pluginObj);
 					}
+					_LOG.info("初始化插件[" + pluginId + "]...");
 					_pluginObj.doInit(new PluginContext(_pluginMeta));
+					_LOG.info("启动插件[" + pluginId + "]...");
 					_pluginObj.doStart();
 					__PLUGIN_MAPS.put(_pluginMeta.getId(), _pluginObj);
 					//
@@ -142,6 +149,7 @@ public class DefaultPluginFactory implements IPluginFactory {
 						__PLUGIN_INTERFACE_WITH_PID.put(_interfaceName, _pluginMeta.getId());
 					}
 				}
+				_LOG.info("插件[" + pluginId + "]实例对象创建完毕");
 				return _pluginObj;
 			}
 		} catch (ClassNotFoundException e) {
@@ -176,6 +184,7 @@ public class DefaultPluginFactory implements IPluginFactory {
 	public synchronized ClassLoader getPluginClassLoader() {
 		if (__PLUGIN_CLASSLOADER == null) {
 			if (StringUtils.isNotBlank(__PLUGIN_CONFIG.getPluginHomePath())) {
+				_LOG.info("创建插件工厂类加载器对象...");
 				ArrayList<URL> _commonLibs = new ArrayList<URL>();
 				// 扫描并分析插件通用类路径
 				File _pluginCommonFile = new File(__PLUGIN_CONFIG.getPluginHomePath(), ".plugin");
@@ -187,6 +196,7 @@ public class DefaultPluginFactory implements IPluginFactory {
                             File[] _libFiles = _tempFile.listFiles();
 							for (File _libFile : _libFiles != null ? _libFiles : new File[0]) {
 								if (_libFile.getPath().endsWith("jar")) {
+									_LOG.info("插件工厂类加载器加载Jar文件 [" + _libFile.getPath() + "]");
 									_commonLibs.add(_libFile.toURI().toURL());
 								}
 							}
@@ -194,6 +204,7 @@ public class DefaultPluginFactory implements IPluginFactory {
 						// 设置通用类文件路径
 						_tempFile = new File(_pluginCommonFile, "classes");
 						if (_tempFile.exists() && _tempFile.isDirectory()) {
+							_LOG.info("插件工厂类加载器加载类路径[" + _tempFile.getPath() + "]");
 							_commonLibs.add(_tempFile.toURI().toURL());
 						}
 					} catch (MalformedURLException e) {
@@ -204,6 +215,7 @@ public class DefaultPluginFactory implements IPluginFactory {
 					URL[] urls = _commonLibs.toArray(new URL[_commonLibs.size()]);
 					__PLUGIN_CLASSLOADER = new PluginClassLoader(urls, PluginMeta.class.getClassLoader());
 				}
+				_LOG.info("插件工厂类加载器对象创建完毕");
 			}
 			// 若未找到插件通用类路径导致ClassLoader为空，则返回系统默认类加载器
 			if (__PLUGIN_CLASSLOADER == null) {
@@ -218,8 +230,10 @@ public class DefaultPluginFactory implements IPluginFactory {
 	 */
 	public void initialize(IPluginConfig config) throws PluginException {
 		__PLUGIN_CONFIG = config;
+		_LOG.info("初始化默认插件工厂...");
 		IPluginParser _parser = config.getPluginParserClassImpl();
 		if (_parser != null) {
+			_LOG.info("初始化插件配置文件分析器[" + _parser.getClass().getName() + "]");
 			_parser.setPluginFactory(this);
 			 Map<String, PluginMeta> _metas = _parser.doParser();
 			 if (_metas != null && !_metas.isEmpty()) {
@@ -229,6 +243,7 @@ public class DefaultPluginFactory implements IPluginFactory {
 			throw new PluginException("插件主配置文件分析器参数未设置.");
 		}
 		__IS_INITED = true;
+		_LOG.info("默认插件工厂初始化完毕");
 	}
 
 	/* (non-Javadoc)
@@ -255,6 +270,7 @@ public class DefaultPluginFactory implements IPluginFactory {
 			IPlugin _p = null;
 			try {
 				_p = this.__PLUGIN_MAPS.get(pluginId);
+				_LOG.info("销毁插件[" + pluginId + "]...");
 				_p.destroy();
 			} catch (Exception e) {
 				Logs.warn("销毁插件 (Id = " + pluginId + ") 时发生异常", RuntimeUtils.unwrapThrow(e));

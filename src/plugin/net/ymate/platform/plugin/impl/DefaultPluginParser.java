@@ -19,7 +19,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.ymate.platform.commons.lang.BlurObject;
-import net.ymate.platform.commons.logger.Logs;
 import net.ymate.platform.commons.util.FileUtils;
 import net.ymate.platform.commons.util.ResourceUtils;
 import net.ymate.platform.commons.util.RuntimeUtils;
@@ -29,6 +28,8 @@ import net.ymate.platform.plugin.PluginMeta;
 import net.ymate.platform.plugin.PluginParserException;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -61,6 +62,8 @@ import org.xml.sax.SAXException;
  *          </table>
  */
 public class DefaultPluginParser implements IPluginParser {
+
+	private static final Log _LOG = LogFactory.getLog(DefaultPluginParser.class);
 
 	private static final String ATTR_NAME = "name";
 	private static final String ATTR_ALIAS = "alias";
@@ -125,7 +128,7 @@ public class DefaultPluginParser implements IPluginParser {
 	 * @throws ParserConfigurationException
 	 */
 	private PluginMeta __doManifestFileProcess(String pluginHomePath, URL configFileUrl) throws IOException, SAXException, ParserConfigurationException {
-		Logs.debug("分析插件配置文件: " + configFileUrl.getFile());
+		_LOG.info("分析插件配置文件: " + configFileUrl.getFile());
 		InputStream _in = configFileUrl.openStream();
 		Document _document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(_in);
 		Element _rootElement = _document.getDocumentElement();
@@ -135,7 +138,7 @@ public class DefaultPluginParser implements IPluginParser {
 		String alias = _rootElement.getAttribute(ATTR_ALIAS);
 		String version = _rootElement.getAttribute(ATTR_VERSION);
 		if (StringUtils.isBlank(id) || StringUtils.isBlank(name)) {
-			Logs.warn("插件配置文件 " + configFileUrl.getFile() + " 中的 id 或 name 属性未设置, 此插件将被忽略.");
+			_LOG.warn("插件配置文件 " + configFileUrl.getFile() + " 中的 id 或 name 属性未设置, 此插件将被忽略.");
 			return null;
 		}
 		//
@@ -146,7 +149,7 @@ public class DefaultPluginParser implements IPluginParser {
 			disabled = new BlurObject(_node.getTextContent()).toBooleanValue();
 		}
 		if (disabled) {
-			Logs.warn("插件配置文件 " + configFileUrl.getFile() + " 中的 disabled 属性已开启, 此插件将被忽略.");
+			_LOG.warn("插件配置文件 " + configFileUrl.getFile() + " 中的 disabled 属性已开启, 此插件将被忽略.");
 			return null;
 		}
 		String initClass = _rootElement.getAttribute(ATTR_CLASS);

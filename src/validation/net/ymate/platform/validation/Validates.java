@@ -32,6 +32,8 @@ import net.ymate.platform.validation.impl.RegexValidator;
 import net.ymate.platform.validation.impl.RequriedValidator;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -59,6 +61,8 @@ import org.apache.commons.lang.StringUtils;
  */
 public class Validates {
 
+	private static final Log _LOG = LogFactory.getLog(Validates.class);
+
 	/**
 	 * 注册的验证器映射
 	 */
@@ -83,6 +87,7 @@ public class Validates {
 	public static void registerValidatorClass(Class<? extends IValidator> validatorClass) throws ValidationException {
 		IValidator _targetObj = null;
 		try {
+			_LOG.info("注册验证器[" + validatorClass.getName() + "]");
 			_targetObj = validatorClass.newInstance();
 			__VALIDATOR_MAPS.put(_targetObj.getName(), _targetObj);
 		} catch (Exception e) {
@@ -181,6 +186,7 @@ public class Validates {
 							}
 							
 						});
+						_LOG.info("执行验证器[name=" + _validator.getName() + ", fieldName=" + _fieldName + ", passed=" + StringUtils.isBlank(_result) + "]");
 						if (StringUtils.isNotBlank(_result)) {
 							_resultValue.add(new ValidateResult(_fieldName, _result));
 							break;

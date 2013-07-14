@@ -11,9 +11,9 @@ import java.io.File;
 import java.net.URL;
 import java.security.AccessControlException;
 
-import net.ymate.platform.commons.logger.Logs;
 import net.ymate.platform.commons.util.FileUtils;
 import net.ymate.platform.commons.util.ResourceUtils;
+import net.ymate.platform.commons.util.RuntimeUtils;
 import net.ymate.platform.commons.util.SystemEnvUtils;
 import net.ymate.platform.configuration.annotation.Configuration;
 import net.ymate.platform.configuration.provider.IConfigurationProvider;
@@ -68,6 +68,7 @@ public class Cfgs {
 	 * @throws ConfigurationInitializeException
 	 */
 	public static void initialize(ICfgConfig config) throws ConfigurationInitializeException {
+		System.out.println("[信息: 初始化配置体系]");
 		if (config == null) {
 			throw new ConfigurationInitializeException("配置体系初始化失败，参数配置对象为NULL");
 		}
@@ -99,16 +100,23 @@ public class Cfgs {
 				}
 			}
 			//
+			System.out.println("[信息: CONFIG_HOME=" + __CONFIG_HOME + "]");
+			//
 			__USER_HOME = System.getProperty("user.home", "");
 			if (StringUtils.isNotBlank(__USER_HOME)) {
 				__USER_HOME = FileUtils.fixSeparator(__USER_HOME);
 			}
+			//
+			System.out.println("[信息: USER_HOME=" + __USER_HOME + "]");
 			//
 			__USER_DIR = System.getProperty("user.dir", "");
 			if (StringUtils.isNotBlank(__USER_DIR)) {
 				__USER_DIR = FileUtils.fixSeparator(__USER_DIR);
 			}
 			__IS_INITED = true;
+			//
+			System.out.println("[信息: USER_DIR=" + __USER_DIR + "]");
+			System.out.println("[信息: 配置体系初始化完毕]");
 		} else {
 			throw new ConfigurationInitializeException("无效的CONFIG_HOME路径，请传入CONFIG_HOME参数或添加系统变量");
 		}
@@ -135,6 +143,9 @@ public class Cfgs {
 	 * @return 配置文件真实路径
 	 */
 	public static String smartSearch(String cfgFile) {
+		if (StringUtils.isBlank(cfgFile)) {
+			return null;
+		}
 		File _targetFile = search(cfgFile);
 		if (_targetFile == null) {
 			if (cfgFile.startsWith("jar:")) {
@@ -203,7 +214,7 @@ public class Cfgs {
 				}
 			}
 		} catch (AccessControlException e) {
-			System.err.println("[警告：" + e.getMessage() + "]");
+			RuntimeUtils.unwrapThrow(e).printStackTrace(System.err);
 		}
 		return null;
 	}
@@ -251,11 +262,12 @@ public class Cfgs {
 				config.initialize(_provider);
 				return true;
 			} catch (ConfigurationLoadException e) {
-				Logs.error("配置文件 " + cfgFileName + " 加载异常", e);
+				System.err.println("加载配置文件 " + cfgFileName + " 异常");
+				RuntimeUtils.unwrapThrow(e).printStackTrace(System.err);
 				return false;
 			}
 		} else {
-			Logs.error("配置管理器尚未初始化，无法完成配置对象填充操作");
+			System.err.println("配置管理器尚未初始化，无法完成配置对象填充操作");
 		}
 		return false;
 	}

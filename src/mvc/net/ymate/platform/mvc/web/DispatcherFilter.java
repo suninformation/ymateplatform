@@ -9,6 +9,7 @@ package net.ymate.platform.mvc.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -21,7 +22,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.ymate.platform.commons.logger.Logs;
 import net.ymate.platform.commons.util.RuntimeUtils;
 import net.ymate.platform.module.base.YMP;
 import net.ymate.platform.mvc.support.RequestExecutor;
@@ -37,6 +37,8 @@ import net.ymate.platform.mvc.web.view.impl.JspView;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -63,6 +65,8 @@ import org.apache.commons.lang.time.StopWatch;
  *          </table>
  */
 public class DispatcherFilter implements Filter {
+
+	private static final Log _LOG = LogFactory.getLog(DispatcherFilter.class);
 
 	private static final String IGNORE = "^.+\\.(jsp|png|gif|jpg|js|css|jspx|jpeg|swf|ico)$";
 	
@@ -104,10 +108,15 @@ public class DispatcherFilter implements Filter {
 		HttpServletRequest _httpRequest = this.wrapperRequest((HttpServletRequest) request);
 		IWebRequestContext _context = new WebRequestContext(_httpRequest, prefix);
 		if (null == ignorePatern || !ignorePatern.matcher(_context.getUrl()).find()) {
-			StopWatch _stopWatch = null;
+			StopWatch _stopWatch = new StopWatch();
+			_stopWatch.start();
+			_LOG.info("接收请求" + _context.toString());
 			if (YMP.IS_DEV_MODEL) {
-				_stopWatch = new StopWatch();
-				_stopWatch.start();
+				Enumeration<?> _headerNames = _httpRequest.getHeaderNames();
+				while(_headerNames.hasMoreElements()) {
+					String _headerName = (String) _headerNames.nextElement();
+					_LOG.info("请求头[" + _headerName + "]=" + _httpRequest.getHeader(_headerName));
+				}
 			}
 			WebContext.setContext(new WebContext(WebContext.createWebContextMap(__filterConfig.getServletContext(), _httpRequest, (HttpServletResponse) response, null), _context));
 			try {
@@ -155,10 +164,8 @@ public class DispatcherFilter implements Filter {
 				}
 			} finally {
 				WebContext.setContext(null);
-				if (YMP.IS_DEV_MODEL) {
-					_stopWatch.stop();
-					Logs.info("控制器[" + _context.getRequestMapping() + "][" + _httpRequest.getMethod() + "]请求处理完毕，耗时" + _stopWatch.getTime() + "ms");
-				}
+				_stopWatch.stop();
+				_LOG.info("请求[" + _context.getRequestMapping() + "][" + _httpRequest.getMethod() + "]处理完毕，耗时" + _stopWatch.getTime() + "ms");
 			}
         } else {
         	chain.doFilter(request, response);

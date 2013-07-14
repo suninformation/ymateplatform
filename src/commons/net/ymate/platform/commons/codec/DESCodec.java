@@ -14,6 +14,11 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 
+import net.ymate.platform.commons.util.RuntimeUtils;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <p>
  * DESCodec
@@ -39,6 +44,8 @@ import javax.crypto.spec.DESKeySpec;
  *          </table>
  */
 public class DESCodec {
+
+	private static final Log _LOG = LogFactory.getLog(DESCodec.class);
 
 	private final static String DES = "DES";
 
@@ -112,7 +119,7 @@ public class DESCodec {
 		try {
 			return new String(decrypt(hex2byte(data.getBytes())));
 		} catch (Exception e) {
-            // 忽略...
+			_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 		}
 		return null;
 	}
@@ -128,7 +135,7 @@ public class DESCodec {
 		try {
 			return byte2hex(encrypt(data.getBytes()));
 		} catch (Exception e) {
-            // 忽略...
+			_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 		}
 		return null;
 	}

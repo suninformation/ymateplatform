@@ -21,6 +21,9 @@ import net.ymate.platform.validation.ValidationException;
 import net.ymate.platform.validation.annotation.ValidateRule;
 import net.ymate.platform.validation.annotation.Validation;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <p>
  * RequestExecutor
@@ -46,6 +49,8 @@ import net.ymate.platform.validation.annotation.Validation;
  *          </table>
  */
 public class RequestExecutor {
+
+	private static final Log _LOG = LogFactory.getLog(RequestExecutor.class);
 
 	protected final RequestMeta requestMeta;
 	protected final IFilterChain chain;
@@ -102,6 +107,7 @@ public class RequestExecutor {
 	 * @throws Exception 抛出任何可能异常
 	 */
 	public IView execute() throws Exception {
+		_LOG.info("开始执行请求...");
 		IView _view = null;
 		if (chain != null) {
 			_view = chain.doChain(this.requestMeta);
@@ -128,6 +134,7 @@ public class RequestExecutor {
 				validateFieldValues.clear();
 			}
 		}
+		_LOG.info("请求执行完毕");
 		return _view;
 	}
 

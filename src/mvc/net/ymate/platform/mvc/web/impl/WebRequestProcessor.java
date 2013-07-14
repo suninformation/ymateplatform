@@ -32,6 +32,9 @@ import net.ymate.platform.mvc.web.support.HttpRequestMeta;
 import net.ymate.platform.mvc.web.support.RequestMappingParser;
 import net.ymate.platform.mvc.web.support.WebControllerBeanFactory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <p>
  * WebRequestProcessor
@@ -57,6 +60,8 @@ import net.ymate.platform.mvc.web.support.WebControllerBeanFactory;
  *          </table>
  */
 public class WebRequestProcessor extends DefaultRequestProcessor {
+
+	private static final Log _LOG = LogFactory.getLog(WebRequestProcessor.class);
 
 	protected final Map<String, RequestMeta> __REQUEST_MAPPING_MAP;
 
@@ -122,8 +127,10 @@ public class WebRequestProcessor extends DefaultRequestProcessor {
 					__CONSTANT_REQUEST_MAPPING_MAP.put(_meta.getRequestMapping(), _meta);
 				}
 			}
+			_LOG.info("注册控制器请求映射 [" + _meta.getRequestMapping() + ", " + _meta.getClass().getName() + "]");
 			// 注册拦截器
 			for (PairObject<Class<IFilter>, String> _c : _meta.getFilters()) {
+				_LOG.info("注册拦截器 [" + _c.getKey() + ", " + _c.getKey().getName() + "]");
 				this.getControllerBeanFactory().add(_c.getKey());
 			}
 		}

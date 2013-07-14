@@ -15,6 +15,8 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -42,6 +44,8 @@ import org.apache.commons.lang.SystemUtils;
  */
 public class SystemEnvUtils {
 
+	private static final Log _LOG = LogFactory.getLog(SystemEnvUtils.class);
+
 	/**
 	 * 系统环境变量映射
 	 */
@@ -68,7 +72,7 @@ public class SystemEnvUtils {
 			} else if (SystemUtils.IS_OS_UNIX) {
 				p = Runtime.getRuntime().exec("/bin/sh -c set");
 			} else {
-				System.err.println("SystemEnvUtils：未知操作系统 os.name=" + SystemUtils.OS_NAME);
+				_LOG.warn("未知操作系统 os.name=" + SystemUtils.OS_NAME);
 				SYSTEM_ENV_MAP.clear();
 			}
 			if (p != null) {
@@ -84,7 +88,7 @@ public class SystemEnvUtils {
 				}
 			}
 		} catch (IOException e) {
-			System.err.println("SystemUtils：获取系统环境失败，失败原因：" + e.getMessage());
+			_LOG.warn("获取系统环境变量失败", RuntimeUtils.unwrapThrow(e));
 		}
 	}
 

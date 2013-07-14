@@ -15,6 +15,11 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import net.ymate.platform.commons.util.RuntimeUtils;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <p>
  * MD5Codec
@@ -40,6 +45,8 @@ import java.security.NoSuchAlgorithmException;
  *          </table>
  */
 public class MD5Codec {
+
+	private static final Log _LOG = LogFactory.getLog(MD5Codec.class);
 
 	/** 小写十六进制字符 */
 	protected final static String[] hexDigits = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
@@ -89,7 +96,6 @@ public class MD5Codec {
 	 */
 	public static String encodeFile(String fileAbsolutePath) {
 		String resultString = "";
-
 		// 不论什麽异常，都不会影响计算，只是如果异常发生，那么该值为"",显然不是md5结果串
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
@@ -98,18 +104,16 @@ public class MD5Codec {
 				FileInputStream in = new FileInputStream(file);
 				byte[] fileBytes = new byte[(int) file.length()];
 				in.read(fileBytes);
-
 				resultString = byteArrayToHexString(md.digest(fileBytes));
 				in.close();
 			}
 		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+			_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 		} catch (IOException e) {
-			e.printStackTrace();
+			_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 		}
-
 		return resultString;
 	}
 
@@ -124,10 +128,9 @@ public class MD5Codec {
 			MessageDigest md = MessageDigest.getInstance("MD5");
 			return md.digest(origin.getBytes());
 		} catch (Exception e) {
-			System.err.println("无法获得MD5实例");
-			e.printStackTrace();
+			_LOG.warn("无法获得MD5实例", RuntimeUtils.unwrapThrow(e));
 		}
-		return null;
+		return new byte[0];
 	}
 
 	/**
@@ -141,10 +144,9 @@ public class MD5Codec {
 			MessageDigest md = MessageDigest.getInstance("MD5");
 			return byteArrayToHexString(md.digest(origin.getBytes()));
 		} catch (Exception e) {
-			System.err.println("无法获得MD5实例");
-			e.printStackTrace();
-			return "";
+			_LOG.warn("无法获得MD5实例", RuntimeUtils.unwrapThrow(e));
 		}
+		return "";
 	}
 
 	/**
@@ -158,10 +160,9 @@ public class MD5Codec {
 			MessageDigest md = MessageDigest.getInstance("MD5");
 			return md.digest(origin);
 		} catch (Exception e) {
-			System.err.println("无法获得MD5实例");
-			e.printStackTrace();
-			return new byte[0];
+			_LOG.warn("无法获得MD5实例", RuntimeUtils.unwrapThrow(e));
 		}
+		return new byte[0];
 	}
 
 	/**

@@ -16,6 +16,7 @@ import net.ymate.platform.commons.beans.AbstractBeanMetaLoader;
 import net.ymate.platform.commons.beans.IBeanMeta;
 import net.ymate.platform.commons.beans.annotation.Bean;
 import net.ymate.platform.commons.util.ClassUtils;
+import net.ymate.platform.commons.util.RuntimeUtils;
 
 /**
  * <p>
@@ -116,7 +117,7 @@ public class AnnotationBeanMetaLoader<T extends Annotation> extends AbstractBean
 		try {
 			_meta.setObject(clazz.newInstance());
 		} catch (Throwable e) {
-			throw new Error("[错误]分析IBeanMeta时发生异常", e);
+			throw new Error("[错误]分析IBeanMeta时发生异常", RuntimeUtils.unwrapThrow(e));
 		}
 		return _meta;
 	}

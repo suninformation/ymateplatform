@@ -12,11 +12,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import net.ymate.platform.commons.logger.Logs;
 import net.ymate.platform.commons.util.FileUtils;
-import net.ymate.platform.commons.util.RuntimeUtils;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 /**
@@ -44,6 +44,8 @@ import org.apache.commons.lang.StringUtils;
  *          </table>
  */
 public class PluginMeta {
+
+	private static final Log _LOG = LogFactory.getLog(PluginMeta.class);
 
 	private IPluginFactory pluginFactory;
 
@@ -190,6 +192,7 @@ public class PluginMeta {
 
 	public ClassLoader getClassLoader() {
 		if (classLoader == null) {
+			_LOG.info("创建插件[" + this.getId() + "]类加载器...");
 			if (StringUtils.isNotBlank(getPath())) {
 				ArrayList<URL> _libList = new ArrayList<URL>();
 				try {
@@ -200,6 +203,7 @@ public class PluginMeta {
 						for (File _libFile : _libFiles != null ? _libFiles : new File[0]) {
 							if (_libFile.isFile() && _libFile.getAbsolutePath().endsWith("jar")) {
 								_libList.add(_libFile.toURI().toURL());
+								_LOG.info("插件[" + this.getId() + "]类加载器加载Jar文件[" + _libFile.getPath() + "]");
 							}
 						}
 					}
@@ -207,15 +211,17 @@ public class PluginMeta {
 					_pluginLibDir = new File(FileUtils.fixSeparator(this.getPath()) + "classes");
 					if (_pluginLibDir.exists() && _pluginLibDir.isDirectory()) {
 						_libList.add(_pluginLibDir.toURI().toURL());
+						_LOG.info("插件[" + this.getId() + "]类加载器加载类路径[" + _pluginLibDir.getPath() + "]");
 					}
 				} catch (MalformedURLException e) {
-					Logs.debug("初始化插件 [ Id = " + this.getId() + "] 类加载器时异常", RuntimeUtils.unwrapThrow(e));
+//					_LOG.warn("Create Plugin[" + this.getId() + "] ClassLoader Exception", RuntimeUtils.unwrapThrow(e));
 				}
 				URL[] urls = _libList.toArray(new URL[_libList.size()]);
 				classLoader = new PluginClassLoader(urls, pluginFactory.getPluginClassLoader());
 			} else {
 				classLoader = pluginFactory.getPluginClassLoader();
 			}
+			_LOG.info("插件[" + this.getId() + "]类加载器创建完毕");
 		}
 		return classLoader;
 	}

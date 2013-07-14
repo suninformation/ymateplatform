@@ -34,6 +34,8 @@ import net.ymate.platform.mvc.web.view.impl.RedirectView;
 import net.ymate.platform.mvc.web.view.impl.TextView;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -61,6 +63,7 @@ import org.apache.commons.lang.StringUtils;
  */
 public class HttpRequestExecutor extends RequestExecutor {
 
+	private static final Log _LOG = LogFactory.getLog(HttpRequestExecutor.class);
 
 	/**
 	 * 构造器
@@ -84,6 +87,7 @@ public class HttpRequestExecutor extends RequestExecutor {
 	protected Object parseCookieValueAnnotation(String paramName, String defaultValue, boolean required, Class<?> type, String defaultParamName) {
 		String _paramName = StringUtils.defaultIfEmpty(paramName, defaultParamName);
 		String _value = StringUtils.defaultIfEmpty(CookieHelper.create().getCookie(_paramName).toStringValue(), defaultValue);
+		_LOG.info("分析请求参数[name=" + _paramName + ", value=" + _value + ", type=Cookies]");
 		// 若方法存在参数验证注解则放弃此项
 		if (!hasValidation() && required && StringUtils.isBlank(_value)) {
 			throw new NullPointerException("方法参数" + _paramName + "值为空");
@@ -95,6 +99,7 @@ public class HttpRequestExecutor extends RequestExecutor {
 	protected Object parsePathVariableAnnotation(String paramName, String defaultValue, boolean required, Class<?> type, String defaultParamName) {
 		String _paramName = StringUtils.defaultIfEmpty(paramName, defaultParamName);
 		String _value = StringUtils.defaultIfEmpty((String) WebContext.getContext().get(_paramName), defaultValue);
+		_LOG.info("分析请求参数[name=" + _paramName + ", value=" + _value + ", type=PathVariable]");
 		if (!hasValidation() && required && StringUtils.isBlank(_value)) {
 			throw new NullPointerException("方法参数" + _paramName + "值为空");
 		}
@@ -105,6 +110,7 @@ public class HttpRequestExecutor extends RequestExecutor {
 	protected Object parseRequestHeaderAnnotation(String paramName, String defaultValue, boolean required, Class<?> type, String defaultParamName) {
 		String _paramName = StringUtils.defaultIfEmpty(paramName, defaultParamName);
 		String _value = StringUtils.defaultIfEmpty(WebContext.getRequest().getHeader(_paramName), defaultValue);
+		_LOG.info("分析请求参数[name=" + _paramName + ", value=" + _value + ", type=Header]");
 		if (!hasValidation() && required && StringUtils.isBlank(_value)) {
 			throw new NullPointerException("方法参数" + _paramName + "值为空");
 		}
@@ -118,6 +124,7 @@ public class HttpRequestExecutor extends RequestExecutor {
 			if (type.equals(IUploadFileWrapper[].class)) {
 				if (WebContext.getRequest() instanceof MultipartRequestWrapper) {
 					IUploadFileWrapper[] _value = ((MultipartRequestWrapper) WebContext.getRequest()).getFiles(_paramName);
+					_LOG.info("分析请求参数[name=" + _paramName + ", value=" + _value.toString() + ", type=RequestParameter]");
 					validateFieldValues.put(_paramName, _value);
 					return ((MultipartRequestWrapper) WebContext.getRequest()).getFiles(_paramName);
 				}
@@ -134,6 +141,7 @@ public class HttpRequestExecutor extends RequestExecutor {
 				for (int _tempIdx = 0; _tempIdx < _values.length; _tempIdx++) {
 					_tempParams[_tempIdx] = new BlurObject(_values[_tempIdx]).toObjectValue(_arrayClassType);
 				}
+				_LOG.info("分析请求参数[name=" + _paramName + ", value=" + _tempParams.toString() + ", type=RequestParameter]");
 				validateFieldValues.put(_paramName, _tempParams);
 				return _tempParams;
 			} else if (!hasValidation() && required) {
@@ -144,6 +152,7 @@ public class HttpRequestExecutor extends RequestExecutor {
 		} else if (type.equals(IUploadFileWrapper.class)) {
 			if (WebContext.getRequest() instanceof MultipartRequestWrapper) {
 				IUploadFileWrapper _value = ((MultipartRequestWrapper) WebContext.getRequest()).getFile(_paramName);
+				_LOG.info("分析请求参数[name=" + _paramName + ", value=" + _value.getName() + ", type=RequestParameter]");
 				validateFieldValues.put(_paramName, _value);
 				return _value;
 			}
@@ -151,6 +160,7 @@ public class HttpRequestExecutor extends RequestExecutor {
 			return null;
 		}
 		String _value = StringUtils.defaultIfEmpty(WebContext.getRequest().getParameter(_paramName), defaultValue);
+		_LOG.info("分析请求参数[name=" + _paramName + ", value=" + _value + ", type=RequestParameter]");
 		if (!hasValidation() && required && StringUtils.isBlank(_value)) {
 			throw new NullPointerException("方法参数" + _paramName + "值为空");
 		}

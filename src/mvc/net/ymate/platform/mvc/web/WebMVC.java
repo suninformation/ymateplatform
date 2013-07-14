@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 
-import org.apache.commons.lang.StringUtils;
-
 import net.ymate.platform.commons.i18n.I18N;
 import net.ymate.platform.commons.i18n.II18NEventHandler;
 import net.ymate.platform.commons.lang.BlurObject;
@@ -23,6 +21,8 @@ import net.ymate.platform.mvc.MVC;
 import net.ymate.platform.mvc.web.context.WebContext;
 import net.ymate.platform.mvc.web.impl.WebRequestProcessor;
 import net.ymate.platform.mvc.web.support.CookieHelper;
+
+import org.apache.commons.lang.StringUtils;
 
 
 
@@ -52,6 +52,8 @@ import net.ymate.platform.mvc.web.support.CookieHelper;
  *          </table>
  */
 public class WebMVC extends MVC {
+
+//	private static final Log _LOG = LogFactory.getLog(WebMVC.class);
 
 	/**
 	 * 初始化WebMVC管理器

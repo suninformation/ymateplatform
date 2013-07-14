@@ -16,10 +16,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-import net.ymate.platform.commons.logger.Logs;
 import net.ymate.platform.commons.util.RuntimeUtils;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -47,6 +48,8 @@ import org.apache.commons.lang.StringUtils;
  */
 public class I18N {
 
+	private static final Log _LOG = LogFactory.getLog(I18N.class);
+
 	protected static Map<Locale, Map<String, Properties>> __RESOURCES_CAHCES = new ConcurrentHashMap<Locale, Map<String, Properties>>();
 
 	protected static Locale __DEFAULT_LOCALE;
@@ -66,6 +69,7 @@ public class I18N {
 		if (!__IS_INITED) {
 			__DEFAULT_LOCALE = defaultLocale == null ? Locale.getDefault() : defaultLocale;
 			__IS_INITED = true;
+			_LOG.info("初始化国际化资源管理器I18N [" + __DEFAULT_LOCALE+ "]");
 		}
 	}
 
@@ -96,16 +100,16 @@ public class I18N {
 	 * @return 获取当前本地线程语言，若为空则返回默认
 	 */
 	public static Locale current() {
-		if (__IS_INITED) {
-			Locale _locale = __CURRENT_LOCALE.get();
-			if (_locale == null) {
-				if (__EVENT_HANDLER != null) {
-					_locale = __EVENT_HANDLER.loadCurrentLocale();
-				}
-			}
-			return _locale == null ? __DEFAULT_LOCALE : _locale;
+		if (!__IS_INITED) {
+			throw new UnsupportedOperationException("I18N服务尚未初始化");
 		}
-		throw new UnsupportedOperationException("I18N服务尚未初始化");
+		Locale _locale = __CURRENT_LOCALE.get();
+		if (_locale == null) {
+			if (__EVENT_HANDLER != null) {
+				_locale = __EVENT_HANDLER.loadCurrentLocale();
+			}
+		}
+		return _locale == null ? __DEFAULT_LOCALE : _locale;
 	}
 
 	/**
@@ -181,7 +185,7 @@ public class I18N {
 						__RESOURCES_CAHCES.get(current()).put(resourceName, _prop);
 					}
 				} catch (IOException e) {
-					Logs.warn(e.getMessage(), RuntimeUtils.unwrapThrow(e));
+					_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 				}
 			}
 		}

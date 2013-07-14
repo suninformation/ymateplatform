@@ -12,6 +12,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.ymate.platform.commons.util.RuntimeUtils;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <p>
  * BlurObject
@@ -37,6 +42,8 @@ import java.util.Set;
  *          </table>
  */
 public class BlurObject implements Serializable, Cloneable {
+
+	private static final Log _LOG = LogFactory.getLog(BlurObject.class);
 	
 	/**
 	 * 
@@ -538,8 +545,7 @@ public class BlurObject implements Serializable, Cloneable {
 			try {
 				object = clazz.cast(attr);
 			} catch (ClassCastException e) {
-				// System.err.println("[警告：" + e.getMessage() + "]");
-				// ~~~
+				_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 			}
 		}
 		return object;

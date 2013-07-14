@@ -43,6 +43,8 @@ import java.util.Set;
  */
 public class ResourceUtils {
 
+//	private static final Log _LOG = LogFactory.getLog(ResourceUtils.class);
+
 	/**
 	 * 
 	 * @param resourceName
@@ -106,6 +108,7 @@ public class ResourceUtils {
 		try {
 			return (url != null) ? url.openStream() : null;
 		} catch (IOException e) {
+			//_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 		}
 		return null;
 	}
@@ -127,7 +130,7 @@ public class ResourceUtils {
 				try {
 					return ResourceUtils.class.getClassLoader().loadClass(className);
 				} catch (ClassNotFoundException exc) {
-                    // 忽略...
+					// _LOG.warn("", RuntimeUtils.unwrapThrow(exc));
 				}
 			}
 		}

@@ -26,6 +26,9 @@ import net.ymate.platform.mvc.support.RequestExecutor;
 import net.ymate.platform.mvc.support.RequestMeta;
 import net.ymate.platform.mvc.support.impl.ControllerBeanFactory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 
 /**
  * <p>
@@ -53,6 +56,8 @@ import net.ymate.platform.mvc.support.impl.ControllerBeanFactory;
  */
 public class DefaultRequestProcessor implements IRequestProcessor {
 
+	private static final Log _LOG = LogFactory.getLog(DefaultRequestProcessor.class);
+
 	protected final static Map<String, RequestExecutor> __REQUEST_EXECUTOR_CACHES = new ConcurrentHashMap<String, RequestExecutor>();
 
 	protected final Map<String, RequestMeta> __CONSTANT_REQUEST_MAPPING_MAP;
@@ -70,10 +75,12 @@ public class DefaultRequestProcessor implements IRequestProcessor {
 	 * @see net.ymate.platform.mvc.IRequestProcessor#initialize()
 	 */
 	public void initialize() {
+		_LOG.info("初始化默认控制器请求处理器...");
         for (IBeanMeta iBeanMeta : new ArrayList<IBeanMeta>(this.getControllerBeanFactory().getBeanMetas())) {
             IControllerBeanMeta _controllerMeta = (IControllerBeanMeta) iBeanMeta;
             this.addControllerMetaToMap(_controllerMeta);
         }
+        _LOG.info("默认控制器请求处理器初始化完毕");
 	}
 
 	/* (non-Javadoc)
@@ -81,6 +88,7 @@ public class DefaultRequestProcessor implements IRequestProcessor {
 	 */
 	public IControllerBeanFactory getControllerBeanFactory() {
 		if (__CONTROLLER_BEAN_FACTORY == null) {
+			_LOG.info("创建控制器类工厂对象");
 			__CONTROLLER_BEAN_FACTORY = new ControllerBeanFactory(MVC.getConfig().getControllerPackages());
 		}
 		return __CONTROLLER_BEAN_FACTORY;
@@ -101,9 +109,11 @@ public class DefaultRequestProcessor implements IRequestProcessor {
 	 */
 	protected void addControllerMetaToMap(IControllerBeanMeta beanMeta) {
 		for (RequestMeta _meta : beanMeta.getRequestMetas()) {
+			_LOG.info("注册控制器请求映射 [" + _meta.getRequestMapping() + ", " + _meta.getClass().getName() + "]");
 			__CONSTANT_REQUEST_MAPPING_MAP.put(_meta.getRequestMapping(), _meta);
 			// 注册拦截器
 			for (PairObject<Class<IFilter>, String> _c : _meta.getFilters()) {
+				_LOG.info("注册拦截器 [" + _c.getKey() + ", " + _c.getKey().getName() + "]");
 				this.getControllerBeanFactory().add(_c.getKey());
 			}
 		}
@@ -159,7 +169,10 @@ public class DefaultRequestProcessor implements IRequestProcessor {
 	            	_chain.add(new PairObject<IFilter, String>(this.getControllerBeanFactory().get(_filter.getKey()), _filter.getValue()));
 	            }
 				_exec = this.getRequestExecutor(_meta, _chain);
+				_LOG.info("创建并绑定请求执行器 [" + _meta.getRequestMapping() + "]");
 				this.putRequestExecutorToCache(_meta.getRequestMapping(), _exec);
+			} else {
+				_LOG.info("从缓存中获取请求执行器 [" + _meta.getRequestMapping() + "]");
 			}
 			return _exec;
 		}

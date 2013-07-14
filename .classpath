@@ -25,5 +25,6 @@
 	<classpathentry kind="lib" path="/ymateplatform-libs/lib/paranamer-2.3.jar"/>
 	<classpathentry kind="lib" path="/ymateplatform-libs/lib/reflectasm-1.05.jar"/>
 	<classpathentry kind="lib" path="/ymateplatform-libs/lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="/ymateplatform-libs/lib/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

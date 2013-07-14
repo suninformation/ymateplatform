@@ -21,6 +21,9 @@ import net.ymate.platform.mvc.annotation.Controller;
 import net.ymate.platform.mvc.filter.IFilter;
 import net.ymate.platform.mvc.support.IControllerBeanFactory;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <p>
  * ControllerBeanFactory
@@ -46,6 +49,8 @@ import net.ymate.platform.mvc.support.IControllerBeanFactory;
  *          </table>
  */
 public class ControllerBeanFactory extends AnnotationBeanFactory implements IControllerBeanFactory {
+
+	private static final Log _LOG = LogFactory.getLog(ControllerBeanFactory.class);
 
 	protected static final Set<String> excludedClassNameSet;
 	
@@ -86,6 +91,7 @@ public class ControllerBeanFactory extends AnnotationBeanFactory implements ICon
 			IBeanMetaLoader _loader = this.getBeanMetaLoader(clazz);
 			for (IBeanMeta _meta : _loader.loadBeanMetas()) {
 				if (!this.beanMap.containsKey(_meta.getClassName())) {
+					_LOG.info("添加控制器 [" + _meta.getClassName() + "]");
 					this.beanMetaList.add(_meta);
 					this.addBeanMeta(_meta);
 					return _meta;
@@ -95,6 +101,7 @@ public class ControllerBeanFactory extends AnnotationBeanFactory implements ICon
 			IBeanMetaLoader _loader = new AnnotationBeanMetaLoader<Bean>(Bean.class, clazz);
 			for (IBeanMeta _meta : _loader.loadBeanMetas()) {
 				if (!this.beanMap.containsKey(_meta.getClassName())) {
+					_LOG.info("添加拦截器 [" + _meta.getClassName() + "]");
 					this.beanMetaList.add(_meta);
 					this.addBeanMeta(_meta);
 					return _meta;

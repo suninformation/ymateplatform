@@ -18,6 +18,8 @@ import net.ymate.platform.plugin.Plugins;
 import net.ymate.platform.plugin.impl.DefaultPluginConfig;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 
@@ -47,6 +49,8 @@ import org.apache.commons.lang.StringUtils;
  */
 public abstract class MVC {
 
+	private static final Log _LOG = LogFactory.getLog(MVC.class);
+
 	/**
 	 * 当前MVC框架初始化配置对象
 	 */
@@ -66,6 +70,7 @@ public abstract class MVC {
 	 */
 	protected static void __doInitialize(IMvcConfig config, IRequestProcessor processor) {
 		if (!__IS_INITED) {
+			_LOG.info("初始化MVC框架...");
 			__MVC_CONFIG = config;
 			__META_PROCESSOR = processor == null ? new DefaultRequestProcessor() : processor;
 			__META_PROCESSOR.initialize();
@@ -78,8 +83,10 @@ public abstract class MVC {
 			}
 			//
 			if (__MVC_CONFIG.getEventHandlerClassImpl() != null) {
+				_LOG.info("回调MVC框架事件处理器接口, 触发onInitialized事件...");
 				__MVC_CONFIG.getEventHandlerClassImpl().onInitialized();
 			}
+			_LOG.info("MVC框架初始化完毕");
 		}
 	}
 

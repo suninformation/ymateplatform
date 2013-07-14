@@ -17,6 +17,9 @@ import net.ymate.platform.mvc.filter.IFilterChain;
 import net.ymate.platform.mvc.support.RequestMeta;
 import net.ymate.platform.mvc.view.IView;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <p>
  * DefaultFilterChain
@@ -42,6 +45,8 @@ import net.ymate.platform.mvc.view.IView;
  *          </table>
  */
 public class DefaultFilterChain implements IFilterChain {
+
+	private static final Log _LOG = LogFactory.getLog(DefaultFilterChain.class);
 
 	protected final List<PairObject<IFilter, String>> filters;
 
@@ -81,6 +86,7 @@ public class DefaultFilterChain implements IFilterChain {
 	public IView doChain(RequestMeta meta) throws Exception {
 		IView _view = null;
 		for (PairObject<IFilter, String> _filter : this.filters) {
+			_LOG.info("执行拦截器 [" + _filter.getKey().getClass().getName() + ", " + _filter.getValue() + "]");
 			_view = _filter.getKey().doFilter(meta, _filter.getValue());
 			if (_view != null) {
 				break;
