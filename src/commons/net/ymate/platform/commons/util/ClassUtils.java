@@ -12,6 +12,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -294,6 +296,27 @@ public class ClassUtils {
 			names.add(i.getName());
 		}
 		return names.toArray(new String[names.size()]);
+	}
+
+	/**
+	 * @param clazz 类对象
+	 * @return 获取泛型的数据类型集合，注：不适用于泛型嵌套, 即泛型里若包含泛型则返回此泛型的RawType类型
+	 */
+	public static List<Class<?>> getParameterizedTypes(Class<?> clazz) {
+		List<Class<?>> _clazzs = new ArrayList<Class<?>>();
+		Type _types = clazz.getGenericSuperclass();
+		if (ParameterizedType.class.isAssignableFrom(_types.getClass())) {
+			for (Type _type : ((ParameterizedType) _types).getActualTypeArguments()) {
+				if (ParameterizedType.class.isAssignableFrom(_type.getClass())) {
+					_clazzs.add((Class<?>) ((ParameterizedType) _type).getRawType());
+				} else {
+					_clazzs.add((Class<?>) _type);
+				}
+			}
+		} else {
+			_clazzs.add((Class<?>) _types);
+		}
+		return _clazzs;
 	}
 
 	/**
