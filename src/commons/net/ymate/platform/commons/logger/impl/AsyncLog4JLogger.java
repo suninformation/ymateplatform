@@ -142,7 +142,7 @@ public class AsyncLog4JLogger extends AbstractLogger implements ILogger{
 		if (level.getValue() > logLevel.getValue()) {
 			return;
 		}
-		StringBuffer sb = new StringBuffer(DateTimeUtils.formatTime(DateTimeUtils.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss.SSS"));
+		StringBuilder sb = new StringBuilder(DateTimeUtils.formatTime(DateTimeUtils.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss.SSS"));
 		sb.append(logLevel.getDisplayName());
 		if (enableCallerInfo) {
 			sb.append('[').append(Thread.currentThread().getId()).append(':').append(makeCallerInfo(callerDeepth)).append(']');
@@ -175,7 +175,6 @@ public class AsyncLog4JLogger extends AbstractLogger implements ILogger{
 				try {
 					PairObject<Integer, PairObject<Object, Throwable>> logPObject;
 					Object msg;
-					Throwable e;
 					while (!isStoped) {
 						// 获取需要记录的日志内容，得到了就不为空
 						logPObject = logQueue.poll(30, TimeUnit.SECONDS);
@@ -183,54 +182,27 @@ public class AsyncLog4JLogger extends AbstractLogger implements ILogger{
 							continue;
 						}
 						msg = logPObject.getValue().getKey();
-						e = logPObject.getValue().getValue();
-						if (e == null) {
-							if (logPObject.getKey() == LogLevel.ERROR.getValue()) {
-								logger.error(msg);
-							} else if (logPObject.getKey() == LogLevel.WARN.getValue()) {
-								logger.warn(msg);
-							} else if (logPObject.getKey() == LogLevel.INFO.getValue()) {
-								logger.info(msg);
-							} else if (logPObject.getKey() == LogLevel.DEBUG.getValue()) {
-								logger.debug(msg);
-							} else if (logPObject.getKey() == LogLevel.TRACE.getValue()) {
-								logger.trace(msg);
-							} else if (logPObject.getKey() == LogLevel.FATAL.getValue()) {
-								logger.fatal(msg);
-							} else {
-								logger.debug(msg);
-							}
-							// 判断是否输出到控制台
-							if (isPrintConsole) {
-								System.out.println(msg);
-							}
+						if (logPObject.getValue().getValue() != null) {
+							((StringBuilder) msg).append("- ").append(toStacksString(logPObject.getValue().getValue()));
+						}
+						if (logPObject.getKey() == LogLevel.ERROR.getValue()) {
+							logger.error(msg);
+						} else if (logPObject.getKey() == LogLevel.WARN.getValue()) {
+							logger.warn(msg);
+						} else if (logPObject.getKey() == LogLevel.INFO.getValue()) {
+							logger.info(msg);
+						} else if (logPObject.getKey() == LogLevel.DEBUG.getValue()) {
+							logger.debug(msg);
+						} else if (logPObject.getKey() == LogLevel.TRACE.getValue()) {
+							logger.trace(msg);
+						} else if (logPObject.getKey() == LogLevel.FATAL.getValue()) {
+							logger.fatal(msg);
 						} else {
-							if (logPObject.getKey() == LogLevel.ERROR.getValue()) {
-								logger.error(msg);
-								logger.error(toStacksString(e));
-							} else if (logPObject.getKey() == LogLevel.WARN.getValue()) {
-								logger.warn(msg);
-								logger.warn(toStacksString(e));
-							} else if (logPObject.getKey() == LogLevel.INFO.getValue()) {
-								logger.info(msg);
-								logger.info(toStacksString(e));
-							} else if (logPObject.getKey() == LogLevel.DEBUG.getValue()) {
-								logger.debug(msg);
-								logger.debug(toStacksString(e));
-							} else if (logPObject.getKey() == LogLevel.TRACE.getValue()) {
-								logger.trace(msg);
-								logger.trace(toStacksString(e));
-							} else if (logPObject.getKey() == LogLevel.FATAL.getValue()) {
-								logger.fatal(msg);
-								logger.fatal(toStacksString(e));
-							} else {
-								logger.debug(msg);
-								logger.debug(toStacksString(e));
-							}
-							// 判断是否输出到控制台
-							if (isPrintConsole) {
-								System.out.println(msg + "\r\n" + toStacksString(e));
-							}
+							logger.debug(msg);
+						}
+						// 判断是否输出到控制台
+						if (isPrintConsole) {
+							System.out.println(msg);
 						}
 					}
 				} catch (Exception e) {

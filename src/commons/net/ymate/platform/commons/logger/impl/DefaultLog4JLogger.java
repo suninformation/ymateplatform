@@ -103,14 +103,15 @@ public class DefaultLog4JLogger extends AbstractLogger implements ILogger {
 		if (level.getValue() > logLevel.getValue()) {
 			return;
 		}
-		StringBuffer sb = new StringBuffer(DateTimeUtils.formatTime(DateTimeUtils.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss.SSS"));
+		StringBuilder sb = new StringBuilder(DateTimeUtils.formatTime(DateTimeUtils.currentTimeMillis(), "yyyy-MM-dd HH:mm:ss.SSS"));
 		sb.append(logLevel.getDisplayName());
 		if (enableCallerInfo) {
 			sb.append('[').append(Thread.currentThread().getId()).append(':').append(makeCallerInfo(callerDeepth)).append(']');
 		}
 		sb.append(' ').append(info);
 		if (e != null) {
-			sb.append("\r\n").append(toStacksString(e));
+//			sb.append("\r\n").append(toStacksString(e));
+			sb.append("- ").append(toStacksString(e));
 		}
 		//
 		logger.log(SELF_FQCN, logLevel.toLevel(), sb.toString(), null);
