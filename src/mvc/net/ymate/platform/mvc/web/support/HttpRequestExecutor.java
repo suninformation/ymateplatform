@@ -124,7 +124,7 @@ public class HttpRequestExecutor extends RequestExecutor {
 			if (type.equals(IUploadFileWrapper[].class)) {
 				if (WebContext.getRequest() instanceof MultipartRequestWrapper) {
 					IUploadFileWrapper[] _value = ((MultipartRequestWrapper) WebContext.getRequest()).getFiles(_paramName);
-					_LOG.info("分析请求参数[name=" + _paramName + ", value=" + _value.toString() + ", type=RequestParameter]");
+					_LOG.info("分析请求参数[name=" + _paramName + ", value=" + (_value != null ? _value.toString() : "") + ", type=RequestParameter]");
 					validateFieldValues.put(_paramName, _value);
 					return ((MultipartRequestWrapper) WebContext.getRequest()).getFiles(_paramName);
 				}
@@ -141,7 +141,7 @@ public class HttpRequestExecutor extends RequestExecutor {
 				for (int _tempIdx = 0; _tempIdx < _values.length; _tempIdx++) {
 					_tempParams[_tempIdx] = new BlurObject(_values[_tempIdx]).toObjectValue(_arrayClassType);
 				}
-				_LOG.info("分析请求参数[name=" + _paramName + ", value=" + _tempParams.toString() + ", type=RequestParameter]");
+				_LOG.info("分析请求参数[name=" + _paramName + ", value=" + (_tempParams != null ? _tempParams.toString() : "") + ", type=RequestParameter]");
 				validateFieldValues.put(_paramName, _tempParams);
 				return _tempParams;
 			} else if (!hasValidation() && required) {
@@ -152,7 +152,7 @@ public class HttpRequestExecutor extends RequestExecutor {
 		} else if (type.equals(IUploadFileWrapper.class)) {
 			if (WebContext.getRequest() instanceof MultipartRequestWrapper) {
 				IUploadFileWrapper _value = ((MultipartRequestWrapper) WebContext.getRequest()).getFile(_paramName);
-				_LOG.info("分析请求参数[name=" + _paramName + ", value=" + _value.getName() + ", type=RequestParameter]");
+				_LOG.info("分析请求参数[name=" + _paramName + ", value=" + (_value != null ? _value.getName() : "") + ", type=RequestParameter]");
 				validateFieldValues.put(_paramName, _value);
 				return _value;
 			}
