@@ -15,7 +15,7 @@ import net.ymate.platform.configuration.Cfgs;
 import net.ymate.platform.configuration.ICfgConfig;
 import net.ymate.platform.configuration.provider.IConfigurationProvider;
 import net.ymate.platform.configuration.provider.impl.JConfigProvider;
-import net.ymate.platform.module.base.IModule;
+import net.ymate.platform.module.base.AbstractModule;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -43,10 +43,10 @@ import org.apache.commons.lang.StringUtils;
  *          </tr>
  *          </table>
  */
-public class ConfigModule implements IModule {
+public class ConfigModule extends AbstractModule {
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.module.base.IModule#initialize(java.util.Map)
+	 * @see net.ymate.platform.module.base.AbstractModule#initialize(java.util.Map)
 	 */
 	public void initialize(final Map<String, String> moduleCfgs) throws Exception {
 		Cfgs.initialize(new ICfgConfig() {
@@ -77,12 +77,6 @@ public class ConfigModule implements IModule {
 			}
 
 		});
-	}
-
-	/* (non-Javadoc)
-	 * @see net.ymate.platform.module.base.IModule#destroy()
-	 */
-	public void destroy() throws Exception {
 	}
 
 }

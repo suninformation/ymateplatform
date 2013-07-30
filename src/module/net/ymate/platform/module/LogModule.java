@@ -16,10 +16,9 @@ import net.ymate.platform.commons.logger.ILogger.LogLevel;
 import net.ymate.platform.commons.logger.Logs;
 import net.ymate.platform.commons.logger.impl.DefaultLog4JLogger;
 import net.ymate.platform.commons.util.ClassUtils;
-import net.ymate.platform.commons.util.ExpressionUtils;
 import net.ymate.platform.commons.util.RuntimeUtils;
 import net.ymate.platform.configuration.Cfgs;
-import net.ymate.platform.module.base.IModule;
+import net.ymate.platform.module.base.AbstractModule;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -47,10 +46,10 @@ import org.apache.commons.lang.StringUtils;
  *          </tr>
  *          </table>
  */
-public class LogModule implements IModule {
+public class LogModule extends AbstractModule {
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.module.base.IModule#initialize(java.util.Map)
+	 * @see net.ymate.platform.module.base.AbstractModule#initialize(java.util.Map)
 	 */
 	public void initialize(final Map<String, String> moduleCfgs) throws Exception {
 		Logs.initialize(new ILogConfig() {
@@ -59,16 +58,12 @@ public class LogModule implements IModule {
 				String _logCfgF = moduleCfgs.get("xml_cfg_file");
 				if (StringUtils.isBlank(_logCfgF)) {
 					if (Cfgs.isInited()) {
-						_logCfgF = Cfgs.getUserDir() + "cfgs/log4j.xml";
+						_logCfgF = Cfgs.smartSearch("cfgs/log4j.xml");
 					} else {
 						_logCfgF = RuntimeUtils.getRootPath() + "cfgs/log4j.xml";
 					}
 				} else if (_logCfgF.contains("${user.dir}")) {
-					if (Cfgs.isInited()) {
-						_logCfgF = ExpressionUtils.bind(_logCfgF).set("user.dir", Cfgs.getUserDir()).getResult();
-					} else {
-						_logCfgF = ExpressionUtils.bind(_logCfgF).set("user.dir", RuntimeUtils.getRootPath()).getResult();
-					}
+					_logCfgF = doParseVariableUserDir(_logCfgF);
 				}
 				return _logCfgF;
 			}
@@ -77,16 +72,12 @@ public class LogModule implements IModule {
 				String _logOutputF = moduleCfgs.get("output_path");
 				if (StringUtils.isBlank(_logOutputF)) {
 					if (Cfgs.isInited()) {
-						_logOutputF = Cfgs.getUserDir() + "logs";
+						_logOutputF = Cfgs.smartSearch("logs");
 					} else {
 						_logOutputF = RuntimeUtils.getRootPath() + "logs";
 					}
 				} else if (_logOutputF.contains("${user.dir}")) {
-					if (Cfgs.isInited()) {
-						_logOutputF = ExpressionUtils.bind(_logOutputF).set("user.dir", Cfgs.getUserDir()).getResult();
-					} else {
-						_logOutputF = ExpressionUtils.bind(_logOutputF).set("user.dir", RuntimeUtils.getRootPath()).getResult();
-					}
+					_logOutputF = doParseVariableUserDir(_logOutputF);
 				}
 				return _logOutputF;
 			}
@@ -111,7 +102,7 @@ public class LogModule implements IModule {
 	}
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.module.base.IModule#destroy()
+	 * @see net.ymate.platform.module.base.AbstractModule#destroy()
 	 */
 	public void destroy() throws Exception {
 		Logs.clear();

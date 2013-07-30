@@ -16,11 +16,9 @@ import java.util.Map;
 
 import net.ymate.platform.commons.lang.BlurObject;
 import net.ymate.platform.commons.util.ClassUtils;
-import net.ymate.platform.commons.util.ExpressionUtils;
 import net.ymate.platform.commons.util.ResourceUtils;
 import net.ymate.platform.commons.util.RuntimeUtils;
-import net.ymate.platform.configuration.Cfgs;
-import net.ymate.platform.module.base.IModule;
+import net.ymate.platform.module.base.AbstractModule;
 import net.ymate.platform.mvc.MVC;
 import net.ymate.platform.mvc.filter.IFilter;
 import net.ymate.platform.mvc.web.IWebErrorHandler;
@@ -56,10 +54,10 @@ import org.apache.commons.lang.StringUtils;
  *          </tr>
  *          </table>
  */
-public class WebMvcModule implements IModule {
+public class WebMvcModule extends AbstractModule {
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.module.base.IModule#initialize(java.util.Map)
+	 * @see net.ymate.platform.module.base.AbstractModule#initialize(java.util.Map)
 	 */
 	@SuppressWarnings("unchecked")
 	public void initialize(Map<String, String> moduleCfgs) throws Exception {
@@ -95,11 +93,7 @@ public class WebMvcModule implements IModule {
 					_pluginHome = _pluginHomeFile.getPath();
 				}
 			} else if (_pluginHome.contains("${user.dir}")) {
-				if (Cfgs.isInited()) {
-					_pluginHome = ExpressionUtils.bind(_pluginHome).set("user.dir", Cfgs.getUserDir()).getResult();
-				} else {
-					_pluginHome = ExpressionUtils.bind(_pluginHome).set("user.dir", RuntimeUtils.getRootPath()).getResult();
-				}
+				_pluginHome = doParseVariableUserDir(_pluginHome);
 			}
 		}
 		//
@@ -125,7 +119,7 @@ public class WebMvcModule implements IModule {
 	}
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.module.base.IModule#destroy()
+	 * @see net.ymate.platform.module.base.AbstractModule#destroy()
 	 */
 	public void destroy() throws Exception {
 		WebMVC.destory();

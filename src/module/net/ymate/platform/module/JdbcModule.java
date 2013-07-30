@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.ymate.platform.commons.lang.BlurObject;
-import net.ymate.platform.module.base.IModule;
+import net.ymate.platform.module.base.AbstractModule;
 import net.ymate.platform.persistence.jdbc.IJdbcConfig;
 import net.ymate.platform.persistence.jdbc.JDBC;
 import net.ymate.platform.persistence.jdbc.support.DataSourceCfgMeta;
@@ -44,10 +44,10 @@ import org.apache.commons.lang.StringUtils;
  *          </tr>
  *          </table>
  */
-public class JdbcModule implements IModule {
+public class JdbcModule extends AbstractModule {
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.module.base.IModule#initialize(java.util.Map)
+	 * @see net.ymate.platform.module.base.AbstractModule#initialize(java.util.Map)
 	 */
 	public void initialize(final Map<String, String> moduleCfgs) throws Exception {
 		final boolean _showSql = new BlurObject(moduleCfgs.get("base.show_sql")).toBooleanValue();
@@ -93,7 +93,7 @@ public class JdbcModule implements IModule {
 	}
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.module.base.IModule#destroy()
+	 * @see net.ymate.platform.module.base.AbstractModule#destroy()
 	 */
 	public void destroy() throws Exception {
 		JDBC.destroy();
