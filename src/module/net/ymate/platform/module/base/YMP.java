@@ -41,7 +41,7 @@ import org.apache.commons.lang.time.StopWatch;
  */
 public class YMP {
 
-	public final static String VERSION = "1.1.0";
+	public final static String VERSION = "0.1.0";
 
 	public static boolean IS_DEV_MODEL;
 
