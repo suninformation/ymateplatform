@@ -191,7 +191,8 @@ public class PageQuery<T> {
 		_query.getParameters().addAll(this.getParameters());
 		_query.setSql("select count(1) from (" + __doRemoveOrderBy(sql) + ") c_t");
 		_query.execute();
-		return new BlurObject(_query.getResultSet().get(0)[1]).toIntValue();
+		Object[] _ct = (Object[]) _query.getResultSet().get(0)[0];
+		return new BlurObject(_ct[1]).toIntValue();
 	}
 
 	/**
