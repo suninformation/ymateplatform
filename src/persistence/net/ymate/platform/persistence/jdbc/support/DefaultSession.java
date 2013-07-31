@@ -150,7 +150,7 @@ public class DefaultSession implements ISession {
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#executeForUpdate(java.lang.String, java.lang.Object[])
 	 */
-	public int executeForUpdate(String sql, Object...params) throws OperatorException {
+	public int executeForUpdate(String sql, Object[] params) throws OperatorException {
 		IUpdateOperator _opt = new UpdateOperator(sql);
 		if (params != null && params.length > 0) {
 			if (sql.indexOf("?") > 0) {
@@ -189,21 +189,21 @@ public class DefaultSession implements ISession {
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#findAll(java.lang.Class, java.lang.String, java.lang.String[], int, int, java.lang.Object[])
 	 */
-	public <T> PageResultSet<T> findAll(Class<T> entity, String cond, String[] fieldFilter, int pageSize, int page, Object...params) throws OperatorException {
+	public <T> PageResultSet<T> findAll(Class<T> entity, String cond, String[] fieldFilter, int pageSize, int page, Object[] params) throws OperatorException {
 		return this.getEntitySupport().selectByCondWithPage(entity, cond, params, pageSize, page, fieldFilter);
 	}
 
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#findAll(java.lang.Class, java.lang.String, java.lang.String[], int, int, boolean, java.lang.Object[])
 	 */
-	public <T> PageResultSet<T> findAll(Class<T> entity, String cond, String[] fieldFilter, int pageSize, int page, boolean count, Object...params) throws OperatorException {
+	public <T> PageResultSet<T> findAll(Class<T> entity, String cond, String[] fieldFilter, int pageSize, int page, boolean count, Object[] params) throws OperatorException {
 		return this.getEntitySupport().selectByCondWithPage(entity, cond, params, pageSize, page, fieldFilter, count);
 	}
 
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#findAll(java.lang.String, net.ymate.platform.persistence.jdbc.operator.IResultSetHandler, java.lang.Object[])
 	 */
-	public <T> List<T> findAll(String sql, IResultSetHandler<T> handler, Object...params) throws OperatorException {
+	public <T> List<T> findAll(String sql, IResultSetHandler<T> handler, Object[] params) throws OperatorException {
 		IQueryOperator<T> _opt = new QueryOperator<T>(sql, handler);
 		if (params != null && params.length > 0) {
 			if (sql.indexOf("?") > 0) {
@@ -226,21 +226,21 @@ public class DefaultSession implements ISession {
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#findAll(java.lang.Class, java.lang.String, java.lang.Object[])
 	 */
-	public <T> List<T> findAll(Class<T> entity, String cond, Object...params) throws OperatorException {
+	public <T> List<T> findAll(Class<T> entity, String cond, Object[] params) throws OperatorException {
 		return this.getEntitySupport().selectByCond(entity, cond, params);
 	}
 
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#findAll(java.lang.Class, java.lang.String, java.lang.String[], java.lang.Object[])
 	 */
-	public <T> List<T> findAll(Class<T> entity, String cond, String[] fieldFilter, Object...params) throws OperatorException {
+	public <T> List<T> findAll(Class<T> entity, String cond, String[] fieldFilter, Object[] params) throws OperatorException {
 		return this.getEntitySupport().selectByCond(entity, cond, params, fieldFilter);
 	}
 
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#findAll(java.lang.String, net.ymate.platform.persistence.jdbc.operator.IResultSetHandler, int, int, java.lang.Object[])
 	 */
-	public <T> PageResultSet<T> findAll(String sql, IResultSetHandler<T> handler, int pageSize, int page, Object...params) throws OperatorException {
+	public <T> PageResultSet<T> findAll(String sql, IResultSetHandler<T> handler, int pageSize, int page, Object[] params) throws OperatorException {
 		PageQuery<T> _opt = new PageQuery<T>(sql, handler, page, pageSize);
 		if (params != null && params.length > 0) {
 			if (sql.indexOf("?") > 0) {
@@ -255,7 +255,7 @@ public class DefaultSession implements ISession {
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#findAll(java.lang.String, net.ymate.platform.persistence.jdbc.operator.IResultSetHandler, int, int, boolean, java.lang.Object[])
 	 */
-	public <T> PageResultSet<T> findAll(String sql, IResultSetHandler<T> handler, int pageSize, int page, boolean count, Object...params) throws OperatorException {
+	public <T> PageResultSet<T> findAll(String sql, IResultSetHandler<T> handler, int pageSize, int page, boolean count, Object[] params) throws OperatorException {
 		PageQuery<T> _opt = new PageQuery<T>(sql, handler, page, pageSize);
 		_opt.setAllowRecordCount(count);
 		if (params != null && params.length > 0) {
@@ -271,7 +271,7 @@ public class DefaultSession implements ISession {
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#findFirst(java.lang.String, net.ymate.platform.persistence.jdbc.operator.IResultSetHandler, java.lang.Object[])
 	 */
-	public <T> T findFirst(String sql, IResultSetHandler<T> handler, Object...params) throws OperatorException {
+	public <T> T findFirst(String sql, IResultSetHandler<T> handler, Object[] params) throws OperatorException {
 		PageQuery<T> _opt = new PageQuery<T>(sql, handler, 1, 1);
 		_opt.setAllowRecordCount(false);
 		if (params != null && params.length > 0) {
@@ -289,7 +289,7 @@ public class DefaultSession implements ISession {
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#findFirst(java.lang.Class, java.lang.String, java.lang.String[], java.lang.Object[])
 	 */
-	public <T> T findFirst(Class<T> entity, String cond, String[] fieldFilter, Object...params) throws OperatorException {
+	public <T> T findFirst(Class<T> entity, String cond, String[] fieldFilter, Object[] params) throws OperatorException {
 		PageResultSet<T> _results = this.getEntitySupport().selectByCondWithPage(entity, cond, params, 1, 1, fieldFilter, false);
 		return _results.getResultSet().isEmpty() ? null : _results.getResultSet().get(0);
 	}
@@ -353,14 +353,14 @@ public class DefaultSession implements ISession {
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#getAmount(java.lang.Class, java.lang.String, java.lang.Object[])
 	 */
-	public <T> long getAmount(Class<T> entityClass, String whereStr, Object...params) throws OperatorException {
+	public <T> long getAmount(Class<T> entityClass, String whereStr, Object[] params) throws OperatorException {
 		return this.getEntitySupport().getAmount(entityClass, whereStr, params);
 	}
 
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#getAmount(java.lang.String, java.lang.Object[])
 	 */
-	public <T> long getAmount(String sql, Object...params) throws OperatorException {
+	public <T> long getAmount(String sql, Object[] params) throws OperatorException {
 		IQueryOperator<Object[]> _query = new QueryOperator<Object[]>(new ArrayResultSetHandler());
 		_query.setConnection(this.getConnection());
 		if (params != null && params.length > 0) {

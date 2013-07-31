@@ -71,7 +71,7 @@ public interface ISession {
 	 * @return 执行SQL查询，返回全部结果数据
 	 * @throws OperatorException
 	 */
-	public <T> List<T> findAll(String sql, IResultSetHandler<T> handler, Object...params) throws OperatorException;
+	public <T> List<T> findAll(String sql, IResultSetHandler<T> handler, Object[] params) throws OperatorException;
 
 	/**
 	 * @param <T> 指定结果集数据类型
@@ -89,7 +89,7 @@ public interface ISession {
 	 * @return 根据实体执行SQL查询，返回全部结果数据
 	 * @throws OperatorException
 	 */
-	public <T> List<T> findAll(Class<T> entity, String cond, Object...params) throws OperatorException;
+	public <T> List<T> findAll(Class<T> entity, String cond, Object[] params) throws OperatorException;
 
 	/**
 	 * @param <T> 指定结果集数据类型
@@ -100,7 +100,7 @@ public interface ISession {
 	 * @return 根据实体执行SQL查询，返回全部结果数据
 	 * @throws OperatorException
 	 */
-	public <T> List<T> findAll(Class<T> entity, String cond, String[] fieldFilter, Object...params) throws OperatorException;
+	public <T> List<T> findAll(Class<T> entity, String cond, String[] fieldFilter, Object[] params) throws OperatorException;
 
 	/**
 	 * @param <T> 指定结果集数据类型
@@ -112,7 +112,7 @@ public interface ISession {
 	 * @return 执行SQL分页查询（执行总记录数统计）
 	 * @throws OperatorException
 	 */
-	public <T> PageResultSet<T> findAll(String sql, IResultSetHandler<T> handler, int pageSize, int page, Object...params) throws OperatorException;
+	public <T> PageResultSet<T> findAll(String sql, IResultSetHandler<T> handler, int pageSize, int page, Object[] params) throws OperatorException;
 
 	/**
 	 * @param <T> 指定结果集数据类型
@@ -125,7 +125,7 @@ public interface ISession {
 	 * @return 执行SQL分页查询
 	 * @throws OperatorException
 	 */
-	public <T> PageResultSet<T> findAll(String sql, IResultSetHandler<T> handler, int pageSize, int page, boolean count, Object...params) throws OperatorException;
+	public <T> PageResultSet<T> findAll(String sql, IResultSetHandler<T> handler, int pageSize, int page, boolean count, Object[] params) throws OperatorException;
 
 	/**
 	 * @param <T> 指定结果集数据类型
@@ -138,7 +138,7 @@ public interface ISession {
 	 * @return 根据实体执行SQL分页查询
 	 * @throws OperatorException
 	 */
-	public <T> PageResultSet<T> findAll(Class<T> entity, String cond, String[] fieldFilter, int pageSize, int page, Object...params) throws OperatorException;
+	public <T> PageResultSet<T> findAll(Class<T> entity, String cond, String[] fieldFilter, int pageSize, int page, Object[] params) throws OperatorException;
 
 	/**
 	 * @param <T> 指定结果集数据类型
@@ -152,7 +152,7 @@ public interface ISession {
 	 * @return 根据实体执行SQL分页查询
 	 * @throws OperatorException
 	 */
-	public <T> PageResultSet<T> findAll(Class<T> entity, String cond, String[] fieldFilter, int pageSize, int page, boolean count, Object...params) throws OperatorException;
+	public <T> PageResultSet<T> findAll(Class<T> entity, String cond, String[] fieldFilter, int pageSize, int page, boolean count, Object[] params) throws OperatorException;
 
 	/**
 	 * @param <T> 指定结果集数据类型
@@ -162,7 +162,7 @@ public interface ISession {
 	 * @return 执行SQL查询，返回结果集中第一条数据
 	 * @throws OperatorException
 	 */
-	public <T> T findFirst(String sql, IResultSetHandler<T> handler, Object...params) throws OperatorException;
+	public <T> T findFirst(String sql, IResultSetHandler<T> handler, Object[] params) throws OperatorException;
 
 	/**
 	 * @param <T> 指定结果集数据类型
@@ -173,7 +173,7 @@ public interface ISession {
 	 * @return 根据实体执行SQL查询，返回结果集中第一条数据
 	 * @throws OperatorException
 	 */
-	public <T>T findFirst(Class<T> entity, String cond, String[] fieldFilter, Object...params) throws OperatorException;
+	public <T>T findFirst(Class<T> entity, String cond, String[] fieldFilter, Object[] params) throws OperatorException;
 
 	/**
 	 * @param <T> 指定结果集数据类型
@@ -200,7 +200,7 @@ public interface ISession {
 	 * @return 执行SQL更新（如更新、插入和删除），返回此次更新影响的记录数
 	 * @throws OperatorException
 	 */
-	public int executeForUpdate(String sql, Object...params) throws OperatorException;
+	public int executeForUpdate(String sql, Object[] params) throws OperatorException;
 
 	/**
 	 * @param sql SQL更新语句
@@ -288,7 +288,7 @@ public interface ISession {
 	 * @return 计算查询结果总记录数量
 	 * @throws OperatorException
 	 */
-	public <T> long getAmount(Class<T> entityClass, String whereStr, Object...params) throws OperatorException;
+	public <T> long getAmount(Class<T> entityClass, String whereStr, Object[] params) throws OperatorException;
 
 	/**
 	 * @param <T> 指定实体类型
@@ -297,6 +297,6 @@ public interface ISession {
 	 * @return 计算查询结果总记录数量
 	 * @throws OperatorException
 	 */
-	public <T> long getAmount(String sql, Object...params) throws OperatorException;
+	public <T> long getAmount(String sql, Object[] params) throws OperatorException;
 
 }
