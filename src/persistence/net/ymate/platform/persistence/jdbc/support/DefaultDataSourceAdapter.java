@@ -11,12 +11,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 import net.ymate.platform.commons.util.RuntimeUtils;
+import net.ymate.platform.persistence.jdbc.AbstractDataSourceAdapter;
 import net.ymate.platform.persistence.jdbc.ConnectionException;
-import net.ymate.platform.persistence.jdbc.IDataSourceAdapter;
-import net.ymate.platform.persistence.jdbc.base.dialect.IDialect;
-import net.ymate.platform.persistence.jdbc.base.dialect.impl.MySqlDialect;
-import net.ymate.platform.persistence.jdbc.base.dialect.impl.OracleDialect;
-import net.ymate.platform.persistence.jdbc.base.dialect.impl.SQLServer2005Dialect;
 
 /**
  * <p>
@@ -42,17 +38,13 @@ import net.ymate.platform.persistence.jdbc.base.dialect.impl.SQLServer2005Dialec
  *          </tr>
  *          </table>
  */
-public class DefaultDataSourceAdapter implements IDataSourceAdapter {
-
-	protected DataSourceCfgMeta cfgMeta;
-
-	protected IDialect dialect;
+public class DefaultDataSourceAdapter extends AbstractDataSourceAdapter {
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.persistence.jdbc.IDataSourceAdapter#initialize(net.ymate.platform.persistence.jdbc.support.DataSourceCfgMeta)
+	 * @see net.ymate.platform.persistence.jdbc.AbstractDataSourceAdapter#initialize(net.ymate.platform.persistence.jdbc.support.DataSourceCfgMeta)
 	 */
 	public void initialize(DataSourceCfgMeta cfgMeta) {
-		this.cfgMeta = cfgMeta;
+		super.initialize(cfgMeta);
 		try {
 			Class.forName(cfgMeta.getDriverClass());
 		} catch (ClassNotFoundException e) {
@@ -65,43 +57,10 @@ public class DefaultDataSourceAdapter implements IDataSourceAdapter {
 	 */
 	public Connection getConnection() throws ConnectionException {
 		try {
-			Connection conn;
-	        if (cfgMeta.getName() != null) {
-				conn = DriverManager.getConnection(cfgMeta.getConnectionUrl(), cfgMeta.getUserName(), cfgMeta.getPassword());
-	        } else {
-	            conn = DriverManager.getConnection(cfgMeta.getConnectionUrl());
-	        }
-	        return conn;
+	        return DriverManager.getConnection(cfgMeta.getConnectionUrl(), cfgMeta.getUserName(), cfgMeta.getPassword());
 		} catch (Exception e) {
 			throw new ConnectionException(RuntimeUtils.unwrapThrow(e));
 		}
-	}
-
-	/* (non-Javadoc)
-	 * @see net.ymate.platform.persistence.jdbc.IDataSourceAdapter#getDialect()
-	 */
-	public IDialect getDialect() {
-		if (dialect == null) {
-			try {
-				String _prodName = this.getConnection().getMetaData().getDatabaseProductName().toLowerCase();
-				if (_prodName.contains("oracle")) {
-					dialect = new OracleDialect();
-				} else if (_prodName.contains("mysql")) {
-					dialect = new MySqlDialect();
-				} else if (_prodName.contains("sql server")) {
-					dialect = new SQLServer2005Dialect();
-				}
-			} catch (Exception e) {
-				throw new Error(RuntimeUtils.unwrapThrow(e));
-			}
-		}
-		return dialect;
-	}
-
-	/* (non-Javadoc)
-	 * @see net.ymate.platform.persistence.jdbc.IDataSourceAdapter#destroy()
-	 */
-	public void destroy() {
 	}
 
 }

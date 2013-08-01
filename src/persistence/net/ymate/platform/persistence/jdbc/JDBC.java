@@ -7,10 +7,15 @@
  */
 package net.ymate.platform.persistence.jdbc;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.ymate.platform.commons.util.ClassUtils;
+import net.ymate.platform.persistence.jdbc.base.dialect.IDialect;
+import net.ymate.platform.persistence.jdbc.base.dialect.impl.MySqlDialect;
+import net.ymate.platform.persistence.jdbc.base.dialect.impl.OracleDialect;
+import net.ymate.platform.persistence.jdbc.base.dialect.impl.SQLServer2005Dialect;
 import net.ymate.platform.persistence.jdbc.support.DataSourceCfgMeta;
 import net.ymate.platform.persistence.jdbc.support.DefaultConnectionHolder;
 import net.ymate.platform.persistence.jdbc.support.DefaultDataSourceAdapter;
@@ -65,6 +70,20 @@ public class JDBC {
 	protected static Map<String, IDataSourceAdapter> __DATASOURCE_CACHE = new ConcurrentHashMap<String, IDataSourceAdapter>();
 
 	protected static RepositoryBeanFactory __REPOSTORY_BEAN_FACTORY;
+
+	protected static Map<String, Class<? extends IDialect>> __DIALECT = new HashMap<String, Class<? extends IDialect>>();
+
+	public static String DIALECT_ORACLE = "oracle";
+
+	public static String DIALECT_MYSQL = "mysql";
+
+	public static String DIALECT_SQLSERVER = "microsoft sql server";
+
+	static {
+		__DIALECT.put(DIALECT_ORACLE, OracleDialect.class);
+		__DIALECT.put(DIALECT_MYSQL, MySqlDialect.class);
+		__DIALECT.put(DIALECT_SQLSERVER, SQLServer2005Dialect.class);
+	}
 
 	/**
 	 * 数据源配置信息
@@ -134,12 +153,23 @@ public class JDBC {
 		return __REPOSTORY_BEAN_FACTORY.add(clazz) != null;
 	}
 
-//	/**
-//	 * @return 返回存储器对象工厂
-//	 */
-//	public static RepositoryBeanFactory getRepositoryBeanFactory() {
-//		return __REPOSTORY_BEAN_FACTORY;
-//	}
+	/**
+	 * 注册数据库IDialect接口实现类
+	 * 
+	 * @param dialectName 方言名称(将被toLowerCase方法转换小写字符)，用于与数据库ProductName匹配
+	 * @param clazz IDialect接口实现类
+	 */
+	public static void registerDialectClass(String dialectName, Class<? extends IDialect> clazz) {
+		__DIALECT.put(dialectName.toLowerCase(), clazz);
+	}
+
+	/**
+	 * @param dialectName 方言名称(将被toLowerCase方法转换小写字符)
+	 * @return 获取数据库IDialect接口实现类
+	 */
+	public static Class<? extends IDialect> getDialectClass(String dialectName) {
+		return __DIALECT.get(dialectName.toLowerCase());
+	}
 
 	/**
 	 * @return 采用默认数据源构建会话对象
