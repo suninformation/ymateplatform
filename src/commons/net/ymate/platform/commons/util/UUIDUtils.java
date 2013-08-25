@@ -41,6 +41,8 @@ public class UUIDUtils {
 
 	private final static String chars64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789^~abcdefghijklmnopqrstuvwxyz";
 
+	private final static Random __random = new Random(System.currentTimeMillis());
+
 	/**
 	 * 返回一个唯一的16位字符串。 基于： 32位当前时间，32位对象的identityHashCode和32位随机数
 	 * 
@@ -134,9 +136,8 @@ public class UUIDUtils {
 	public static String randomString(int length, boolean isOnlyNum) {
 		int size = isOnlyNum ? 10 : 62;
 		StringBuffer hash = new StringBuffer(length);
-		Random _rnd = new Random(System.currentTimeMillis());
 		for (int i = 0; i < length; i++) {
-			hash.append(__randChars.charAt(_rnd.nextInt(size)));
+			hash.append(__randChars.charAt(__random.nextInt(size)));
 		}
 		return hash.toString();
 	}
