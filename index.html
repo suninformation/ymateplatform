@@ -4,59 +4,171 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>ymateplatform by suninformation</title>
-
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
     <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
   </head>
   <body>
-    <div class="wrapper">
+
       <header>
         <h1>ymateplatform</h1>
         <p>YMP开发框架是一套轻量级的JAVA应用开发框架，具有统一的配置体系结构、系统与业务日志分离、插件化开发模式、简单轻量的MVC和持久化支持等特性；</p>
-
-        <p class="view"><a href="https://github.com/suninformation/ymateplatform">View the Project on GitHub <small>suninformation/ymateplatform</small></a></p>
-
-
-        <ul>
-          <li><a href="https://github.com/suninformation/ymateplatform/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/suninformation/ymateplatform/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/suninformation/ymateplatform">View On <strong>GitHub</strong></a></li>
-        </ul>
       </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/suninformation/ymateplatform" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/suninformation/ymateplatform/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/suninformation/ymateplatform/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
       <section>
         <h1>
-<a name="welcome-to-the-ymateplatform" class="anchor" href="#welcome-to-the-ymateplatform"><span class="octicon octicon-link"></span></a>Welcome to the yMatePlatform!</h1>
+<a name="%E6%A6%82%E8%BF%B0" class="anchor" href="#%E6%A6%82%E8%BF%B0"><span class="octicon octicon-link"></span></a>概述</h1>
 
 <p><img src="https://github.com/suninformation/ymateplatform/wiki/images/ymp_logo.png" alt=""></p>
 
-<p>YMP开发框架是一套轻量级的JAVA应用开发框架，具有统一的配置体系结构、系统与业务日志分离、插件化开发模式、简单轻量的MVC和持久化支持等特性；</p>
+<h2>
+<a name="ymp%E6%A1%86%E6%9E%B6%E6%98%AF%E4%BB%80%E4%B9%88" class="anchor" href="#ymp%E6%A1%86%E6%9E%B6%E6%98%AF%E4%BB%80%E4%B9%88"><span class="octicon octicon-link"></span></a>YMP框架是什么？</h2>
+
+<p>YMP（yMatePlatform）开发框架是一套轻量级的JAVA应用开发框架，开发初衷只是想按自己的编码习惯，尽量采用最简单的方式实现我需要的东西，达到简化工作任务、统一开发流程为目标，能够减轻一点点的工作压力，让开发变成快乐的事！</p>
+
+<p>在开发过程中，参考了很多优秀的开源项目，如：Hibernate、Struts、Struts2、iBatis、DBUtils、Spring JDBC、String MVC等等，它们都太优秀、太强大也太复杂了，但针对于我所参与的项目来说，有些特性基本无用武之地，反倒成了“累赘”，因此我决定冒天下之大不韪，去掉“累赘”重新造轮子，就这样YMP诞生了！</p>
+
+<p>知识需要共享，我们才能进步，开源才是技术发展的力量源泉，我尊重开源，热爱分享，理解劳动为我们带来的价值，个人的力量始终有限，希望大家能够通过了解更多的开源技术，掌握更多的知识，让我们一起交流心得！</p>
 
 <h2>
-<a name="%E6%96%87%E6%A1%A3%E7%9B%AE%E5%BD%95" class="anchor" href="#%E6%96%87%E6%A1%A3%E7%9B%AE%E5%BD%95"><span class="octicon octicon-link"></span></a>文档目录</h2>
+<a name="ymp%E6%A1%86%E6%9E%B6%E6%9C%89%E5%93%AA%E4%BA%9B%E7%89%B9%E6%80%A7" class="anchor" href="#ymp%E6%A1%86%E6%9E%B6%E6%9C%89%E5%93%AA%E4%BA%9B%E7%89%B9%E6%80%A7"><span class="octicon octicon-link"></span></a>YMP框架有哪些特性？</h2>
 
 <ul>
-<li><a href="https://github.com/suninformation/ymateplatform/wiki/Home">概述</a></li>
-<li><a href="https://github.com/suninformation/ymateplatform/wiki/YMP%E6%A1%86%E6%9E%B6%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%AF%A6%E7%BB%86%E8%AF%B4%E6%98%8E">初始化配置文件详细说明</a></li>
-<li><a href="https://github.com/suninformation/ymateplatform/wiki/YMP%E6%A1%86%E6%9E%B6%E9%85%8D%E7%BD%AE%E4%BD%93%E7%B3%BB%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3">配置体系模块使用详解</a></li>
-<li><a href="https://github.com/suninformation/ymateplatform/wiki/YMP%E6%A1%86%E6%9E%B6%E6%97%A5%E5%BF%97%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3">日志模块使用详解</a></li>
-<li><a href="https://github.com/suninformation/ymateplatform/wiki/YMP%E6%A1%86%E6%9E%B6%E6%8F%92%E4%BB%B6%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3">插件模块使用详解</a></li>
-<li><a href="https://github.com/suninformation/ymateplatform/wiki/YMP%E6%A1%86%E6%9E%B6MVC%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3">MVC模块使用详解</a></li>
-<li><a href="https://github.com/suninformation/ymateplatform/wiki/YMP%E6%A1%86%E6%9E%B6%E6%8C%81%E4%B9%85%E5%8C%96%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3">持久化模块使用详解</a></li>
-<li><a href="https://github.com/suninformation/ymateplatform/wiki/YMP%E6%A1%86%E6%9E%B6%E9%AA%8C%E8%AF%81%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3">验证模块使用详解</a></li>
-<li><p><a href="https://github.com/suninformation/ymateplatform/wiki/YMP%E6%A1%86%E6%9E%B6%E6%A8%A1%E5%9D%97%E7%AE%A1%E7%90%86%E5%99%A8%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3">模块管理器使用详解</a></p></li>
-<li><p><a href="https://github.com/suninformation/ymateplatform/wiki/YMP%E6%A1%86%E6%9E%B6%E5%BF%AB%E9%80%9F%E6%90%AD%E5%BB%BA%E6%89%8B%E5%86%8C">框架快速搭建手册</a></p></li>
-</ul>
+<li>统一配置体系结构，为开发中所需配置文件提供统一的生命周期管理；</li>
+<li>系统与业务的日志分离，按功能或模块进行日志存储并可采用多线程写方式以降低I/O成本；</li>
+<li>插件机制，支持模块化开发与部署；</li>
+<li>MVC分层体系，配置简单，可扩展，易维护，支持零配置，不依赖容器，多种视图支持，支持事件及异常接口扩展并整合插件特性；</li>
+<li>轻量级JDBC封装，多数据源、单实体ORM封装，支持MySQL、Oracle和SQL Server等数据库，支持存储过程调用和编码方式定义复杂的组合查询*；</li>
+<li>支持方法、请求参数绑定与验证，减少人工干预，灵活的验证器扩展接口；</li>
+<li>框架模块化加载，支持自定义模块，统一文件配置，简单、灵活；</li>
+</ul><h2>
+<a name="ymp%E6%A1%86%E6%9E%B6%E6%A8%A1%E5%9D%97%E5%8A%9F%E8%83%BD%E4%BB%8B%E7%BB%8D" class="anchor" href="#ymp%E6%A1%86%E6%9E%B6%E6%A8%A1%E5%9D%97%E5%8A%9F%E8%83%BD%E4%BB%8B%E7%BB%8D"><span class="octicon octicon-link"></span></a>YMP框架模块功能介绍</h2>
+
+<h3>
+<a name="%E9%85%8D%E7%BD%AE%E4%BD%93%E7%B3%BB%E6%A8%A1%E5%9D%97" class="anchor" href="#%E9%85%8D%E7%BD%AE%E4%BD%93%E7%B3%BB%E6%A8%A1%E5%9D%97"><span class="octicon octicon-link"></span></a>配置体系模块</h3>
+
+<p>配置体系模块，是一套简单的结构化开发模式，目的是让开发流程统一和规范，提供模块化开发和集成部署能力的解决方案；</p>
+
+<p>配置体系结构按优先级由低到高划分三层，即：全局-&gt;项目-&gt;模块，其特性如下：</p>
+
+<ul>
+<li>统一配置文件检索、加载方式；</li>
+<li>模块间配置等资源共享：相同项目下各模块可以共用项目级公共配置、类和jar包等资源文件；</li>
+<li>配置文件类型可通过IConfigurationProvider进行扩展、支持缓存，避免重复加载；</li>
+<li>配置文件可自动填充到实现IConfiguration接口的配置对象，支持Annotation注解方式声明；</li>
+<li>集成模块的构建（编译）与分发、服务的启动与停止，以及清晰的资源文件分类结构可快速定位；</li>
+</ul><p>配置体系结构从开发角度解决了模块化开发流程和规范的统一、资源文件的生命周期管理；从维护角度解决了模块化集中式管理，将全部资源集成在整个体系中，其具备有效的资源重用和灵活的系统集成构建、部署和数据备份与迁移等特点；</p>
+
+<p>更多内容参见：<a href="https://github.com/suninformation/ymateplatform/wiki/YMP%E6%A1%86%E6%9E%B6%E9%85%8D%E7%BD%AE%E4%BD%93%E7%B3%BB%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3">配置体系模块使用详解</a></p>
+
+<h3>
+<a name="%E6%97%A5%E5%BF%97%E6%A8%A1%E5%9D%97" class="anchor" href="#%E6%97%A5%E5%BF%97%E6%A8%A1%E5%9D%97"><span class="octicon octicon-link"></span></a>日志模块</h3>
+
+<p>基于Log4J开源日志框架实现，采用XML文件配置日志记录器，对日志记录器对象提供统一生命周期管理，开发过程可以在任意位置调用任日志记录器输出日志，实现系统与业务日志的分离；</p>
+
+<p>框架目前提供了两种日志记录器扩展实现，分别是：</p>
+
+<ul>
+<li>DefaultLog4JLogger：标准日志记录器；</li>
+<li>AsyncLog4JLogger：异步日志记录器，每个日志记录器均采用独立线程进行日志内容输出，避免日志输出阻塞业务代码执行；</li>
+</ul><p>更多内容参见：<a href="https://github.com/suninformation/ymateplatform/wiki/YMP%E6%A1%86%E6%9E%B6%E6%97%A5%E5%BF%97%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3">日志模块使用详解</a></p>
+
+<h3>
+<a name="%E6%8F%92%E4%BB%B6%E6%A8%A1%E5%9D%97" class="anchor" href="#%E6%8F%92%E4%BB%B6%E6%A8%A1%E5%9D%97"><span class="octicon octicon-link"></span></a>插件模块</h3>
+
+<p>插件模块的设计目标是为了在接口开发模式下，可以将任务划分更细颗粒度，可以通过插件灵活变更接口实现；</p>
+
+<p>由于插件采用独立的ClassLoader类加载器来管理私有jar包、类、资源文件等，所以插件之间的调用依赖业务接口；</p>
+
+<p>插件工厂类负责分析、加载和初始化，插件是单例的，即所有可装载的插件在加载后被实例化并由插件工厂维护其生命周期；</p>
+
+<p>更多内容参见：<a href="https://github.com/suninformation/ymateplatform/wiki/YMP%E6%A1%86%E6%9E%B6%E6%8F%92%E4%BB%B6%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3">插件模块使用详解</a></p>
+
+<h3>
+<a name="mvc%E6%A8%A1%E5%9D%97" class="anchor" href="#mvc%E6%A8%A1%E5%9D%97"><span class="octicon octicon-link"></span></a>MVC模块</h3>
+
+<p>MVC模块是一个基于模型、试图和控制器的抽象框架层，在抽象框架基础上分别面向Web应用开发（WebMVC）和面向独立服务程序（ServerMVC）开发提供了扩展支持，使两种应用场景均采用统一的开发模式，即通过简单的配置调整，两种场景的代码可以通用，从而达到降低学习、开发的成本，其具备以下功能特征：</p>
+
+<p>MVC模块提供了、注册和，并与插件模块整合，</p>
+
+<ul>
+<li>支持控制器方法请求路由映射及拦截器、控制器的自动扫描、注册；</li>
+<li>支持自定义异常及事件处理；</li>
+<li>支持插件；</li>
+<li>标准MVC实现，结构清晰、配置简单，完全基于Annotation注解方式配置；</li>
+<li>支持零配置（Convention Model，无需编写控制器代码，直接匹配并执行视图）；</li>
+<li>WebMVC支持多种视图技术，包括：HTML、JSP、JSON、Freemarker、Binary、HttpStatus、Redirect和Forward等；</li>
+<li>WebMVC支持REST风格URL模式；</li>
+<li>支持请求参数与控制器方法绑定；</li>
+<li>支持请求参数有效性验证；</li>
+<li>支持控制器方法的请求拦截；</li>
+</ul><p>更多内容参见：<a href="https://github.com/suninformation/ymateplatform/wiki/YMP%E6%A1%86%E6%9E%B6MVC%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3">MVC模块使用详解</a></p>
+
+<h3>
+<a name="%E6%8C%81%E4%B9%85%E5%8C%96%E6%A8%A1%E5%9D%97" class="anchor" href="#%E6%8C%81%E4%B9%85%E5%8C%96%E6%A8%A1%E5%9D%97"><span class="octicon octicon-link"></span></a>持久化模块</h3>
+
+<p>持久化模块目前基于JDBC框架API进行轻量封装，针对关系型数据库（RDBMS）数据存取的一套简单解决方案，主要关注数据存取的效率、易用性和透明，其具备以下功能特征：</p>
+
+<ul>
+<li>封装JDBC 低级API，结构简单、便于开发、调试和维护；</li>
+<li>支持数据的批量更新，支持数据库存储过程的操作，支持标准化的结果集处理，预编译 SQL 语句处理；</li>
+<li>支持单数据表CRUD等方便操作，无需编写SQL 语句；</li>
+<li>支持结果集与值对象的自动装配，并可通过IResultSetHandler接口自定义装配规则；</li>
+<li>可动态配置数据源，支持通过JNDI 调用容器数据源及多数据源支持；</li>
+<li>通过IDataSourceAdapter接口可自定义数据源、连接池配置；</li>
+<li>支持常见数据库（如：Oracle、MySQL 、SQL Server等）的数据分页查询；</li>
+<li>支持DAO设计模式；</li>
+<li>支持编码方式自定义多表关联组合查询*；</li>
+<li>支持JDBC事务嵌套；</li>
+</ul><p>更多内容参见：<a href="https://github.com/suninformation/ymateplatform/wiki/YMP%E6%A1%86%E6%9E%B6%E6%8C%81%E4%B9%85%E5%8C%96%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3">持久化模块使用详解</a></p>
+
+<h3>
+<a name="%E9%AA%8C%E8%AF%81%E6%A8%A1%E5%9D%97" class="anchor" href="#%E9%AA%8C%E8%AF%81%E6%A8%A1%E5%9D%97"><span class="octicon octicon-link"></span></a>验证模块</h3>
+
+<p>验证模块是参数有效性验证工具，对类方法的参数通过Annotation注解方式声明其验证规则，返回验证结果，并支持I18N；</p>
+
+<p>通过实现IValidator接口或继承AbstractValidator类，可自定义验证器并注册到验证模块；</p>
+
+<p>更多内容参见：<a href="https://github.com/suninformation/ymateplatform/wiki/YMP%E6%A1%86%E6%9E%B6%E9%AA%8C%E8%AF%81%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3">验证模块使用详解</a></p>
+
+<h3>
+<a name="%E6%A8%A1%E5%9D%97%E7%AE%A1%E7%90%86%E5%99%A8" class="anchor" href="#%E6%A8%A1%E5%9D%97%E7%AE%A1%E7%90%86%E5%99%A8"><span class="octicon octicon-link"></span></a>模块管理器</h3>
+
+<p>模块管理器负责YMP框架各模块的加载、初始化工作，模块的加载顺序、参数配置等均由ymp-conf.properties文件统一配置，请阅读<a href="https://github.com/suninformation/ymateplatform/wiki/YMP%E6%A1%86%E6%9E%B6%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%AF%A6%E7%BB%86%E8%AF%B4%E6%98%8E">框架初始化配置文件详细说明</a>；</p>
+
+<p>用户可以通过实现IModule接口，开发自定义模块，并将其添加到配置文件的模块加载列表中即可；</p>
+
+<p>更多内容参见：<a href="https://github.com/suninformation/ymateplatform/wiki/YMP%E6%A1%86%E6%9E%B6%E6%A8%A1%E5%9D%97%E7%AE%A1%E7%90%86%E5%99%A8%E4%BD%BF%E7%94%A8%E8%AF%A6%E8%A7%A3">模块管理器使用详解</a></p>
       </section>
       <footer>
-        <p>This project is maintained by <a href="https://github.com/suninformation">suninformation</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+        <p>Project maintained by <a href="https://github.com/suninformation">suninformation</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
       </footer>
     </div>
-    <script src="javascripts/scale.fix.js"></script>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
               <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
