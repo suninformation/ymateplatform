@@ -107,7 +107,10 @@ public class Validates {
 			List<PairObject<Field, Validate>> _fieldAnnotations = ClassUtils.getFieldAnnotations(targetClass, Validate.class, false);
 			for (PairObject<Field, Validate> _fieldAnno : _fieldAnnotations) {
 				if (_fieldAnno.getValue().isModel() && _fieldAnno.getValue().value().length > 0) {
-					_returnValue.putAll(loadValidateRule(_fieldAnno.getKey().getType()).getValue());
+					Map<String, ValidateRule[]> _modelVMap = loadValidateRule(_fieldAnno.getKey().getType()).getValue();
+					if (_modelVMap != null) {
+						_returnValue.putAll(_modelVMap);
+					}
 				} else {
 					_returnValue.put(StringUtils.defaultIfEmpty(_fieldAnno.getValue().name(), _fieldAnno.getKey().getName()), _fieldAnno.getValue().value());
 				}
@@ -132,8 +135,11 @@ public class Validates {
 				for (Annotation _annotation : _annotations) {
 					if (_annotation instanceof Validate) {
 						Validate _validate = (Validate) _annotation;
-						if (_validate.isModel() && _validate.value().length > 0) {
-							_returnValue.putAll(loadValidateRule(targetMethod.getParameterTypes()[_idx]).getValue());
+						if (_validate.isModel()) {
+							Map<String, ValidateRule[]> _modelVMap = loadValidateRule(targetMethod.getParameterTypes()[_idx]).getValue();
+							if (_modelVMap != null) {
+								_returnValue.putAll(_modelVMap);
+							}
 						} else {
 							_returnValue.put(StringUtils.defaultIfEmpty(_validate.name(), fieldNames[_idx]), _validate.value());
 						}
