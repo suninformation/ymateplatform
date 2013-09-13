@@ -83,7 +83,11 @@ public class RequestExecutor {
 	public RequestExecutor(RequestMeta meta, IFilterChain chain) {
 		this.requestMeta = meta;
 		this.chain = chain;
-		validateRuleConf = Validates.loadValidateRule(meta.getMethod(), meta.getMethodParamNames());
+		if (meta.handler == null) {
+			validateRuleConf = Validates.loadValidateRule(meta.getMethod(), meta.getMethodParamNames());
+		} else {
+			validateRuleConf = new PairObject<Validation, Map<String, ValidateRule[]>>(meta.getMethod().getAnnotation(Validation.class));
+		}
 	}
 
 	/**
@@ -114,10 +118,22 @@ public class RequestExecutor {
 		}
 		if (_view == null) {
 			try {
-				Object[] _params = this.getMethodParams();
+				Object[] _params = null;
+				if (this.requestMeta.getRequestMethodHandler() != null) {
+					_LOG.info("通过控制器请求方法处理程序获取所需的参数集合");
+					_params = this.requestMeta.getRequestMethodHandler().getMethodParams();
+				} else {
+					_params = this.getMethodParams();
+				}
 				if (hasValidation()) {
-					Set<ValidateResult> _results = Validates.execute(validateRuleConf.getKey(), validateRuleConf.getValue(), validateFieldValues);
-					if (!_results.isEmpty()) {
+					Set<ValidateResult> _results = null;
+					if (this.requestMeta.getRequestMethodHandler() != null) {
+						_LOG.info("通过控制器请求方法处理程序执行方法参数验证");
+						_results = this.requestMeta.getRequestMethodHandler().doValidation(this.requestMeta.getMethod(), _params);
+					} else {
+						_results = Validates.execute(validateRuleConf.getKey(), validateRuleConf.getValue(), validateFieldValues);
+					}
+					if (_results != null && !_results.isEmpty()) {
 						if (WebMVC.getConfig().getErrorHandlerClassImpl() != null) {
 							_view = WebMVC.getConfig().getErrorHandlerClassImpl().onValidation(_results);
 						}

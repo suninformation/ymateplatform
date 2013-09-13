@@ -15,6 +15,7 @@ import java.util.List;
 import net.ymate.platform.commons.lang.PairObject;
 import net.ymate.platform.commons.util.ClassUtils;
 import net.ymate.platform.mvc.annotation.RequestMapping;
+import net.ymate.platform.mvc.annotation.RequestMetodHandler;
 import net.ymate.platform.mvc.filter.IFilter;
 import net.ymate.platform.mvc.filter.annotation.Filter;
 import net.ymate.platform.mvc.filter.annotation.FilterClean;
@@ -50,6 +51,7 @@ public class RequestMeta {
 
 	protected final Object target;
 	protected final String mapping;
+	protected final IRequestMethodHandler handler;
 	protected final Method method;
 	protected final String[] methodParamNames;
 	protected final List<PairObject<Class<IFilter>, String>> interceptors;
@@ -68,6 +70,12 @@ public class RequestMeta {
 		this.target = target;
 		this.mapping = this.buildRequestMapping(rootMapping, method);
 		this.method = method;
+		RequestMetodHandler _handlerAnno = method.getAnnotation(RequestMetodHandler.class);
+		if (_handlerAnno != null && _handlerAnno.value() != null) {
+			this.handler = ClassUtils.impl(_handlerAnno.value(), IRequestMethodHandler.class);
+		} else {
+			this.handler = null;
+		}
 		this.methodParamNames = ClassUtils.getMethodParamNames(method);
 		this.parameterTypes = method.getParameterTypes();
 		// 处理控制器方法对象声明的拦截器
@@ -137,6 +145,13 @@ public class RequestMeta {
 	 */
 	public String getRequestMapping() {
 		return mapping;
+	}
+
+	/**
+	 * @return 返回控制器请求方法参数处理程序
+	 */
+	public IRequestMethodHandler getRequestMethodHandler() {
+		return handler;
 	}
 
 	/**
