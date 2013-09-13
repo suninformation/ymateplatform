@@ -220,6 +220,22 @@ public class ClassUtils {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <T> T impl(Class<?> implClass, Class<T> interfaceClass) {
+		if (implClass != null) {
+			if (interfaceClass == null || interfaceClass.isAssignableFrom(implClass)) {
+				try {
+					return (T) implClass.newInstance();
+				} catch (InstantiationException e) {
+					_LOG.warn("", RuntimeUtils.unwrapThrow(e));
+				} catch (IllegalAccessException e) {
+					_LOG.warn("", RuntimeUtils.unwrapThrow(e));
+				}
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * 判断类clazz是否是superClass类的子类对象
 	 * 
