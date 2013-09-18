@@ -54,6 +54,11 @@ public interface IUploadFileWrapper {
 	public long getSize();
 
 	/**
+	 * @return 获取文件Content-Type
+	 */
+	public String getContentType();
+
+	/**
 	 * 转移文件
 	 * 
 	 * @param dest 目标

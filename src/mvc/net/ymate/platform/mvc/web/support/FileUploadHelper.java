@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
+import net.ymate.platform.commons.util.FileUtils;
 import net.ymate.platform.mvc.web.IUploadFileWrapper;
 import net.ymate.platform.mvc.web.WebMVC;
 
@@ -651,6 +652,20 @@ public class FileUploadHelper {
 				return new FileOutputStream(this.__fileObj);
 			}
 			return __fileItemObj.getOutputStream();
+		}
+
+		/* (non-Javadoc)
+		 * @see net.ymate.platform.mvc.web.IUploadFileWrapper#getContentType()
+		 */
+		public String getContentType() {
+			if (this.__isFileObj) {
+				if (this.__fileObj != null) {
+					return FileUtils.MIME_TYPE_MAPS.get(FileUtils.getExtName(__fileObj.getAbsolutePath()));
+				}
+			} else if (__fileItemObj != null) {
+				return __fileItemObj.getContentType();
+			}
+			return null;
 		}
 	}
 
