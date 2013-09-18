@@ -23,6 +23,7 @@ import net.ymate.platform.persistence.jdbc.support.DefaultSession;
 import net.ymate.platform.persistence.jdbc.support.RepositoryBeanFactory;
 import net.ymate.platform.persistence.jdbc.transaction.ITransaction;
 import net.ymate.platform.persistence.jdbc.transaction.Trans;
+import net.ymate.platform.persistence.jdbc.transaction.support.DefaultTransactionProxyHandler;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -143,6 +144,18 @@ public class JDBC {
 	 */
 	public static <T> T getBean(Class<T> clazz) {
 		return __REPOSTORY_BEAN_FACTORY.get(clazz);
+	}
+
+	/**
+	 * @param clazz 存储器接口类
+	 * @return 返回存储器实例动态代理对象，支持声明式事务处理，若不存在则返回null
+	 */
+	public static <T> T getProxyBean(Class<T> clazz) {
+		T _target = getBean(clazz);
+		if (_target != null) {
+			return new DefaultTransactionProxyHandler().bind(_target);
+		}
+		return null;
 	}
 
 	/**
