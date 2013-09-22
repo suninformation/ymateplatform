@@ -9,16 +9,12 @@ package net.ymate.platform.persistence.jdbc.support;
 
 import java.util.List;
 
-import net.ymate.platform.commons.util.ClassUtils;
 import net.ymate.platform.persistence.jdbc.ConnectionException;
-import net.ymate.platform.persistence.jdbc.IEntity;
 import net.ymate.platform.persistence.jdbc.ISession;
 import net.ymate.platform.persistence.jdbc.JDBC;
+import net.ymate.platform.persistence.jdbc.operator.IResultSetHandler;
 import net.ymate.platform.persistence.jdbc.operator.OperatorException;
 import net.ymate.platform.persistence.jdbc.query.PageResultSet;
-import net.ymate.platform.persistence.jdbc.transaction.Trans;
-import net.ymate.platform.persistence.jdbc.transaction.TransResultTask;
-import net.ymate.platform.persistence.jdbc.transaction.TransactionException;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -46,34 +42,14 @@ import org.apache.commons.lang.StringUtils;
  *          </tr>
  *          </table>
  */
-public abstract class AbstractEntityRepository<Entity extends IEntity<PK>, PK> implements IEntityRepository<Entity, PK> {
+public abstract class AbstractEntityRepository implements IEntityRepository {
 
-	private Class<Entity> __entityClass;
-	private Class<PK> __pkClass;
 	private String __dsName;
 
 	/**
 	 * 构造器
 	 */
-	@SuppressWarnings("unchecked")
 	public AbstractEntityRepository() {
-		List<Class<?>> _c = ClassUtils.getParameterizedTypes(getClass());
-		__entityClass = (Class<Entity>) _c.get(0);
-		__pkClass = (Class<PK>) _c.get(1);
-	}
-
-	/**
-	 * @return 获取实体对象类型
-	 */
-	protected Class<Entity> getEntityClass() {
-		return this.__entityClass;
-	}
-
-	/**
-	 * @return 获取主键类型
-	 */
-	protected Class<?> getPrimaryKeyClass() {
-		return this.__pkClass;
 	}
 
 	/* (non-Javadoc)
@@ -91,100 +67,181 @@ public abstract class AbstractEntityRepository<Entity extends IEntity<PK>, PK> i
 	}
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#get(java.lang.Object, java.lang.String[])
+	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#load(java.lang.Class, java.lang.Object, java.lang.String[])
 	 */
-	public Entity get(PK id, String... fieldFilter) throws OperatorException, ConnectionException {
+	public <T, PK> T load(Class<T> t, PK id, String... fieldFilter) throws OperatorException, ConnectionException {
 		ISession _session = JDBC.openSession(this.getDataSourceName());
 		try {
-			return _session.find(this.getEntityClass(), id, fieldFilter);
+			return _session.find(t, id, fieldFilter);
 		} finally {
 			_session.close();
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#save(net.ymate.platform.persistence.jdbc.IEntity)
+	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#save(java.lang.Object)
 	 */
-	public Entity save(final Entity t) throws OperatorException, TransactionException {
-		return Trans.exec(new TransResultTask<Entity>() {
-			public void doTask() throws ConnectionException, OperatorException {
-				ISession _session = JDBC.openSession(getDataSourceName());
-				try {
-					this.setResult(_session.insert(t));
-				} finally {
-					_session.close();
-				}
-			}
-		});
+	public <T> T save(T entity) throws OperatorException, ConnectionException {
+		ISession _session = JDBC.openSession(getDataSourceName());
+		try {
+			return _session.insert(entity);
+		} finally {
+			_session.close();
+		}
 	}
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#update(net.ymate.platform.persistence.jdbc.IEntity, java.lang.String[])
+	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#saveAll(java.util.List)
 	 */
-	public Entity update(final Entity t, final String... fieldFilter) throws OperatorException, TransactionException {
-		return Trans.exec(new TransResultTask<Entity>() {
-			public void doTask() throws ConnectionException, OperatorException {
-				ISession _session = JDBC.openSession(getDataSourceName());
-				try {
-					this.setResult(_session.update(t, fieldFilter));
-				} finally {
-					_session.close();
-				}
-			}
-		});
+	public <T> List<T> saveAll(List<T> entities) throws OperatorException, ConnectionException {
+		ISession _session = JDBC.openSession(getDataSourceName());
+		try {
+			return _session.insertAll(entities);
+		} finally {
+			_session.close();
+		}
 	}
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#delete(net.ymate.platform.persistence.jdbc.IEntity)
+	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#update(java.lang.Object, java.lang.String[])
 	 */
-	public Entity delete(final Entity t) throws OperatorException, TransactionException {
-		return Trans.exec(new TransResultTask<Entity>() {
-			public void doTask() throws ConnectionException, OperatorException {
-				ISession _session = JDBC.openSession(getDataSourceName());
-				try {
-					this.setResult(_session.delete(t));
-				} finally {
-					_session.close();
-				}
-			}
-		});
+	public <T> T update(T entity, String... fieldFilter) throws OperatorException, ConnectionException {
+		ISession _session = JDBC.openSession(getDataSourceName());
+		try {
+			return _session.update(entity, fieldFilter);
+		} finally {
+			_session.close();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#updateAll(java.util.List, java.lang.String[])
+	 */
+	public <T> List<T> updateAll(List<T> entities, String... fieldFilter) throws OperatorException, ConnectionException {
+		ISession _session = JDBC.openSession(getDataSourceName());
+		try {
+			return _session.updateAll(entities, fieldFilter);
+		} finally {
+			_session.close();
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#delete(java.lang.Object)
 	 */
-	public boolean delete(final PK pk) throws OperatorException, TransactionException {
-		return Trans.exec(new TransResultTask<Boolean>() {
-			public void doTask() throws ConnectionException, OperatorException {
-				ISession _session = JDBC.openSession(getDataSourceName());
-				try {
-					this.setResult(_session.delete(getEntityClass(), pk) > 0);
-				} finally {
-					_session.close();
-				}
-			}
-		});
-	}
-
-	/* (non-Javadoc)
-	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#findAll(java.lang.String, java.lang.Object[], java.lang.String[])
-	 */
-	public List<Entity> findAll(String cond, Object[] params, String... fieldFilter) throws OperatorException, ConnectionException {
-		ISession _session = JDBC.openSession(this.getDataSourceName());
+	public <T> T delete(T entity) throws OperatorException, ConnectionException {
+		ISession _session = JDBC.openSession(getDataSourceName());
 		try {
-			return _session.findAll(this.getEntityClass(), cond, fieldFilter, params);
+			return _session.delete(entity);
 		} finally {
 			_session.close();
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#findAll(java.lang.String, java.lang.Object[], int, int, boolean, java.lang.String[])
+	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#delete(java.lang.Class, java.lang.Object)
 	 */
-	public PageResultSet<Entity> findAll(String cond, Object[] params, int pageSize, int currentPage, boolean allowRecordCount, String... fieldFilter) throws OperatorException, ConnectionException {
+	public <T, PK> boolean delete(Class<T> t, PK pk) throws OperatorException, ConnectionException {
+		ISession _session = JDBC.openSession(getDataSourceName());
+		try {
+			return (_session.delete(t, pk) > 0);
+		} finally {
+			_session.close();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#deleteAll(java.util.List)
+	 */
+	public <T> List<T> deleteAll(List<T> entities) throws OperatorException, ConnectionException {
+		ISession _session = JDBC.openSession(getDataSourceName());
+		try {
+			return _session.deleteAll(entities);
+		} finally {
+			_session.close();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#deleteAll(java.lang.Class, java.lang.Object[])
+	 */
+	public <T> int[] deleteAll(Class<T> t, Object[] ids) throws OperatorException, ConnectionException {
+		ISession _session = JDBC.openSession(getDataSourceName());
+		try {
+			return _session.deleteAll(t, ids);
+		} finally {
+			_session.close();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#findAll(java.lang.Class, java.lang.String, java.lang.Object[], java.lang.String[])
+	 */
+	public <T> List<T> findAll(Class<T> t, String cond, Object[] params, String... fieldFilter) throws OperatorException, ConnectionException {
 		ISession _session = JDBC.openSession(this.getDataSourceName());
 		try {
-			return _session.findAll(this.getEntityClass(), cond, fieldFilter, pageSize, currentPage, allowRecordCount, params);
+			return _session.findAll(t, cond, fieldFilter, params);
+		} finally {
+			_session.close();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#findAll(java.lang.Class, java.lang.String, java.lang.Object[], int, int, boolean, java.lang.String[])
+	 */
+	public <T> PageResultSet<T> findAll(Class<T> t, String cond, Object[] params, int pageSize, int currentPage, boolean allowRecordCount, String... fieldFilter)
+			throws OperatorException, ConnectionException {
+		ISession _session = JDBC.openSession(this.getDataSourceName());
+		try {
+			return _session.findAll(t, cond, fieldFilter, pageSize, currentPage, allowRecordCount, params);
+		} finally {
+			_session.close();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#findAll(java.lang.String, net.ymate.platform.persistence.jdbc.operator.IResultSetHandler, java.lang.Object[])
+	 */
+	public <T> List<T> findAll(String sql, IResultSetHandler<T> handler, Object[] params) throws OperatorException, ConnectionException {
+		ISession _session = JDBC.openSession(this.getDataSourceName());
+		try {
+			return _session.findAll(sql, handler, params);
+		} finally {
+			_session.close();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#findAll(java.lang.String, net.ymate.platform.persistence.jdbc.operator.IResultSetHandler, int, int, boolean, java.lang.Object[])
+	 */
+	public <T> PageResultSet<T> findAll(String sql, IResultSetHandler<T> handler, int pageSize, int page, boolean count, Object[] params) throws OperatorException, ConnectionException {
+		ISession _session = JDBC.openSession(this.getDataSourceName());
+		try {
+			return _session.findAll(sql, handler, pageSize, page, count, params);
+		} finally {
+			_session.close();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#executeForUpdate(java.lang.String, java.lang.Object[])
+	 */
+	public int executeForUpdate(String sql, Object[] params) throws OperatorException, ConnectionException {
+		ISession _session = JDBC.openSession(this.getDataSourceName());
+		try {
+			return _session.executeForUpdate(sql, params);
+		} finally {
+			_session.close();
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.jdbc.support.IEntityRepository#executeForUpdateAll(java.lang.String, java.util.List)
+	 */
+	public int[] executeForUpdateAll(String sql, List<Object[]> params) throws OperatorException, ConnectionException {
+		ISession _session = JDBC.openSession(this.getDataSourceName());
+		try {
+			return _session.executeForUpdateAll(sql, params);
 		} finally {
 			_session.close();
 		}

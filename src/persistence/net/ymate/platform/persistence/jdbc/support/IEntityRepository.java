@@ -10,10 +10,9 @@ package net.ymate.platform.persistence.jdbc.support;
 import java.util.List;
 
 import net.ymate.platform.persistence.jdbc.ConnectionException;
-import net.ymate.platform.persistence.jdbc.IEntity;
+import net.ymate.platform.persistence.jdbc.operator.IResultSetHandler;
 import net.ymate.platform.persistence.jdbc.operator.OperatorException;
 import net.ymate.platform.persistence.jdbc.query.PageResultSet;
-import net.ymate.platform.persistence.jdbc.transaction.TransactionException;
 
 /**
  * <p>
@@ -39,27 +38,42 @@ import net.ymate.platform.persistence.jdbc.transaction.TransactionException;
  *          </tr>
  *          </table>
  */
-public interface IEntityRepository<T extends IEntity<PK>, PK> {
+public interface IEntityRepository {
 
 	/**
 	 * @param dsName 数据源名称
 	 * @return 设置数据源名称，若不设置则将采用框架默认数据源
 	 */
-	void setDataSourceName(String dsName);
+	public void setDataSourceName(String dsName);
 
-	T get(PK id, String... fieldFilter) throws OperatorException, ConnectionException;
+	public <T, PK> T load(Class<T> t, PK id, String... fieldFilter) throws OperatorException, ConnectionException;
 
-	T save(T t) throws OperatorException, ConnectionException, TransactionException;
+	public <T> T save(T entity) throws OperatorException, ConnectionException;
 
-	T update(T t, String... fieldFilter) throws OperatorException, ConnectionException, TransactionException;
+	public <T> List<T> saveAll(List<T> entities) throws OperatorException, ConnectionException;
 
-	T delete(T t) throws OperatorException, ConnectionException, TransactionException;
+	public <T> T update(T entity, String... fieldFilter) throws OperatorException, ConnectionException;
 
-	boolean delete(PK pk) throws OperatorException, ConnectionException, TransactionException;
+	public <T> List<T> updateAll(List<T> entities, String... fieldFilter) throws OperatorException, ConnectionException;
 
-	List<T> findAll(String cond, Object[] params, String... fieldFilter) throws OperatorException, ConnectionException;
+	public <T> T delete(T entity) throws OperatorException, ConnectionException;
 
-	PageResultSet<T> findAll(String cond, Object[] params, int pageSize, int currentPage, boolean allowRecordCount, String... fieldFilter)
-			throws OperatorException, ConnectionException;
+	public <T, PK> boolean delete(Class<T> t, PK pk) throws OperatorException, ConnectionException;
+	
+	public <T> List<T> deleteAll(List<T> entities) throws OperatorException, ConnectionException;
+
+	public <T> int[] deleteAll(Class<T> t, Object[] ids) throws OperatorException, ConnectionException;
+
+	public <T> List<T> findAll(Class<T> t, String cond, Object[] params, String... fieldFilter) throws OperatorException, ConnectionException;
+
+	public <T> PageResultSet<T> findAll(Class<T> t, String cond, Object[] params, int pageSize, int currentPage, boolean allowRecordCount, String... fieldFilter) throws OperatorException, ConnectionException;
+
+	public <T> List<T> findAll(String sql, IResultSetHandler<T> handler, Object[] params) throws OperatorException, ConnectionException;
+
+	public <T> PageResultSet<T> findAll(String sql, IResultSetHandler<T> handler, int pageSize, int page, boolean count, Object[] params) throws OperatorException, ConnectionException;
+
+	public int executeForUpdate(String sql, Object[] params) throws OperatorException, ConnectionException;
+
+	public int[] executeForUpdateAll(String sql, List<Object[]> params) throws OperatorException, ConnectionException;
 
 }
