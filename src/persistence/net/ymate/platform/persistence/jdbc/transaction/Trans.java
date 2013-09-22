@@ -11,6 +11,9 @@ import net.ymate.platform.commons.util.RuntimeUtils;
 import net.ymate.platform.persistence.jdbc.transaction.ITransaction.TransactionLevel;
 import net.ymate.platform.persistence.jdbc.transaction.impl.DefaultTransaction;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 
 /**
  * <p>
@@ -41,6 +44,8 @@ import net.ymate.platform.persistence.jdbc.transaction.impl.DefaultTransaction;
  *          </table>
  */
 public class Trans {
+
+	private static final Log _LOG = LogFactory.getLog(Trans.class);
 
 	private static Class<ITransaction> __implClass;
 
@@ -76,6 +81,8 @@ public class Trans {
 			tn.setLevel(level);
 			__trans.set(tn);
 			__count.set(0);
+			//
+			_LOG.info("开启数据库事务");
 		}
 		__count.set(__count.get() + 1);
 	}
@@ -91,6 +98,7 @@ public class Trans {
 		}
 		if (__count.get() == 0) {
 			__trans.get().commit();
+			_LOG.info("提交数据库事务");
 		}
 	}
 
@@ -103,6 +111,7 @@ public class Trans {
 		__count.set(num);
 		if (__count.get() == 0) {
 			__trans.get().rollback();
+			_LOG.info("回滚数据库事务");
 		} else {
 			__count.set(__count.get() - 1);
 		}
@@ -115,6 +124,7 @@ public class Trans {
 		if (__count.get() == 0) {
 			try {
 				__trans.get().close();
+				_LOG.info("关闭数据库事务");
 			} finally {
 				__trans.set(null);
 			}
