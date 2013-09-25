@@ -305,20 +305,32 @@ public class JdbcScaffold {
 		TableMeta _meta = new TableMeta(_pkFields, _tableFields);
 		try {
 			_connHolder = JDBC.getConnectionHolder();
-			_resultSet = _connHolder.getConnection().getMetaData().getPrimaryKeys(dbName, _connHolder.getDialect().getDialectName().equalsIgnoreCase("oracle") ? dbUserName.toUpperCase() : dbUserName, tableName);
-			if (_resultSet != null) {
+			String _dbType = JDBC_SCAFFOLD_CONF.getProperty("ymp.scaffold.jbdc.db_type", "unknow");
+			_resultSet = _connHolder.getConnection().getMetaData().getPrimaryKeys(dbName, _dbType.equalsIgnoreCase("oracle") ? dbUserName.toUpperCase() : dbUserName, tableName);
+			if (_resultSet == null) {
+				_meta = null;
+				System.err.println("Database table \"" + tableName + "\" primaryKey resultSet is null, ignored");
+			} else {
 				while (_resultSet.next()) {
 					_pkFields.add(_resultSet.getString(4).toLowerCase());
 				}
-				_statement = _connHolder.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-				_resultSet = _statement.executeQuery("select * from " + tableName);
-				ResultSetMetaData _rsMetaData = _resultSet.getMetaData();
-				for (int _idx = 1; _idx <= _rsMetaData.getColumnCount(); _idx++) {
-					_tableFields.put(_rsMetaData.getColumnName(_idx).toLowerCase(), new ColumnInfo(_rsMetaData.getColumnName(_idx).toLowerCase(), compressType(_rsMetaData.getColumnClassName(_idx)), _rsMetaData.isAutoIncrement(_idx)));
+				if (_pkFields.isEmpty()) {
+					_meta = null;
+					System.err.println("Database table \"" + tableName + "\" does not set the primary key, ignored");
+				} else {
+					_statement = _connHolder.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+					_resultSet = _statement.executeQuery("select * from " + tableName);
+					ResultSetMetaData _rsMetaData = _resultSet.getMetaData();
+					for (int _idx = 1; _idx <= _rsMetaData.getColumnCount(); _idx++) {
+						_tableFields.put(_rsMetaData.getColumnName(_idx).toLowerCase(), new ColumnInfo(_rsMetaData.getColumnName(_idx).toLowerCase(), compressType(_rsMetaData.getColumnClassName(_idx)), _rsMetaData.isAutoIncrement(_idx)));
+					}
+					//
+					System.err.println("TABLE_NAME: " + tableName + " ---------------->>");
+					System.err.println("COLUMN_NAME\tPK\tCOLUMN_TYPE\tIS_AUTOINCREMENT");
+					for (ColumnInfo _cInfo : _tableFields.values()) {
+						System.err.println(_cInfo.getColumnName() + "\t" + _pkFields.contains(_cInfo.getColumnName()) + "\t" + _cInfo.getColumnType() + "\t" + _cInfo.isAutoIncrement());
+					}
 				}
-			} else {
-				_meta = null;
-				System.err.println("Database table \"" + tableName + "\" does not set the primary key, ignored");
 			}
 		} catch (Throwable e) {
 			if (e instanceof Error) {
