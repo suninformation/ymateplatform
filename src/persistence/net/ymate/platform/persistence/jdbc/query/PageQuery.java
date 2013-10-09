@@ -64,6 +64,19 @@ public class PageQuery<T> {
 	/**
 	 * 构造器
 	 * 
+	 * @param queryOpt 自定义查询操作者对象
+	 * @param pageNumber 页号
+	 * @param pageSize 分页大小
+	 */
+	public PageQuery(IQueryOperator<T> queryOpt, int pageNumber, int pageSize) {
+		this.__queryOpt = queryOpt;
+		this.__pageNumber = pageNumber;
+		this.__pageSize = pageSize;
+	}
+
+	/**
+	 * 构造器
+	 * 
 	 * @param handler 结果集处理器
 	 * @param pageNumber 页号
 	 * @param pageSize 分页大小
