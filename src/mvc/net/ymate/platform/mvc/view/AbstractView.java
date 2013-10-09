@@ -46,27 +46,23 @@ public abstract class AbstractView implements IView {
 		this.attributes = new HashMap<String, Object>();
 	}
 
-	/**
-	 * 添加视图属性
-	 * 
-	 * @param key 属性键
-	 * @param value 属性值
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.mvc.view.IView#addAttribute(java.lang.String, java.lang.Object)
 	 */
 	public void addAttribute(String key, Object value) {
 		this.attributes.put(key, value);
 	}
 
-	/**
-	 * @param key 属性键
-	 * @return 返回键为key的属性值
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.mvc.view.IView#getAttribute(java.lang.String)
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T getAttribute(String key) {
 		return (T) this.attributes.get(key);
 	}
 
-	/**
-	 * @return 返回视图对象的属性映射
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.mvc.view.IView#getAttributes()
 	 */
 	public Map<String, Object> getAttributes() {
 		return Collections.unmodifiableMap(this.attributes);

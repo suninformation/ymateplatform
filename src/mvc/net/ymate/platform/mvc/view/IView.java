@@ -8,6 +8,7 @@
 package net.ymate.platform.mvc.view;
 
 import java.io.OutputStream;
+import java.util.Map;
 
 
 /**
@@ -35,6 +36,27 @@ import java.io.OutputStream;
  *          </table>
  */
 public interface IView {
+
+	/**
+	 * 添加视图属性
+	 * 
+	 * @param key 属性键
+	 * @param value 属性值
+	 */
+	public void addAttribute(String key, Object value);
+
+	/**
+	 * 添加视图属性
+	 * 
+	 * @param key 属性键
+	 * @param value 属性值
+	 */
+	public <T> T getAttribute(String key);
+
+	/**
+	 * @return 返回视图对象的属性映射
+	 */
+	public Map<String, Object> getAttributes();
 
 	/**
      * 视图渲染动作
