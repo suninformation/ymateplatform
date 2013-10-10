@@ -534,6 +534,8 @@ public class BlurObject implements Serializable, Cloneable {
 			object = this.toIntValue();
 		} else if (clazz.equals(Long.class) || clazz.equals(long.class)) {
 			object = this.toLongValue();
+		} else if (clazz.equals(Boolean.class) || clazz.equals(boolean.class)) {
+			object = this.toBooleanValue();
 		} else if (clazz.equals(List.class)) {
 			object = this.toListValue();
 		} else if (clazz.equals(Map.class)) {
