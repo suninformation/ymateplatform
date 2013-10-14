@@ -7,6 +7,7 @@
  */
 package net.ymate.platform.mvc.web.view.impl;
 
+import net.ymate.platform.mvc.web.WebMVC;
 import net.ymate.platform.mvc.web.context.WebContext;
 import net.ymate.platform.mvc.web.view.AbstractWebView;
 
@@ -78,7 +79,7 @@ public class TextView extends AbstractWebView {
 		if (StringUtils.isNotBlank(getContentType())) {
 			WebContext.getResponse().setContentType(getContentType());
 		}
-		IOUtils.write(this.text, WebContext.getResponse().getOutputStream());
+		IOUtils.write(this.text, WebContext.getResponse().getOutputStream(), StringUtils.defaultIfEmpty(WebMVC.getConfig().getCharsetEncoding(), WebContext.getResponse().getCharacterEncoding()));
 	}
 
 	/**

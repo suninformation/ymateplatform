@@ -9,6 +9,7 @@ package net.ymate.platform.mvc.web.view.impl;
 
 import javax.servlet.http.HttpServletResponse;
 
+import net.ymate.platform.mvc.web.WebMVC;
 import net.ymate.platform.mvc.web.context.WebContext;
 import net.ymate.platform.mvc.web.view.AbstractWebView;
 
@@ -117,7 +118,7 @@ public class JsonView extends AbstractWebView {
 		if (this.jsonpCallback != null) {
 			_jsonStr.insert(0, this.jsonpCallback + "(").append(");");
 		}
-		IOUtils.write(_jsonStr.toString(), response.getOutputStream());
+		IOUtils.write(_jsonStr.toString(), response.getOutputStream(), StringUtils.defaultIfEmpty(WebMVC.getConfig().getCharsetEncoding(), response.getCharacterEncoding()));
 	}
 
 }

@@ -76,6 +76,7 @@ public class DispatcherFilter implements Filter {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		// 设置默认编码和内容类型
 		request.setCharacterEncoding(WebMVC.getConfig().getCharsetEncoding());
+		response.setCharacterEncoding(WebMVC.getConfig().getCharsetEncoding());
 		response.setContentType("text/html;charset=" + WebMVC.getConfig().getCharsetEncoding());
 		//
 		IWebRequestContext _context = __dispHelper.bindRequestContext((HttpServletRequest) request);
