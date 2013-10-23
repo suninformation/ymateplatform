@@ -7,6 +7,8 @@
  */
 package net.ymate.platform.commons.util;
 
+import java.util.regex.Matcher;
+
 /**
  * <p>
  * ExpressionUtils
@@ -54,7 +56,7 @@ public class ExpressionUtils {
 	 * 构造器
 	 */
 	private ExpressionUtils(String expressionStr) {
-		this.__result = expressionStr; // .replace("\\", "/");
+		this.__result = Matcher.quoteReplacement(expressionStr);
 	}
 
 	/**
@@ -73,7 +75,7 @@ public class ExpressionUtils {
 	 */
 	public ExpressionUtils set(String key, String value) {
 		String namePattern = __pre + key + __suf;
-		this.__result = this.__result.replaceAll(namePattern, value.replace("\\", "/"));
+		this.__result = this.__result.replaceAll(namePattern, Matcher.quoteReplacement(value));
 		return this;
 	}
 
