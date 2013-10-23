@@ -96,10 +96,10 @@ public class UUIDUtils {
 	}
 
 	/**
-	 * @return 返回采用JDK自身UUID生成器生成主键并替换 '-' 字符及转换为大写字母
+	 * @return 返回采用JDK自身UUID生成器生成主键并替换 '-' 字符
 	 */
 	public final static String uuid() {
-		return UUID.randomUUID().toString().replace("-", "").toUpperCase();
+		return UUID.randomUUID().toString().replace("-", "");
 	}
 
 	/**
