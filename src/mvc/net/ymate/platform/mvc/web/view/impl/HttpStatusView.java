@@ -52,7 +52,7 @@ public class HttpStatusView extends AbstractWebView {
 	public HttpStatusView(int status) {
 		this.status = status;
 		this.msg = null;
-		this.__error = false;
+		this.__error = true;
 	}
 
 	/**
