@@ -17,3 +17,5 @@ YMP开发框架是一套轻量级的JAVA应用开发框架，具有统一的配�
 * [模块管理器使用详解](https://github.com/suninformation/ymateplatform/wiki/YMP框架模块管理器使用详解)
 
 * [框架快速搭建手册](https://github.com/suninformation/ymateplatform/wiki/YMP框架快速搭建手册)
+
+* [持久化代码生成器使用详解](https://github.com/suninformation/ymateplatform/wiki/YMP框架持久化代码生成器使用详解)
