@@ -24,10 +24,8 @@
 				<directory>src/main/resources</directory>
 				<excludes>
 					<exclude>**/ymp-*.properties</exclude>
-					<!-- 
 					<exclude>**/*.html</exclude>
-					<exclude>**/*.xml</exclude> -->
-					<exclude>**/ymate_*.xml</exclude>
+					<exclude>**/*.xml</exclude>
 				</excludes>
 				<filtering>true</filtering>
 			</resource>
