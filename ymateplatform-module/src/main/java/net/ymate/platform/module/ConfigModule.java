@@ -59,8 +59,6 @@ public class ConfigModule extends AbstractModule {
 	public void initialize(final Map<String, String> moduleCfgs) throws Exception {
 		Cfgs.initialize(new ICfgConfig() {
 
-			private IConfigurationProvider __provider;
-
 			public String getConfigHome() {
 				String _configHomeF = moduleCfgs.get("config_home");
 				if (StringUtils.isBlank(_configHomeF) || _configHomeF.equalsIgnoreCase("${root}")) {
@@ -78,9 +76,7 @@ public class ConfigModule extends AbstractModule {
 			}
 
 			public IConfigurationProvider getConfigurationProviderClassImpl() {
-				if (__provider == null) {
-					__provider = ClassUtils.impl(StringUtils.defaultIfEmpty(moduleCfgs.get("provider_impl_class"), JConfigProvider.class.getName()), IConfigurationProvider.class, ConfigModule.class);
-				}
+				IConfigurationProvider __provider = ClassUtils.impl(StringUtils.defaultIfEmpty(moduleCfgs.get("provider_impl_class"), JConfigProvider.class.getName()), IConfigurationProvider.class, ConfigModule.class);
 				return __provider;
 			}
 
