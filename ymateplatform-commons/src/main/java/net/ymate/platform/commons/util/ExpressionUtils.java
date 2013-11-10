@@ -64,7 +64,7 @@ public class ExpressionUtils {
 	 * 构造器
 	 */
 	private ExpressionUtils(String expressionStr) {
-		this.__result = Matcher.quoteReplacement(expressionStr);
+		this.__result = expressionStr; // Matcher.quoteReplacement(expressionStr);
 	}
 
 	/**
