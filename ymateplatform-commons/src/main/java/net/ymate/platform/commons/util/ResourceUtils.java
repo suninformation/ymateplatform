@@ -25,6 +25,9 @@ import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * <p>
  * ResourceUtils
@@ -51,7 +54,7 @@ import java.util.Set;
  */
 public class ResourceUtils {
 
-//	private static final Log _LOG = LogFactory.getLog(ResourceUtils.class);
+	private static final Log _LOG = LogFactory.getLog(ResourceUtils.class);
 
 	/**
 	 * 
@@ -65,7 +68,7 @@ public class ResourceUtils {
 		AggregateIterator<URL> iterator = new AggregateIterator<URL>();
 		iterator.addEnumeration(Thread.currentThread().getContextClassLoader().getResources(resourceName));
 		if ((!iterator.hasNext()) || (aggregate)) {
-			iterator.addEnumeration(ResourceUtils.class.getClassLoader().getResources(resourceName));
+			iterator.addEnumeration(ClassUtils.getDefaultClassLoader().getResources(resourceName));
 		}
 		if ((!iterator.hasNext()) || (aggregate)) {
 			ClassLoader cl = callingClass.getClassLoader();
@@ -88,7 +91,7 @@ public class ResourceUtils {
 	public static URL getResource(String resourceName, Class<?> callingClass) {
 		URL url = Thread.currentThread().getContextClassLoader().getResource(resourceName);
 		if (url == null) {
-			url = ResourceUtils.class.getClassLoader().getResource(resourceName);
+			url = ClassUtils.getDefaultClassLoader().getResource(resourceName);
 		}
 		if (url == null) {
 			url = callingClass.getResource(resourceName);
@@ -116,7 +119,7 @@ public class ResourceUtils {
 		try {
 			return (url != null) ? url.openStream() : null;
 		} catch (IOException e) {
-			//_LOG.warn("", RuntimeUtils.unwrapThrow(e));
+			_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 		}
 		return null;
 	}
@@ -136,9 +139,9 @@ public class ResourceUtils {
 				return Class.forName(className);
 			} catch (ClassNotFoundException ex) {
 				try {
-					return ResourceUtils.class.getClassLoader().loadClass(className);
+					return ClassUtils.getDefaultClassLoader().loadClass(className);
 				} catch (ClassNotFoundException exc) {
-					// _LOG.warn("", RuntimeUtils.unwrapThrow(exc));
+					 _LOG.warn("", RuntimeUtils.unwrapThrow(exc));
 				}
 			}
 		}

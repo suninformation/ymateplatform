@@ -16,6 +16,8 @@
 package net.ymate.platform.commons.util;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -23,7 +25,9 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.JarURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -36,6 +40,8 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import net.ymate.platform.commons.lang.PairObject;
 
@@ -74,6 +80,15 @@ public class ClassUtils {
 
 	private static final Log _LOG = LogFactory.getLog(ClassUtils.class);
 
+	private static InnerClassLoader _INNER_CLASS_LOADER = new InnerClassLoader(new URL[] {}, ClassUtils.class.getClassLoader());
+
+	/**
+	 * @return 返回默认类加载器对象
+	 */
+	public static ClassLoader getDefaultClassLoader() {
+		return _INNER_CLASS_LOADER;
+	}
+
 	/**
 	 * 在参数packageNames指定的包路径内，查找实现了由clazz指定的接口、注解或抽象类的类对象集合
 	 * 
@@ -89,27 +104,87 @@ public class ClassUtils {
 				Iterator<URL> _urls = ResourceUtils.getResources(_packageName.replaceAll("\\.", "/"), callingClass, true);
 				while (_urls.hasNext()) {
 					URL _url = _urls.next();
-					if (_url.getProtocol().equalsIgnoreCase("file") || _url.getProtocol().equalsIgnoreCase("vfsfile")) {
-						File[] _files = new File(_url.toURI()).listFiles();
-						for (File _file : _files != null ? _files : new File[0]) {
-							__doFindClassByClazz(_returnValue, clazz, _packageName, _file, callingClass);
-						}
-					} else if (_url.getProtocol().equalsIgnoreCase("jar") || _url.getProtocol().equalsIgnoreCase("zip") || _url.getProtocol().equalsIgnoreCase("wsjar")) {
-						// 暂时不对ZIP格式的文件包支持，直接跳过
-						if (_url.getProtocol().equalsIgnoreCase("zip")) {
-							_LOG.warn("暂时不对ZIP格式的文件包支持，直接跳过");
-							continue;
-						}
-						//
-						JarFile _jarFileObj = ((JarURLConnection) _url.openConnection()).getJarFile();
-						__doFindClassByJar(_returnValue, clazz, _packageName, _jarFileObj, callingClass);
-					}
+					__doProcessURL(_url, _returnValue, clazz, _packageName, callingClass);
 				}
 			}
 		} catch (Exception e) {
 			_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 		}
 		return _returnValue;
+	}
+
+	private static <T> void __doProcessURL(URL _url, Collection<Class<T>> collections, Class<T> clazz, String _packageName, Class<?> callingClass) throws URISyntaxException, IOException {
+		if (_url.getProtocol().equalsIgnoreCase("file") || _url.getProtocol().equalsIgnoreCase("vfsfile")) {
+			File[] _files = new File(_url.toURI()).listFiles();
+			for (File _file : _files != null ? _files : new File[0]) {
+				__doFindClassByClazz(collections, clazz, _packageName, _file, callingClass);
+			}
+		} else if (_url.getProtocol().equalsIgnoreCase("jar") || _url.getProtocol().equalsIgnoreCase("wsjar")) {
+			JarFile _jarFileObj = ((JarURLConnection) _url.openConnection()).getJarFile();
+			__doFindClassByJar(collections, clazz, _packageName, _jarFileObj, callingClass);
+		} else if (_url.getProtocol().equalsIgnoreCase("zip")) {
+			__doFindClassByZip(collections, clazz, _packageName, _url, callingClass);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	protected static <T> void __doFindClassByZip(Collection<Class<T>> collections, Class<T> clazz, String packageName, URL zipUrl, Class<?> callingClass) {
+		ZipInputStream _zipStream = null;
+		try {
+			String _zipFilePath = zipUrl.toString();
+			if (_zipFilePath.indexOf('!') > 0) {
+				_zipFilePath = StringUtils.substringBetween(zipUrl.toString(), "zip:", "!");
+			} else {
+				_zipFilePath = StringUtils.substringAfter(zipUrl.toString(), "zip:");
+			}
+			_zipStream = new ZipInputStream(new FileInputStream(new File(_zipFilePath)));
+			ZipEntry _zipEntry = null;
+			while (null != (_zipEntry = _zipStream.getNextEntry())) {
+				if (!_zipEntry.isDirectory()) {
+					if (_zipEntry.getName().endsWith(".class") && _zipEntry.getName().indexOf('$') < 0) {
+						Class<?> _class = __doProcessEntry(zipUrl, _zipEntry);
+						if (_class != null) {
+							if (clazz.isAnnotation()) {
+								if (isAnnotationOf(_class, (Class<Annotation>) clazz)) {
+									collections.add((Class<T>) _class);
+								}
+							} else if (clazz.isInterface()) {
+								if (isInterfaceOf(_class, clazz)) {
+									collections.add((Class<T>) _class);
+								}
+							} else if (isSubclassOf(_class, clazz)) {
+								collections.add((Class<T>) _class);
+							}
+						}
+					}
+				}
+				_zipStream.closeEntry();
+            }
+		} catch (Exception e) {
+			_LOG.warn("", RuntimeUtils.unwrapThrow(e));
+		} finally {
+			if (_zipStream != null) {
+				try {
+					_zipStream.close();
+				} catch (IOException e) {
+					_LOG.warn("", RuntimeUtils.unwrapThrow(e));
+				}
+			}
+		}
+	}
+
+	private static Class<?> __doProcessEntry(URL zipUrl, ZipEntry entry) {  
+        if (entry.getName().endsWith(".class")) {
+			try {
+				_INNER_CLASS_LOADER.addURL(zipUrl); // ~~是否需要进行去得判断呢？
+				String _className = entry.getName().replace("/", ".");
+				_className = _className.substring(0, _className.length() - 6);
+				return Class.forName(_className, true, _INNER_CLASS_LOADER);
+			} catch (Throwable e) {
+				_LOG.warn("", RuntimeUtils.unwrapThrow(e));
+			}
+        }
+        return null;
 	}
 
 	/**
@@ -196,6 +271,19 @@ public class ClassUtils {
 				}
 			}
 		}
+	}
+
+	static class InnerClassLoader extends URLClassLoader {
+
+		public InnerClassLoader(URL[] urls, ClassLoader parent) {
+			super(urls, parent);
+		}
+
+		@Override
+		public void addURL(URL url) {
+			super.addURL(url);
+		}
+
 	}
 
 	/**
