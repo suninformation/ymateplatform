@@ -16,22 +16,23 @@
 package net.ymate.platform.mvc.web.support;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import net.ymate.platform.commons.codec.Base64Codec;
 import net.ymate.platform.commons.codec.DESCodec;
-import net.ymate.platform.commons.codec.MD5Codec;
 import net.ymate.platform.commons.lang.BlurObject;
+import net.ymate.platform.commons.util.RuntimeUtils;
 import net.ymate.platform.mvc.web.WebMVC;
 import net.ymate.platform.mvc.web.context.WebContext;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -59,6 +60,8 @@ import org.apache.commons.lang.StringUtils;
  */
 public class CookieHelper {
 
+	private static final Log _LOG = LogFactory.getLog(CookieHelper.class);
+
 	private HttpServletRequest __request;
 
 	/**
@@ -71,19 +74,24 @@ public class CookieHelper {
 	 */
 	private boolean __useBase64;
 
-	private boolean __useEncodeUrl;
-
 	/**
 	 * 加密密钥
 	 */
 	private String __cookieKey = null;
-	private DESCodec __codecHelper = null;
 
 	/**
 	 * 构造器
 	 */
 	private CookieHelper() {
 		this.__request = WebContext.getRequest();
+	}
+
+	private String getCharsetEncoding() {
+		String _encoding = WebMVC.getConfig().getCharsetEncoding();
+		if (StringUtils.isBlank(_encoding)) {
+			_encoding = this.__request.getCharacterEncoding();
+		}
+		return _encoding;
 	}
 
 	/**
@@ -116,17 +124,10 @@ public class CookieHelper {
 	public BlurObject getCookie(String key) {
 		Cookie _c = __doGetCookie(WebMVC.getConfig().getCookiePrefix() + key);
 		if (_c != null) {
-			String _v = __doDecodeValue(_c.getValue());
-			if (this.__useEncodeUrl) {
-				try {
-					_v = URLEncoder.encode(_v, WebMVC.getConfig().getCharsetEncoding());
-				} catch (UnsupportedEncodingException e) {
-					System.err.println("[警告：" + e.getMessage() + "]");
-				}
-			}
+			String _v = decodeValue(_c.getValue());
 			return new BlurObject(_v);
 		}
-		return null;
+		return new BlurObject("");
 	}
 
 	/**
@@ -141,14 +142,7 @@ public class CookieHelper {
 			for (Cookie _cookie : _cookies) {
 				String _name = _cookie.getName();
 				if (_name.startsWith(_cookiePre)) {
-					String _v = __doDecodeValue(_cookie.getValue());
-					if (this.__useEncodeUrl) {
-						try {
-							_v = URLDecoder.decode(_v, WebMVC.getConfig().getCharsetEncoding());
-						} catch (UnsupportedEncodingException e) {
-							System.err.println("[警告：" + e.getMessage() + "]");
-						}
-					}
+					String _v = decodeValue(_cookie.getValue());
 					_returnValue.put(_name.substring(_preLength), new BlurObject(_v));
 				}
 			}
@@ -180,14 +174,7 @@ public class CookieHelper {
 	 * @return 添加或重设Cookie
 	 */
 	public CookieHelper setCookie(String key, String value, int maxAge) {
-		if (this.__useEncodeUrl) {
-			try {
-				value = URLEncoder.encode(value, WebMVC.getConfig().getCharsetEncoding());
-			} catch (UnsupportedEncodingException e) {
-				System.err.println("[警告：" + e.getMessage() + "]");
-			}
-		}
-		Cookie _cookie = new Cookie(WebMVC.getConfig().getCookiePrefix() + key, StringUtils.isBlank(value) ? "" : __doEncodeValue(value));
+		Cookie _cookie = new Cookie(WebMVC.getConfig().getCookiePrefix() + key, StringUtils.isBlank(value) ? "" : encodeValue(value));
 		_cookie.setMaxAge(maxAge);
 		_cookie.setPath(WebMVC.getConfig().getCookiePath());
 		if (StringUtils.isNotBlank(WebMVC.getConfig().getCookieDomain())) {
@@ -199,7 +186,7 @@ public class CookieHelper {
 	}
 
 	/**
-	 * @return 设置开启采用密钥加密
+	 * @return 设置开启采用密钥加密(将默认开启Base64编码)
 	 */
 	public CookieHelper allowUseAuthKey() {
 		this.__useAuthKey = true;
@@ -207,18 +194,10 @@ public class CookieHelper {
 	}
 
 	/**
-	 * @return 设置开启采用Base64编码
+	 * @return 设置开启采用Base64编码(默认支持UrlEncode编码)
 	 */
 	public CookieHelper allowUseBase64() {
 		this.__useBase64 = true;
-		return this;
-	}
-
-	/**
-	 * @return 设置开启采用UrlEncode编码
-	 */
-	public CookieHelper allowUseEncodeUrl() {
-		this.__useEncodeUrl = true;
 		return this;
 	}
 
@@ -240,40 +219,40 @@ public class CookieHelper {
 		if (this.__useAuthKey) {
 			String _key = WebMVC.getConfig().getCookieAuthKey();
 			if (StringUtils.isNotBlank(_key)) {
-				return MD5Codec.encode(_key + this.__request.getHeader(HttpHeaders.USER_AGENT));
+				return DigestUtils.md5Hex(_key + this.__request.getHeader(HttpHeaders.USER_AGENT));
 			}
 		}
 		return "";
 	}
 
-	private String __doEncodeValue(String value) {
-		String _value = null;
-		if (this.__useAuthKey) {
-			if (__cookieKey == null) {
-				__cookieKey = __getEncodedAuthKeyStr();
-			}
-			if (StringUtils.isNotBlank(__cookieKey)) {
-				try {
-					if (__codecHelper == null) {
-						__codecHelper = DESCodec.create(__cookieKey);
-					}
-					_value = __codecHelper.encrypt(value);
-				} catch (Exception e) {
-					// ~~~
+	public String encodeValue(String value) {
+		String _value = value;
+		if (StringUtils.isNotBlank(value)) {
+			if (this.__useAuthKey) {
+				if (__cookieKey == null) {
+					__cookieKey = __getEncodedAuthKeyStr();
 				}
-			} else {
-				_value = value;
+				if (StringUtils.isNotBlank(__cookieKey)) {
+					try {
+						_value = new String(Base64.encodeBase64URLSafe(DESCodec.encrypt(value.getBytes(getCharsetEncoding()), __cookieKey.getBytes())), getCharsetEncoding());
+					} catch (Exception e) {
+						_LOG.warn("", RuntimeUtils.unwrapThrow(e));
+					}
+				}
+			} else if (this.__useBase64) {
+				try {
+					_value = new String(Base64.encodeBase64URLSafe(_value.getBytes(getCharsetEncoding())), getCharsetEncoding());
+				} catch (UnsupportedEncodingException e) {
+					_LOG.warn("", RuntimeUtils.unwrapThrow(e));
+				}
 			}
 		} else {
-			_value = value;
-		}
-		if (StringUtils.isNotBlank(_value) && this.__useBase64) {
-			_value = Base64Codec.encode(_value);
+			_value = "";
 		}
 		return _value;
 	}
 
-	private String __doDecodeValue(String value) {
+	public String decodeValue(String value) {
 		String _value = null;
 		if (this.__useAuthKey) {
 			if (__cookieKey == null) {
@@ -281,26 +260,20 @@ public class CookieHelper {
 			}
 			if (StringUtils.isNotBlank(__cookieKey)) {
 				try {
-					if (__codecHelper == null) {
-						__codecHelper = DESCodec.create(__cookieKey);
-					}
-					if (this.__useBase64) {
-						value = Base64Codec.decode(_value);
-					}
-					_value = __codecHelper.decrypt(value);
+					_value = new String(DESCodec.decrypt(Base64.decodeBase64(value.getBytes(getCharsetEncoding())), __cookieKey.getBytes()));
 				} catch (Exception e) {
-					// ~~~
+					_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 				}
 			} else {
-				if (this.__useBase64) {
-					value = Base64Codec.decode(value);
-				}
 				_value = value;
 			}
-		} else {
-			if (this.__useBase64) {
-				value = Base64Codec.decode(value);
+		} else if (this.__useBase64) {
+			try {
+				value = new String(Base64.decodeBase64(value.getBytes(getCharsetEncoding())));
+			} catch (UnsupportedEncodingException e) {
+				_LOG.warn("", RuntimeUtils.unwrapThrow(e));
 			}
+		} else {
 			_value = value;
 		}
 		return _value;
