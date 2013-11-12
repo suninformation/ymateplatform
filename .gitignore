@@ -1,9 +1,13 @@
 *.DS_Store
 *.class
-*.settings
-bin
-lib
-target
+*.settings/
+
+*.project
+*.classpath
+
+bin/
+lib/
+target/
 
 # Package Files #
 *.jar
