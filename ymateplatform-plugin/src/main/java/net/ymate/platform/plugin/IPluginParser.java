@@ -43,8 +43,6 @@ import java.util.Map;
  */
 public interface IPluginParser {
 
-	public static String PLUGIN_XML_MAIN_CONFIG_FILE = "ymate_plugin.xml";
-
 	/**
 	 * @return 执行插件分析，返回插件元描述对象映射
 	 * @throws PluginParserException

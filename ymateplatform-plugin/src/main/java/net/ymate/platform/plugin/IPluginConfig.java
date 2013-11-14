@@ -62,4 +62,9 @@ public interface IPluginConfig {
 	 */
 	public String getPluginHomePath();
 
+	/**
+	 * @return 返回插件主配置文件名称，若不提供则默认采用：ymate_plugin.xml
+	 */
+	public String getPluginManifestFile();
+
 }

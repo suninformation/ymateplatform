@@ -94,7 +94,7 @@ public class DefaultPluginParser implements IPluginParser {
 		Map<String, PluginMeta> _returnValue = new HashMap<String, PluginMeta>();
 		try {
 			// 首先加载当前CLASSPATH内的所有包含插件主配置文件的Jar包
-			Iterator<URL> _configURLs = ResourceUtils.getResources(PLUGIN_XML_MAIN_CONFIG_FILE, this.getClass(), true);
+			Iterator<URL> _configURLs = ResourceUtils.getResources(__pluginFactory.getPluginConfig().getPluginManifestFile(), this.getClass(), true);
 			while (_configURLs.hasNext()) {
 				PluginMeta _meta = __doManifestFileProcess(null, _configURLs.next());
 				if (_meta != null) {
@@ -108,7 +108,7 @@ public class DefaultPluginParser implements IPluginParser {
                     File[] _subDirFiles = _pluginDirFile.listFiles();
 					for (File _subDirFile : _subDirFiles != null ? _subDirFiles : new File[0]) {
 						if (_subDirFile.isDirectory()) {
-							File _manifestFile = new File(_subDirFile, PLUGIN_XML_MAIN_CONFIG_FILE);
+							File _manifestFile = new File(_subDirFile, __pluginFactory.getPluginConfig().getPluginManifestFile());
 							if (_manifestFile.exists() && _manifestFile.isFile()) {
 								PluginMeta _meta = __doManifestFileProcess(__pluginFactory.getPluginConfig().getPluginHomePath(), _manifestFile.toURL());
 								if (_meta != null) {

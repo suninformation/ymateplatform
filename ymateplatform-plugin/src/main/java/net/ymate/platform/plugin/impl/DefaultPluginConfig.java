@@ -20,6 +20,8 @@ import net.ymate.platform.plugin.IPluginExtraParser;
 import net.ymate.platform.plugin.IPluginFactory;
 import net.ymate.platform.plugin.IPluginParser;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * <p>
  * DefaultPluginConfig
@@ -46,6 +48,8 @@ import net.ymate.platform.plugin.IPluginParser;
  */
 public final class DefaultPluginConfig implements IPluginConfig {
 
+	private static final String PLUGIN_MAINIFEST_FILE = "ymate_plugin.xml";
+
 	private IPluginFactory __pluginFactoryImpl;
 
 	private IPluginParser __pluginParserImpl;
@@ -54,11 +58,13 @@ public final class DefaultPluginConfig implements IPluginConfig {
 
 	private String __pluginHome;
 
+	private String __manifestFile;
+
 	/**
 	 * 构造器
 	 */
 	public DefaultPluginConfig() {
-		this(new DefaultPluginFactory(), new DefaultPluginParser(), null, null);
+		this(new DefaultPluginFactory(), new DefaultPluginParser(), null, null, null);
 	}
 
 	/**
@@ -67,7 +73,17 @@ public final class DefaultPluginConfig implements IPluginConfig {
 	 * @param pluginHome
 	 */
 	public DefaultPluginConfig(IPluginExtraParser extraParser, String pluginHome) {
-		this(new DefaultPluginFactory(), new DefaultPluginParser(), extraParser, pluginHome);
+		this(new DefaultPluginFactory(), new DefaultPluginParser(), extraParser, pluginHome, null);
+	}
+
+	/**
+	 * 构造器
+	 * @param extraParser
+	 * @param pluginHome
+	 * @param manifestFile
+	 */
+	public DefaultPluginConfig(IPluginExtraParser extraParser, String pluginHome, String manifestFile) {
+		this(new DefaultPluginFactory(), new DefaultPluginParser(), extraParser, pluginHome, manifestFile);
 	}
 
 	/**
@@ -75,7 +91,16 @@ public final class DefaultPluginConfig implements IPluginConfig {
 	 * @param pluginHome
 	 */
 	public DefaultPluginConfig(String pluginHome) {
-		this(null, pluginHome);
+		this(null, pluginHome, null);
+	}
+
+	/**
+	 * 构造器
+	 * @param pluginHome
+	 * @param manifestFile
+	 */
+	public DefaultPluginConfig(String pluginHome, String manifestFile) {
+		this(null, pluginHome, manifestFile);
 	}
 
 	/**
@@ -84,12 +109,14 @@ public final class DefaultPluginConfig implements IPluginConfig {
 	 * @param parser
 	 * @param extraParser
 	 * @param pluginHome
+	 * @param manifestFile
 	 */
-	public DefaultPluginConfig(IPluginFactory factory, IPluginParser parser, IPluginExtraParser extraParser, String pluginHome) {
+	public DefaultPluginConfig(IPluginFactory factory, IPluginParser parser, IPluginExtraParser extraParser, String pluginHome, String manifestFile) {
 		__pluginFactoryImpl = factory;
 		__pluginParserImpl = parser;
 		__extraParserImpl = extraParser;
 		__pluginHome = pluginHome;
+		__manifestFile = StringUtils.defaultIfBlank(manifestFile, PLUGIN_MAINIFEST_FILE);
 	}
 
 	/* (non-Javadoc)
@@ -118,6 +145,13 @@ public final class DefaultPluginConfig implements IPluginConfig {
 	 */
 	public String getPluginHomePath() {
 		return __pluginHome;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.plugin.IPluginConfig#getPluginManifestFile()
+	 */
+	public String getPluginManifestFile() {
+		return __manifestFile;
 	}
 
 }
