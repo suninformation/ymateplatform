@@ -77,7 +77,7 @@ public class WebMVC extends MVC {
 	public static void initialize(IWebMvcConfig config) {
 		__doInitialize(config, new WebRequestProcessor());
 		if (config.isI18n()) {
-			final String _localKey = StringUtils.defaultIfEmpty(config.getExtendParams().get("i18n_language_key"), "lang");
+			final String _localKey = StringUtils.defaultIfEmpty(config.getExtendParams().get("optional.i18n_language_key"), "lang");
 			I18N.setEventHandler(new II18NEventHandler() {
 
 				public Locale loadCurrentLocale() {
