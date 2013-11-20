@@ -15,6 +15,8 @@
  */
 package net.ymate.platform.mvc;
 
+import net.ymate.platform.mvc.context.IRequestContext;
+
 
 
 /**
@@ -47,6 +49,20 @@ public interface IEventHandler {
 	 * MVC框架初始化时将执行此事件回调
 	 */
 	public void onInitialized();
+
+	/**
+	 * 当接收到请求时将执行此事件回调 
+	 * 
+	 * @param context
+	 */
+	public void onRequestReceived(IRequestContext context);
+
+	/**
+	 * 当接收到的请求处理完毕时将执行此事件回调
+	 * 
+	 * @param context
+	 */
+	public void onRequestCompleted(IRequestContext context);
 
 	/**
 	 * MVC框架销毁时将执行此事件回调

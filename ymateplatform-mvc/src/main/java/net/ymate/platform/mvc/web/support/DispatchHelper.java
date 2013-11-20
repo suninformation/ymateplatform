@@ -17,7 +17,6 @@ package net.ymate.platform.mvc.web.support;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Enumeration;
 import java.util.Locale;
 
 import javax.servlet.FilterConfig;
@@ -27,7 +26,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.ymate.platform.base.YMP;
 import net.ymate.platform.commons.util.RuntimeUtils;
 import net.ymate.platform.mvc.support.RequestExecutor;
 import net.ymate.platform.mvc.view.IView;
@@ -41,9 +39,6 @@ import net.ymate.platform.mvc.web.view.impl.HttpStatusView;
 import net.ymate.platform.mvc.web.view.impl.JspView;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.StopWatch;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -71,7 +66,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DispatchHelper {
 
-	private static final Log _LOG = LogFactory.getLog(DispatchHelper.class);
+//	private static final Log _LOG = LogFactory.getLog(DispatchHelper.class);
 
 	public static final String DEFAULT_METHOD_PARAM = "_method";
 
@@ -111,19 +106,13 @@ public class DispatchHelper {
 	}
 
 	public void doRequestProcess(IWebRequestContext context, ServletContext servletContext, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		StopWatch _stopWatch = new StopWatch();
-		_stopWatch.start();
 		try {
-			_LOG.info("接收请求" + context.toString());
-			if (YMP.IS_DEV_MODEL) {
-				Enumeration<?> _headerNames = request.getHeaderNames();
-				while(_headerNames.hasMoreElements()) {
-					String _headerName = (String) _headerNames.nextElement();
-					_LOG.info("请求头[" + _headerName + "]=" + request.getHeader(_headerName));
-				}
-			}
 			request = wrapperRequestForREST(request);
 			WebContext.setContext(new WebContext(WebContext.createWebContextMap(servletContext, request, response, null), context));
+			// 触发请求接收事件接口回调
+			if (WebMVC.getConfig().getEventHandlerClassImpl() != null) {
+				WebMVC.getConfig().getEventHandlerClassImpl().onRequestReceived(context);
+			}
 			//
 			RequestExecutor _executor = WebMVC.processRequestMapping(context);
 			if (_executor != null) {
@@ -168,9 +157,12 @@ public class DispatchHelper {
 				throw new ServletException(e);
 			}
 		} finally {
+			// 触发请求处理完毕事件接口回调
+			if (WebMVC.getConfig().getEventHandlerClassImpl() != null) {
+				WebMVC.getConfig().getEventHandlerClassImpl().onRequestCompleted(context);
+			}
+			//
 			WebContext.setContext(null);
-			_stopWatch.stop();
-			_LOG.info("请求[" + context.getRequestMapping() + "][" + request.getMethod() + "]处理完毕，耗时" + _stopWatch.getTime() + "ms");
 		}
 	}
 

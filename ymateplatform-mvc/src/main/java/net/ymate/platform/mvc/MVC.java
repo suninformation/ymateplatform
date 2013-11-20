@@ -92,9 +92,8 @@ public abstract class MVC {
 				// 初始化国际化资源管理器
 				I18N.initialize(__MVC_CONFIG.getLocale());
 			}
-			//
+			// 回调MVC框架事件处理器接口, 触发onInitialized事件
 			if (__MVC_CONFIG.getEventHandlerClassImpl() != null) {
-				_LOG.info("回调MVC框架事件处理器接口, 触发onInitialized事件...");
 				__MVC_CONFIG.getEventHandlerClassImpl().onInitialized();
 			}
 			_LOG.info("MVC框架初始化完毕");
@@ -103,6 +102,11 @@ public abstract class MVC {
 
 	protected static void __doDestroy() {
 		if (__IS_INITED) {
+			// 回调MVC框架事件处理器接口, 触发onDestroyed事件
+			if (__MVC_CONFIG.getEventHandlerClassImpl() != null) {
+				__MVC_CONFIG.getEventHandlerClassImpl().onDestroyed();
+			}
+			//
 			__PLUGIN_FACTORY.destroy();
 			__META_PROCESSOR.destroy();
 			__IS_INITED = false;
