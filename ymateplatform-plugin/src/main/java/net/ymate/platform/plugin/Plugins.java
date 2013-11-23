@@ -53,7 +53,7 @@ public class Plugins {
 	 * @throws PluginException
 	 */
 	public static IPluginFactory createPluginFactory() throws PluginException {
-		return createPluginFactory(new DefaultPluginConfig());
+		return createPluginFactory(new DefaultPluginConfig(true));
 	}
 
 	/**

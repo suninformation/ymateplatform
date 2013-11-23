@@ -56,24 +56,28 @@ public final class DefaultPluginConfig implements IPluginConfig {
 
 	private IPluginExtraParser __extraParserImpl;
 
+	private boolean __includeClassPath;
+
 	private String __pluginHome;
 
 	private String __manifestFile;
 
 	/**
 	 * 构造器
+	 * @param includeClassPath
 	 */
-	public DefaultPluginConfig() {
-		this(new DefaultPluginFactory(), new DefaultPluginParser(), null, null, null);
+	public DefaultPluginConfig(boolean includeClassPath) {
+		this(new DefaultPluginFactory(), new DefaultPluginParser(), null, null, null, includeClassPath);
 	}
 
 	/**
 	 * 构造器
 	 * @param extraParser
 	 * @param pluginHome
+	 * @param includeClassPath
 	 */
-	public DefaultPluginConfig(IPluginExtraParser extraParser, String pluginHome) {
-		this(new DefaultPluginFactory(), new DefaultPluginParser(), extraParser, pluginHome, null);
+	public DefaultPluginConfig(IPluginExtraParser extraParser, String pluginHome, boolean includeClassPath) {
+		this(new DefaultPluginFactory(), new DefaultPluginParser(), extraParser, pluginHome, null, includeClassPath);
 	}
 
 	/**
@@ -81,26 +85,29 @@ public final class DefaultPluginConfig implements IPluginConfig {
 	 * @param extraParser
 	 * @param pluginHome
 	 * @param manifestFile
+	 * @param includeClassPath
 	 */
-	public DefaultPluginConfig(IPluginExtraParser extraParser, String pluginHome, String manifestFile) {
-		this(new DefaultPluginFactory(), new DefaultPluginParser(), extraParser, pluginHome, manifestFile);
+	public DefaultPluginConfig(IPluginExtraParser extraParser, String pluginHome, String manifestFile, boolean includeClassPath) {
+		this(new DefaultPluginFactory(), new DefaultPluginParser(), extraParser, pluginHome, manifestFile, includeClassPath);
 	}
 
 	/**
 	 * 构造器
 	 * @param pluginHome
+	 * @param includeClassPath
 	 */
-	public DefaultPluginConfig(String pluginHome) {
-		this(null, pluginHome, null);
+	public DefaultPluginConfig(String pluginHome, boolean includeClassPath) {
+		this(null, pluginHome, null, includeClassPath);
 	}
 
 	/**
 	 * 构造器
 	 * @param pluginHome
 	 * @param manifestFile
+	 * @param includeClassPath
 	 */
-	public DefaultPluginConfig(String pluginHome, String manifestFile) {
-		this(null, pluginHome, manifestFile);
+	public DefaultPluginConfig(String pluginHome, String manifestFile, boolean includeClassPath) {
+		this(null, pluginHome, manifestFile, includeClassPath);
 	}
 
 	/**
@@ -110,11 +117,13 @@ public final class DefaultPluginConfig implements IPluginConfig {
 	 * @param extraParser
 	 * @param pluginHome
 	 * @param manifestFile
+	 * @param includeClassPath
 	 */
-	public DefaultPluginConfig(IPluginFactory factory, IPluginParser parser, IPluginExtraParser extraParser, String pluginHome, String manifestFile) {
+	public DefaultPluginConfig(IPluginFactory factory, IPluginParser parser, IPluginExtraParser extraParser, String pluginHome, String manifestFile, boolean includeClassPath) {
 		__pluginFactoryImpl = factory;
 		__pluginParserImpl = parser;
 		__extraParserImpl = extraParser;
+		__includeClassPath = includeClassPath;
 		__pluginHome = pluginHome;
 		__manifestFile = StringUtils.defaultIfBlank(manifestFile, PLUGIN_MAINIFEST_FILE);
 	}
@@ -138,6 +147,13 @@ public final class DefaultPluginConfig implements IPluginConfig {
 	 */
 	public IPluginExtraParser getPluginExtraParserClassImpl() {
 		return __extraParserImpl;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.plugin.IPluginConfig#isIncludeClassPath()
+	 */
+	public boolean isIncludeClassPath() {
+		return __includeClassPath;
 	}
 
 	/* (non-Javadoc)

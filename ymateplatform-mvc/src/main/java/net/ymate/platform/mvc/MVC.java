@@ -85,7 +85,7 @@ public abstract class MVC {
 			//
 			__PLUGIN_FACTORY = Plugins.createPluginFactory(new DefaultPluginConfig(__MVC_CONFIG.getPluginExtraParser(), 
 					__MVC_CONFIG.getPluginHome(), 
-					MVC.getConfig().getExtendParams().get("optional.plugins_manifest_file")));
+					MVC.getConfig().getExtendParams().get("optional.plugins_manifest_file"), true));
 			
 			__IS_INITED = true;
 			if (__MVC_CONFIG.isI18n()) {

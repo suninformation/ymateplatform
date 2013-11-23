@@ -58,6 +58,11 @@ public interface IPluginConfig {
 	public IPluginExtraParser getPluginExtraParserClassImpl();
 
 	/**
+	 * @return 是否加载当前CLASSPATH内的所有包含插件主配置文件的Jar包
+	 */
+	public boolean isIncludeClassPath();
+
+	/**
 	 * @return 返回插件存放路径
 	 */
 	public String getPluginHomePath();

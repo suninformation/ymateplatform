@@ -93,12 +93,14 @@ public class DefaultPluginParser implements IPluginParser {
 	public Map<String, PluginMeta> doParser() throws PluginParserException {
 		Map<String, PluginMeta> _returnValue = new HashMap<String, PluginMeta>();
 		try {
-			// 首先加载当前CLASSPATH内的所有包含插件主配置文件的Jar包
-			Iterator<URL> _configURLs = ResourceUtils.getResources(__pluginFactory.getPluginConfig().getPluginManifestFile(), this.getClass(), true);
-			while (_configURLs.hasNext()) {
-				PluginMeta _meta = __doManifestFileProcess(null, _configURLs.next());
-				if (_meta != null) {
-					_returnValue.put(_meta.getId(), _meta);
+			if (__pluginFactory.getPluginConfig().isIncludeClassPath()) {
+				// 首先加载当前CLASSPATH内的所有包含插件主配置文件的Jar包
+				Iterator<URL> _configURLs = ResourceUtils.getResources(__pluginFactory.getPluginConfig().getPluginManifestFile(), this.getClass(), true);
+				while (_configURLs.hasNext()) {
+					PluginMeta _meta = __doManifestFileProcess(null, _configURLs.next());
+					if (_meta != null) {
+						_returnValue.put(_meta.getId(), _meta);
+					}
 				}
 			}
 			// 然后尝试加载由PLUGIN_HOME指定的插件目录
