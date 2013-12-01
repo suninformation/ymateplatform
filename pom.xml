@@ -6,17 +6,10 @@
 	<artifactId>ymate-platform-parent</artifactId>
 	<version>1</version>
 	<packaging>pom</packaging>
-	<name>ymateplatform</name>
+	<name>ymateplatform-parent</name>
 	<description>yMatePlatform Library based on Java.</description>
 	<modules>
-		<module>ymateplatform-base</module>
-		<module>ymateplatform-commons</module>
-		<module>ymateplatform-configuration</module>
-		<module>ymateplatform-module</module>
-		<module>ymateplatform-mvc</module>
-		<module>ymateplatform-persistence</module>
-		<module>ymateplatform-plugin</module>
-		<module>ymateplatform-validation</module>
+		<module>ymateplatform</module>
 	</modules>
 	<build>
 		<resources>
