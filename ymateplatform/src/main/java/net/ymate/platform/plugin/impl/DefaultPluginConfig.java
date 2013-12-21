@@ -125,7 +125,7 @@ public final class DefaultPluginConfig implements IPluginConfig {
 		__extraParserImpl = extraParser;
 		__includeClassPath = includeClassPath;
 		__pluginHome = pluginHome;
-		__manifestFile = StringUtils.defaultIfBlank(manifestFile, PLUGIN_MAINIFEST_FILE);
+		__manifestFile = StringUtils.defaultIfEmpty(manifestFile, PLUGIN_MAINIFEST_FILE);
 	}
 
 	/* (non-Javadoc)
