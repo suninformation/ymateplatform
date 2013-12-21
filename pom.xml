@@ -20,7 +20,7 @@
 					<exclude>**/*.html</exclude>
 					<exclude>**/*.xml</exclude>
 				</excludes>
-				<filtering>true</filtering>
+				<filtering>false</filtering>
 			</resource>
 		</resources>
 		<pluginManagement>
