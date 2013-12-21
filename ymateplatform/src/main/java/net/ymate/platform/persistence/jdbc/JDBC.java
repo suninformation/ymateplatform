@@ -24,10 +24,13 @@ import net.ymate.platform.persistence.jdbc.base.dialect.IDialect;
 import net.ymate.platform.persistence.jdbc.base.dialect.impl.MySqlDialect;
 import net.ymate.platform.persistence.jdbc.base.dialect.impl.OracleDialect;
 import net.ymate.platform.persistence.jdbc.base.dialect.impl.SQLServer2005Dialect;
+import net.ymate.platform.persistence.jdbc.support.C3p0DataSourceAdapter;
 import net.ymate.platform.persistence.jdbc.support.DataSourceCfgMeta;
+import net.ymate.platform.persistence.jdbc.support.DbcpDataSourceAdapter;
 import net.ymate.platform.persistence.jdbc.support.DefaultConnectionHolder;
 import net.ymate.platform.persistence.jdbc.support.DefaultDataSourceAdapter;
 import net.ymate.platform.persistence.jdbc.support.DefaultSession;
+import net.ymate.platform.persistence.jdbc.support.JndiDataSourceAdapter;
 import net.ymate.platform.persistence.jdbc.support.RepositoryBeanFactory;
 import net.ymate.platform.persistence.jdbc.transaction.ITransaction;
 import net.ymate.platform.persistence.jdbc.transaction.Trans;
@@ -78,20 +81,21 @@ public class JDBC {
 
 	protected static Map<String, IDataSourceAdapter> __DATASOURCE_CACHE = new ConcurrentHashMap<String, IDataSourceAdapter>();
 
+	protected static Map<String, String> __DEFAULT_ADAPTER_NAMES = new HashMap<String, String>();
+
 	protected static RepositoryBeanFactory __REPOSTORY_BEAN_FACTORY;
 
 	protected static Map<String, Class<? extends IDialect>> __DIALECT = new HashMap<String, Class<? extends IDialect>>();
 
-	public static String DIALECT_ORACLE = "oracle";
-
-	public static String DIALECT_MYSQL = "mysql";
-
-	public static String DIALECT_SQLSERVER = "microsoft sql server";
-
 	static {
-		__DIALECT.put(DIALECT_ORACLE, OracleDialect.class);
-		__DIALECT.put(DIALECT_MYSQL, MySqlDialect.class);
-		__DIALECT.put(DIALECT_SQLSERVER, SQLServer2005Dialect.class);
+		__DIALECT.put("oracle", OracleDialect.class);
+		__DIALECT.put("mysql", MySqlDialect.class);
+		__DIALECT.put("microsoft sql server", SQLServer2005Dialect.class);
+		//  { "default", "c3p0", "dbcp", "jndi" };
+		__DEFAULT_ADAPTER_NAMES.put("default", DefaultDataSourceAdapter.class.getName());
+		__DEFAULT_ADAPTER_NAMES.put("c3p0", C3p0DataSourceAdapter.class.getName());
+		__DEFAULT_ADAPTER_NAMES.put("dbcp", DbcpDataSourceAdapter.class.getName());
+		__DEFAULT_ADAPTER_NAMES.put("jndi", JndiDataSourceAdapter.class.getName());
 	}
 
 	/**
@@ -113,10 +117,11 @@ public class JDBC {
 			TABLE_PREFIX = StringUtils.trimToEmpty(config.getTablePrefix());
 			isShowSQL = config.isShowSql();
 			for (DataSourceCfgMeta _cfgMeta : config.getDataSourceCfgMetas()) {
-				IDataSourceAdapter _adapter = ClassUtils.impl(_cfgMeta.getAdapterClass(), IDataSourceAdapter.class, JDBC.class);
-				if (_adapter == null) {
-					_adapter = new DefaultDataSourceAdapter();
+				String _adapterClassName = StringUtils.defaultIfEmpty(_cfgMeta.getAdapterClass(), "default");
+				if (__DEFAULT_ADAPTER_NAMES.containsKey(_adapterClassName.toLowerCase())) {
+					_adapterClassName = __DEFAULT_ADAPTER_NAMES.get(_adapterClassName.toLowerCase());
 				}
+				IDataSourceAdapter _adapter = ClassUtils.impl(_adapterClassName, IDataSourceAdapter.class, JDBC.class);
 				_adapter.initialize(_cfgMeta);
 				__DATASOURCE_CACHE.put(_cfgMeta.getName(), _adapter);
 			}
@@ -182,6 +187,10 @@ public class JDBC {
 	 */
 	public static void registerDialectClass(String dialectName, Class<? extends IDialect> clazz) {
 		__DIALECT.put(dialectName.toLowerCase(), clazz);
+	}
+
+	public static void registerDataSourceAdapterClass(String adapterName, Class<? extends IDataSourceAdapter> clazz) {
+		__DEFAULT_ADAPTER_NAMES.put(adapterName, clazz.getName());
 	}
 
 	/**

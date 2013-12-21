@@ -13,21 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.ymate.platform.persistence.jdbc;
+package net.ymate.platform.persistence.jdbc.support;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+
 import net.ymate.platform.commons.util.RuntimeUtils;
-import net.ymate.platform.persistence.jdbc.base.dialect.IDialect;
-import net.ymate.platform.persistence.jdbc.support.DataSourceCfgMeta;
+import net.ymate.platform.persistence.jdbc.AbstractDataSourceAdapter;
+import net.ymate.platform.persistence.jdbc.ConnectionException;
 
 /**
  * <p>
- * AbstractDataSourceAdapter
+ * JndiDataSourceAdapter
  * </p>
  * <p>
- * 数据源适配器接口抽象实现类；
+ * 基于JNDI的数据源适配器接口实现类；
  * </p>
  * 
  * @author 刘镇(suninformation@163.com)
@@ -42,55 +47,40 @@ import net.ymate.platform.persistence.jdbc.support.DataSourceCfgMeta;
  *          <td>0.0.0</td>
  *          <td>创建类</td>
  *          <td>刘镇</td>
- *          <td>2013年8月1日下午8:30:34</td>
+ *          <td>2013年12月19日下午2:43:51</td>
  *          </tr>
  *          </table>
  */
-public abstract class AbstractDataSourceAdapter implements IDataSourceAdapter {
+public class JndiDataSourceAdapter extends AbstractDataSourceAdapter {
 
-	protected DataSourceCfgMeta cfgMeta;
-
-	protected IDialect dialect;
+	protected DataSource __ds;
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.persistence.jdbc.IDataSourceAdapter#initialize(net.ymate.platform.persistence.jdbc.support.DataSourceCfgMeta)
+	 * @see net.ymate.platform.persistence.jdbc.AbstractDataSourceAdapter#initialize(net.ymate.platform.persistence.jdbc.support.DataSourceCfgMeta)
 	 */
 	public void initialize(DataSourceCfgMeta cfgMeta) {
-		this.cfgMeta = cfgMeta;
-	}
-
-	/* (non-Javadoc)
-	 * @see net.ymate.platform.persistence.jdbc.IDataSourceAdapter#getDialect()
-	 */
-	public IDialect getDialect() {
-		if (dialect == null) {
-			Connection _conn = null;
-			try {
-				_conn = this.getConnection();
-				String _prodName = _conn.getMetaData().getDatabaseProductName();
-				dialect = JDBC.getDialectClass(_prodName).newInstance();
-			} catch (Exception e) {
-				throw new Error(RuntimeUtils.unwrapThrow(e));
-			} finally {
-				if (_conn != null) {
-					try {
-						_conn.close();
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-					_conn = null;
-				}
-			}
+		super.initialize(cfgMeta);
+		//
+		try {
+			// 从JNDI获取数据库源
+			Context _initContext = new InitialContext();
+			Context _envContext = (Context) _initContext.lookup("java:/comp/env");
+			__ds = (DataSource) _envContext.lookup(cfgMeta.getConnectionUrl());
+		} catch (NamingException e) {
+			throw new Error(RuntimeUtils.unwrapThrow(e));
 		}
-		return dialect;
+		
 	}
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.persistence.jdbc.IDataSourceAdapter#destroy()
+	 * @see net.ymate.platform.persistence.jdbc.IDataSourceAdapter#getConnection()
 	 */
-	public void destroy() {
-		this.cfgMeta = null;
-		this.dialect = null;
+	public Connection getConnection() throws ConnectionException {
+		try {
+			return __ds.getConnection();
+		} catch (SQLException e) {
+			throw new ConnectionException(RuntimeUtils.unwrapThrow(e));
+		}
 	}
 
 }
