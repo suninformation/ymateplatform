@@ -42,6 +42,7 @@ import net.ymate.platform.mvc.web.support.HttpRequestMeta;
 import net.ymate.platform.mvc.web.support.RequestMappingParser;
 import net.ymate.platform.mvc.web.support.WebControllerBeanFactory;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -137,10 +138,10 @@ public class WebRequestProcessor extends DefaultRequestProcessor {
 					__CONSTANT_REQUEST_MAPPING_MAP.put(_meta.getRequestMapping(), _meta);
 				}
 			}
-			_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.mvc.register_controller", _meta.getRequestMapping(), _meta.getClass().getName()));
+			_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.mvc.register_controller", _meta.getRequestMapping(), _meta.getTarget().getClass().getName() + "#" + _meta.getMethod().getName()));
 			// 注册拦截器
 			for (PairObject<Class<IFilter>, String> _c : _meta.getFilters()) {
-				_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.mvc.register_filter", _c.getKey(), _c.getKey().getName()));
+				_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.mvc.register_filter", _meta.getRequestMapping(), _c.getKey().getSimpleName(), StringUtils.defaultIfEmpty(_c.getValue(), "null")));
 				this.getControllerBeanFactory().add(_c.getKey());
 			}
 		}

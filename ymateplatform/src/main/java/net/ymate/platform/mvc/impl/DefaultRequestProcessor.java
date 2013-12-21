@@ -119,7 +119,7 @@ public class DefaultRequestProcessor implements IRequestProcessor {
 	 */
 	protected void addControllerMetaToMap(IControllerBeanMeta beanMeta) {
 		for (RequestMeta _meta : beanMeta.getRequestMetas()) {
-			_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.mvc.register_controller", _meta.getRequestMapping(), _meta.getClass().getName()));
+			_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.mvc.register_controller", _meta.getRequestMapping(), _meta.getTarget().getClass().getName() + "#" + _meta.getMethod().getName()));
 			__CONSTANT_REQUEST_MAPPING_MAP.put(_meta.getRequestMapping(), _meta);
 			// 注册拦截器
 			for (PairObject<Class<IFilter>, String> _c : _meta.getFilters()) {
