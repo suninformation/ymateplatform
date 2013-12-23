@@ -112,7 +112,7 @@ public class DefaultPluginParser implements IPluginParser {
 						if (_subDirFile.isDirectory()) {
 							File _manifestFile = new File(_subDirFile, __pluginFactory.getPluginConfig().getPluginManifestFile());
 							if (_manifestFile.exists() && _manifestFile.isFile()) {
-								PluginMeta _meta = __doManifestFileProcess(__pluginFactory.getPluginConfig().getPluginHomePath(), _manifestFile.toURL());
+								PluginMeta _meta = __doManifestFileProcess(__pluginFactory.getPluginConfig().getPluginHomePath(), _manifestFile.toURI().toURL());
 								if (_meta != null) {
 									_returnValue.put(_meta.getId(), _meta);
 								}
