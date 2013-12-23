@@ -23,6 +23,10 @@ import java.util.Properties;
 
 import net.ymate.platform.base.IModule;
 import net.ymate.platform.base.IModuleLoader;
+import net.ymate.platform.module.ConfigModule;
+import net.ymate.platform.module.JdbcModule;
+import net.ymate.platform.module.LogModule;
+import net.ymate.platform.module.WebMvcModule;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -52,6 +56,16 @@ import org.apache.commons.lang.StringUtils;
  */
 public class DefaultModuleLoader implements IModuleLoader {
 
+	protected static Map<String, String> __DEFAULT_MODULE_LOADER_NAMES = new HashMap<String, String>();
+
+	static {
+		// configuration|logger|jdbc|webmvc
+		__DEFAULT_MODULE_LOADER_NAMES.put("configuration", ConfigModule.class.getName());
+		__DEFAULT_MODULE_LOADER_NAMES.put("logger", LogModule.class.getName());
+		__DEFAULT_MODULE_LOADER_NAMES.put("jdbc", JdbcModule.class.getName());
+		__DEFAULT_MODULE_LOADER_NAMES.put("webmvc", WebMvcModule.class.getName());
+	}
+
 	private List<IModule> __loadedModules = new ArrayList<IModule>();
 
 	/* (non-Javadoc)
@@ -62,6 +76,11 @@ public class DefaultModuleLoader implements IModuleLoader {
 		if (_moduleList != null && _moduleList.length > 0) {
 			for(String _moduleName : _moduleList) {
 				String _moduleClassName = configs.getProperty("ymp.modules." + _moduleName);
+				if (StringUtils.isBlank(_moduleClassName)) {
+					if (__DEFAULT_MODULE_LOADER_NAMES.containsKey(_moduleName)) {
+						_moduleClassName = __DEFAULT_MODULE_LOADER_NAMES.get(_moduleName);
+					}
+				}
 				if (StringUtils.isNotBlank(_moduleClassName)) {
 					IModule _module = (IModule) Class.forName(_moduleClassName).newInstance();
 					_module.initialize(__parseModuleCfg(_moduleName, configs));
