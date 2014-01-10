@@ -21,6 +21,7 @@ import java.util.Properties;
 import net.ymate.platform.base.impl.DefaultModuleLoader;
 import net.ymate.platform.commons.i18n.I18N;
 import net.ymate.platform.commons.lang.BlurObject;
+import net.ymate.platform.commons.util.RuntimeUtils;
 
 import org.apache.commons.lang.time.StopWatch;
 
@@ -80,7 +81,15 @@ public class YMP {
 			System.out.println(I18N.formatMessage(__LSTRING_FILE, null, null, "ymp.base.platform_version_show", VERSION, BUILD_DATE));
 			//
 			Properties _configs = new Properties();
-			InputStream _in = YMP.class.getClassLoader().getResourceAsStream("ymp-conf.properties");
+			InputStream _in = null;
+			if (RuntimeUtils.isWindows()) {
+				_in = YMP.class.getClassLoader().getResourceAsStream("ymp-conf_WIN.properties");
+			} else if (RuntimeUtils.isUnixOrLinux()) {
+				_in = YMP.class.getClassLoader().getResourceAsStream("ymp-conf_UNIX.properties");
+			}
+			if (_in == null) {
+				_in = YMP.class.getClassLoader().getResourceAsStream("ymp-conf.properties");
+			}
 			if (_in != null) {
 				try {
 					_configs.load(_in);
