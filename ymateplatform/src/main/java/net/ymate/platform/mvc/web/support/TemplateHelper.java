@@ -17,7 +17,10 @@ package net.ymate.platform.mvc.web.support;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import net.ymate.platform.commons.util.FileUtils;
 import net.ymate.platform.commons.util.RuntimeUtils;
 import net.ymate.platform.mvc.web.WebMVC;
 
@@ -87,7 +90,15 @@ public class TemplateHelper {
 	public static String getPluginViewPath() {
 		if (__PLUGIN_VIEW_PATH == null) {
 			synchronized (__LOCKER) {
-				__PLUGIN_VIEW_PATH = "/WEB-INF/plugins/"; // 因为适应Web环境JSP文件的特殊性，默认写死
+				String _pHome = WebMVC.getConfig().getPluginHome();
+				if (StringUtils.isNotBlank(_pHome)) {
+					if (!_pHome.equals("/WEB-INF/plugins/") && _pHome.contains("/WEB-INF/")) {
+						_pHome = StringUtils.substring(_pHome, _pHome.indexOf("/WEB-INF/"));
+					}
+					__PLUGIN_VIEW_PATH = FileUtils.fixSeparator(_pHome);
+				} else {
+					__PLUGIN_VIEW_PATH = "/WEB-INF/plugins/"; // 为了适应Web环境JSP文件的特殊性(即不能引用工程路径外的JSP文件), 建议采用默认"/WEB-INF/plugins/
+				}
 			}
 		}
 		return __PLUGIN_VIEW_PATH;
@@ -103,16 +114,26 @@ public class TemplateHelper {
 				__FREEMARKER_CONFIG.setDefaultEncoding("UTF-8");
 				__FREEMARKER_CONFIG.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER);
 		        //
-				TemplateLoader[] _tmpLoaders;
+				List<TemplateLoader> _tmpLoaders = new ArrayList<TemplateLoader>();
 				try {
-					_tmpLoaders = new TemplateLoader[] {
-							new FileTemplateLoader(new File(RuntimeUtils.getRootPath(), "templates")),
-							new FileTemplateLoader(new File(RuntimeUtils.getRootPath(), "plugins"))
-						};
+					File _tmpFile = null;
+					if (getRootViewPath().contains("/WEB-INF/")) {
+						_tmpFile = new File(RuntimeUtils.getRootPath(), StringUtils.substringAfter(getRootViewPath(), "/WEB-INF/"));
+					} else {
+						_tmpFile = new File(getRootViewPath());
+					}
+					_tmpLoaders.add(new FileTemplateLoader(_tmpFile));
+					//
+					if (getPluginViewPath().contains("/WEB-INF/")) {
+						_tmpFile = new File(RuntimeUtils.getRootPath(), StringUtils.substringAfter(getPluginViewPath(), "/WEB-INF/"));
+					} else {
+						_tmpFile = new File(getPluginViewPath());
+					}
+					_tmpLoaders.add(new FileTemplateLoader(_tmpFile));
 				} catch (IOException e) {
 					throw new Error(RuntimeUtils.unwrapThrow(e));
 				}
-				__FREEMARKER_CONFIG.setTemplateLoader(new MultiTemplateLoader(_tmpLoaders));
+				__FREEMARKER_CONFIG.setTemplateLoader(new MultiTemplateLoader(_tmpLoaders.toArray(new TemplateLoader[0])));
 			}
 		}
 		return __FREEMARKER_CONFIG;
