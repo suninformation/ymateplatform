@@ -24,7 +24,7 @@ import net.ymate.platform.base.AbstractModule;
 import net.ymate.platform.commons.lang.BlurObject;
 import net.ymate.platform.persistence.jdbc.IJdbcConfig;
 import net.ymate.platform.persistence.jdbc.JDBC;
-import net.ymate.platform.persistence.jdbc.support.DataSourceCfgMeta;
+import net.ymate.platform.persistence.jdbc.support.JdbcDataSourceCfgMeta;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -59,7 +59,7 @@ public class JdbcModule extends AbstractModule {
 	 */
 	public void initialize(final Map<String, String> moduleCfgs) throws Exception {
 		final boolean _showSql = new BlurObject(moduleCfgs.get("base.show_sql")).toBooleanValue();
-		final Set<DataSourceCfgMeta> _metas = new HashSet<DataSourceCfgMeta>();
+		final Set<JdbcDataSourceCfgMeta> _metas = new HashSet<JdbcDataSourceCfgMeta>();
 		for (String _name : StringUtils.split(StringUtils.trimToEmpty(moduleCfgs.get("base.datasource_list")), "|")) {
 			String _adaptorClass = moduleCfgs.get("datasource." + _name + ".adapter_class");
 			String _driverClass = moduleCfgs.get("datasource." + _name + ".driver_class");
@@ -74,7 +74,7 @@ public class JdbcModule extends AbstractModule {
 					_params.put(StringUtils.substringAfter(_cfgKey, _paramKey), moduleCfgs.get(_cfgKey));
 				}
 			}
-			_metas.add(new DataSourceCfgMeta(_name, _adaptorClass, _driverClass, _connectionUrl, _userName, _password, _params));
+			_metas.add(new JdbcDataSourceCfgMeta(_name, _adaptorClass, _driverClass, _connectionUrl, _userName, _password, _params));
 		}
 		JDBC.initialize(new IJdbcConfig() {
 			
@@ -94,7 +94,7 @@ public class JdbcModule extends AbstractModule {
 				return StringUtils.split(moduleCfgs.get("base.repository_packages"), "|");
 			}
 			
-			public Set<DataSourceCfgMeta> getDataSourceCfgMetas() {
+			public Set<JdbcDataSourceCfgMeta> getDataSourceCfgMetas() {
 				return _metas;
 			}
 		});

@@ -13,15 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.ymate.platform.persistence.jdbc;
+package net.ymate.platform.persistence.annotation;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * <p>
- * ConnectionException
+ * Column
  * </p>
  * <p>
- * 数据源连接异常；
+ * 声明 Model 类中的一个方法或成员所对应的数据表字段，若参数 name 为空，则默认采用对应方法或成员的名称；
  * </p>
  * 
  * @author 刘镇(suninformation@163.com)
@@ -36,47 +41,28 @@ package net.ymate.platform.persistence.jdbc;
  *          <td>0.0.0</td>
  *          <td>创建类</td>
  *          <td>刘镇</td>
- *          <td>2011-8-30下午12:41:20</td>
+ *          <td>2011-6-15下午10:39:19</td>
  *          </tr>
  *          </table>
  */
-public class ConnectionException extends Exception {
+@Retention(RetentionPolicy.RUNTIME)
+@Target( { ElementType.FIELD })
+@Documented
+public @interface Property {
 
 	/**
-	 * 
+	 * @return 字段名称，若为空，则默认采用对应方法或成员的名称
 	 */
-	private static final long serialVersionUID = 7648640036141581760L;
+	String name() default "";
 
 	/**
-	 * 构造器
+	 * @return 字段值是否自增长
 	 */
-	public ConnectionException() {
-		super();
-	}
+	boolean isAutoIncrement() default false;
 
 	/**
-	 * 构造器
-	 * @param message
+	 * @return  序列名称（只适用类似 Oracle 等数据库，配合 isAutoIncrement 参数一同使用）
 	 */
-	public ConnectionException(String message) {
-		super(message);
-	}
-
-	/**
-	 * 构造器
-	 * @param cause
-	 */
-	public ConnectionException(Throwable cause) {
-		super(cause);
-	}
-
-	/**
-	 * 构造器
-	 * @param message
-	 * @param cause
-	 */
-	public ConnectionException(String message, Throwable cause) {
-		super(message, cause);
-	}
+	String sequenceName() default "";
 
 }

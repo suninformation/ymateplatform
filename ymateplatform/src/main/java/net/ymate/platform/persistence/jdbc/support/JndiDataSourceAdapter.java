@@ -24,8 +24,8 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import net.ymate.platform.commons.util.RuntimeUtils;
+import net.ymate.platform.persistence.base.ConnectionException;
 import net.ymate.platform.persistence.jdbc.AbstractDataSourceAdapter;
-import net.ymate.platform.persistence.jdbc.ConnectionException;
 
 /**
  * <p>
@@ -58,7 +58,7 @@ public class JndiDataSourceAdapter extends AbstractDataSourceAdapter {
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.AbstractDataSourceAdapter#initialize(net.ymate.platform.persistence.jdbc.support.DataSourceCfgMeta)
 	 */
-	public void initialize(DataSourceCfgMeta cfgMeta) {
+	public void initialize(JdbcDataSourceCfgMeta cfgMeta) {
 		super.initialize(cfgMeta);
 		//
 		try {

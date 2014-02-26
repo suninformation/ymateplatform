@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.ymate.platform.persistence.jdbc.support;
+package net.ymate.platform.persistence.support;
 
 import java.util.List;
 
 import net.ymate.platform.commons.beans.IBeanMeta;
 import net.ymate.platform.commons.beans.IBeanMetaLoader;
 import net.ymate.platform.commons.beans.impl.AnnotationBeanFactory;
-import net.ymate.platform.persistence.jdbc.annotation.Repository;
+import net.ymate.platform.persistence.support.annotation.Repository;
 
 /**
  * <p>

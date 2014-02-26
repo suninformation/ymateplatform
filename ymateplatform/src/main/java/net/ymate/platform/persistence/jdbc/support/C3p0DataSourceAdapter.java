@@ -20,8 +20,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import net.ymate.platform.commons.util.RuntimeUtils;
+import net.ymate.platform.persistence.base.ConnectionException;
 import net.ymate.platform.persistence.jdbc.AbstractDataSourceAdapter;
-import net.ymate.platform.persistence.jdbc.ConnectionException;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
@@ -78,7 +78,7 @@ public class C3p0DataSourceAdapter extends AbstractDataSourceAdapter {
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.AbstractDataSourceAdapter#initialize(net.ymate.platform.persistence.jdbc.support.DataSourceCfgMeta)
 	 */
-	public void initialize(DataSourceCfgMeta cfgMeta) {
+	public void initialize(JdbcDataSourceCfgMeta cfgMeta) {
 		super.initialize(cfgMeta);
 		//
 		try {

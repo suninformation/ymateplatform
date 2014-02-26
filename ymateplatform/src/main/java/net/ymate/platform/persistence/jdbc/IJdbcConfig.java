@@ -17,7 +17,7 @@ package net.ymate.platform.persistence.jdbc;
 
 import java.util.Set;
 
-import net.ymate.platform.persistence.jdbc.support.DataSourceCfgMeta;
+import net.ymate.platform.persistence.jdbc.support.JdbcDataSourceCfgMeta;
 
 /**
  * <p>
@@ -68,6 +68,6 @@ public interface IJdbcConfig {
 	/**
 	 * @return 返回数据源配置对象集合
 	 */
-	public Set<DataSourceCfgMeta> getDataSourceCfgMetas();
+	public Set<JdbcDataSourceCfgMeta> getDataSourceCfgMetas();
 
 }

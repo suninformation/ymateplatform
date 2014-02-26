@@ -13,21 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.ymate.platform.persistence.jdbc.operator;
+package net.ymate.platform.persistence.mongodb;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-
-import net.ymate.platform.persistence.base.OperatorException;
-
+import com.mongodb.DB;
 
 /**
  * <p>
- * IResultSetHandler
+ * IMongoDBHolder
  * </p>
  * <p>
- * 结果集数据处理接口，用于完成对记录集原始数据的简单包装及存储处理结果集合等相关信息；
+ * DB对象持有者接口，用于记录DB原始的状态及与数据源对应关系；
  * </p>
  * 
  * @author 刘镇(suninformation@163.com)
@@ -42,45 +37,25 @@ import net.ymate.platform.persistence.base.OperatorException;
  *          <td>0.0.0</td>
  *          <td>创建类</td>
  *          <td>刘镇</td>
- *          <td>2010-6-2 下午02:16:09</td>
+ *          <td>2014年2月6日下午1:52:43</td>
  *          </tr>
  *          </table>
  */
-public interface IResultSetHandler<T> {
+public interface IMongoClientHolder {
 
 	/**
-	 * 执行结果集处理动作
-	 * 
-	 * @param rs 预处理的结果集对象
-	 * @param maxRow 最大记录行数，在于 0 的值才生效
-	 * @throws OperatorException
-	 * @throws SQLException
+	 * @return 获取数据源名称
 	 */
-	public void handle(ResultSet rs, int maxRow) throws OperatorException, SQLException;
-	
+	public String getDataSourceName();
+
 	/**
-	 * @return 获取记录集行数
+	 * @return 获取数据库对象
 	 */
-	public int getRowCount();
-	
+	public DB getDB();
+
 	/**
-	 * @return 获取每行字段数
+	 * 释放连接
 	 */
-	public int getColumnCount();
-	
-	/**
-	 * @return 获取字段名称集合
-	 */
-	public String[] getColumnNames();
-	
-	/**
-	 * @return 获取字段类型集合
-	 */
-	public int[] getColumnTypes();
-	
-	/**
-	 * @return 获取处理后的最终数据结果集合
-	 */
-	public List<T> getResultDataSet();
-	
+	public void release();
+
 }

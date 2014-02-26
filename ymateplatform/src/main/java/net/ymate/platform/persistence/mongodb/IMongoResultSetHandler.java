@@ -13,21 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.ymate.platform.persistence.jdbc.operator;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
+package net.ymate.platform.persistence.mongodb;
 
 import net.ymate.platform.persistence.base.OperatorException;
 
+import com.mongodb.DBObject;
 
 /**
  * <p>
- * IResultSetHandler
+ * IMongoResultSetHandler
  * </p>
  * <p>
- * 结果集数据处理接口，用于完成对记录集原始数据的简单包装及存储处理结果集合等相关信息；
+ * 查询结果集元素处理器接口；
  * </p>
  * 
  * @author 刘镇(suninformation@163.com)
@@ -42,45 +39,19 @@ import net.ymate.platform.persistence.base.OperatorException;
  *          <td>0.0.0</td>
  *          <td>创建类</td>
  *          <td>刘镇</td>
- *          <td>2010-6-2 下午02:16:09</td>
+ *          <td>2014年2月7日下午8:30:37</td>
  *          </tr>
  *          </table>
  */
-public interface IResultSetHandler<T> {
+public interface IMongoResultSetHandler<T> {
 
 	/**
-	 * 执行结果集处理动作
+	 * 执行结果处理动作
 	 * 
-	 * @param rs 预处理的结果集对象
-	 * @param maxRow 最大记录行数，在于 0 的值才生效
+	 * @param object 预处理对象
+	 * @return
 	 * @throws OperatorException
-	 * @throws SQLException
 	 */
-	public void handle(ResultSet rs, int maxRow) throws OperatorException, SQLException;
-	
-	/**
-	 * @return 获取记录集行数
-	 */
-	public int getRowCount();
-	
-	/**
-	 * @return 获取每行字段数
-	 */
-	public int getColumnCount();
-	
-	/**
-	 * @return 获取字段名称集合
-	 */
-	public String[] getColumnNames();
-	
-	/**
-	 * @return 获取字段类型集合
-	 */
-	public int[] getColumnTypes();
-	
-	/**
-	 * @return 获取处理后的最终数据结果集合
-	 */
-	public List<T> getResultDataSet();
-	
+	public T handle(DBObject object) throws OperatorException;
+
 }

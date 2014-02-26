@@ -20,12 +20,12 @@ import java.util.List;
 
 import net.ymate.platform.base.YMP;
 import net.ymate.platform.commons.i18n.I18N;
+import net.ymate.platform.persistence.base.OperatorException;
 import net.ymate.platform.persistence.jdbc.IConnectionHolder;
 import net.ymate.platform.persistence.jdbc.base.impl.GenericAccessor;
 import net.ymate.platform.persistence.jdbc.operator.AbstractOperator;
 import net.ymate.platform.persistence.jdbc.operator.IQueryOperator;
 import net.ymate.platform.persistence.jdbc.operator.IResultSetHandler;
-import net.ymate.platform.persistence.jdbc.operator.OperatorException;
 
 /**
  * <p>

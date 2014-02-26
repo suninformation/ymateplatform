@@ -18,7 +18,7 @@ package net.ymate.platform.persistence.jdbc.transaction;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import net.ymate.platform.persistence.jdbc.ConnectionException;
+import net.ymate.platform.persistence.base.ConnectionException;
 import net.ymate.platform.persistence.jdbc.IConnectionHolder;
 
 /**

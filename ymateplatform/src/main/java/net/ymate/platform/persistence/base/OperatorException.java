@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.ymate.platform.persistence.jdbc;
+package net.ymate.platform.persistence.base;
 
-import java.io.Serializable;
 
 /**
  * <p>
- * IEntity
+ * OperatorException
  * </p>
  * <p>
- * 实体模型接口定义类；
+ * 数据库操作器异常；
  * </p>
  * 
  * @author 刘镇(suninformation@163.com)
@@ -37,20 +36,47 @@ import java.io.Serializable;
  *          <td>0.0.0</td>
  *          <td>创建类</td>
  *          <td>刘镇</td>
- *          <td>2010-12-20下午02:16:46</td>
+ *          <td>2011-9-22下午03:48:38</td>
  *          </tr>
  *          </table>
  */
-public interface IEntity<PK> extends Serializable {
+public class OperatorException extends Exception {
 
 	/**
-	 * @return 获取实体主键值
+	 * 
 	 */
-	public PK getId();
+	private static final long serialVersionUID = -4277478538355228159L;
 
 	/**
-	 * 设置实体主键值
-	 * @param id 主键值
+	 * 构造器
 	 */
-	public void setId(PK id);
+	public OperatorException() {
+		super();
+	}
+
+	/**
+	 * 构造器
+	 * @param message
+	 */
+	public OperatorException(String message) {
+		super(message);
+	}
+
+	/**
+	 * 构造器
+	 * @param cause
+	 */
+	public OperatorException(Throwable cause) {
+		super(cause);
+	}
+
+	/**
+	 * 构造器
+	 * @param message
+	 * @param cause
+	 */
+	public OperatorException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
 }

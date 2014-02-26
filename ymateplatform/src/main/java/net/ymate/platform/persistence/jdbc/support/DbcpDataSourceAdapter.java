@@ -22,8 +22,8 @@ import java.util.Properties;
 
 import net.ymate.platform.commons.util.ResourceUtils;
 import net.ymate.platform.commons.util.RuntimeUtils;
+import net.ymate.platform.persistence.base.ConnectionException;
 import net.ymate.platform.persistence.jdbc.AbstractDataSourceAdapter;
-import net.ymate.platform.persistence.jdbc.ConnectionException;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.dbcp.BasicDataSourceFactory;
@@ -85,7 +85,7 @@ public class DbcpDataSourceAdapter extends AbstractDataSourceAdapter {
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.AbstractDataSourceAdapter#initialize(net.ymate.platform.persistence.jdbc.support.DataSourceCfgMeta)
 	 */
-	public void initialize(DataSourceCfgMeta cfgMeta) {
+	public void initialize(JdbcDataSourceCfgMeta cfgMeta) {
 		super.initialize(cfgMeta);
 		//
 		try {

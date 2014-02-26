@@ -13,20 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.ymate.platform.persistence.jdbc.annotation;
+package net.ymate.platform.persistence.base;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.io.Serializable;
 
 /**
  * <p>
- * Column
+ * IEntityPK
  * </p>
  * <p>
- * 声明 Model 类中的一个方法或成员所对应的数据表字段，若参数 name 为空，则默认采用对应方法或成员的名称；
+ * 实体模型复合主键对象接口定义类；
  * </p>
  * 
  * @author 刘镇(suninformation@163.com)
@@ -41,28 +37,10 @@ import java.lang.annotation.Target;
  *          <td>0.0.0</td>
  *          <td>创建类</td>
  *          <td>刘镇</td>
- *          <td>2011-6-15下午10:39:19</td>
+ *          <td>2011-10-19下午10:16:10</td>
  *          </tr>
  *          </table>
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.FIELD })
-@Documented
-public @interface Column {
-
-	/**
-	 * @return 字段名称，若为空，则默认采用对应方法或成员的名称
-	 */
-	String name() default "";
-
-	/**
-	 * @return 字段值是否自增长
-	 */
-	boolean isAutoIncrement() default false;
-
-	/**
-	 * @return  序列名称（只适用类似 Oracle 等数据库，配合 isAutoIncrement 参数一同使用）
-	 */
-	String sequenceName() default "";
+public interface IEntityPK extends Serializable {
 
 }

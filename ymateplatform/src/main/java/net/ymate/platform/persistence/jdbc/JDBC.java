@@ -20,21 +20,22 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.ymate.platform.commons.util.ClassUtils;
+import net.ymate.platform.persistence.base.ConnectionException;
 import net.ymate.platform.persistence.jdbc.base.dialect.IDialect;
 import net.ymate.platform.persistence.jdbc.base.dialect.impl.MySqlDialect;
 import net.ymate.platform.persistence.jdbc.base.dialect.impl.OracleDialect;
 import net.ymate.platform.persistence.jdbc.base.dialect.impl.SQLServer2005Dialect;
 import net.ymate.platform.persistence.jdbc.support.C3p0DataSourceAdapter;
-import net.ymate.platform.persistence.jdbc.support.DataSourceCfgMeta;
+import net.ymate.platform.persistence.jdbc.support.JdbcDataSourceCfgMeta;
 import net.ymate.platform.persistence.jdbc.support.DbcpDataSourceAdapter;
 import net.ymate.platform.persistence.jdbc.support.DefaultConnectionHolder;
 import net.ymate.platform.persistence.jdbc.support.DefaultDataSourceAdapter;
 import net.ymate.platform.persistence.jdbc.support.DefaultSession;
 import net.ymate.platform.persistence.jdbc.support.JndiDataSourceAdapter;
-import net.ymate.platform.persistence.jdbc.support.RepositoryBeanFactory;
 import net.ymate.platform.persistence.jdbc.transaction.ITransaction;
 import net.ymate.platform.persistence.jdbc.transaction.Trans;
 import net.ymate.platform.persistence.jdbc.transaction.support.DefaultTransactionProxyHandler;
+import net.ymate.platform.persistence.support.RepositoryBeanFactory;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -116,7 +117,7 @@ public class JDBC {
 			DATASOURCE_DEFAULT_NAME = StringUtils.defaultIfEmpty(config.getDefaultDataSourceName(), "default");
 			TABLE_PREFIX = StringUtils.trimToEmpty(config.getTablePrefix());
 			isShowSQL = config.isShowSql();
-			for (DataSourceCfgMeta _cfgMeta : config.getDataSourceCfgMetas()) {
+			for (JdbcDataSourceCfgMeta _cfgMeta : config.getDataSourceCfgMetas()) {
 				String _adapterClassName = StringUtils.defaultIfEmpty(_cfgMeta.getAdapterClass(), "default");
 				if (__DEFAULT_ADAPTER_NAMES.containsKey(_adapterClassName.toLowerCase())) {
 					_adapterClassName = __DEFAULT_ADAPTER_NAMES.get(_adapterClassName.toLowerCase());

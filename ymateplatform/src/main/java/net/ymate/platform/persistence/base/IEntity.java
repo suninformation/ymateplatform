@@ -13,20 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.ymate.platform.persistence.jdbc.annotation;
+package net.ymate.platform.persistence.base;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.io.Serializable;
 
 /**
  * <p>
- * PK
+ * IEntity
  * </p>
  * <p>
- * 声明一个类为主键类；
+ * 实体模型接口定义类；
  * </p>
  * 
  * @author 刘镇(suninformation@163.com)
@@ -41,13 +37,20 @@ import java.lang.annotation.Target;
  *          <td>0.0.0</td>
  *          <td>创建类</td>
  *          <td>刘镇</td>
- *          <td>2011-6-15下午10:56:08</td>
+ *          <td>2010-12-20下午02:16:46</td>
  *          </tr>
  *          </table>
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.TYPE })
-@Documented
-public @interface PK {
+public interface IEntity<PK> extends Serializable {
 
+	/**
+	 * @return 获取实体主键值
+	 */
+	public PK getId();
+
+	/**
+	 * 设置实体主键值
+	 * @param id 主键值
+	 */
+	public void setId(PK id);
 }

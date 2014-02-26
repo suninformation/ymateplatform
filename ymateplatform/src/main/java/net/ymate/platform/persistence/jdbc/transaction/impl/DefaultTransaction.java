@@ -21,7 +21,7 @@ import java.util.List;
 
 import net.ymate.platform.commons.util.RuntimeUtils;
 import net.ymate.platform.commons.util.UUIDUtils;
-import net.ymate.platform.persistence.jdbc.ConnectionException;
+import net.ymate.platform.persistence.base.ConnectionException;
 import net.ymate.platform.persistence.jdbc.IConnectionHolder;
 import net.ymate.platform.persistence.jdbc.transaction.ITransaction;
 

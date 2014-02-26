@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.ymate.platform.commons.util.UUIDUtils;
+import net.ymate.platform.persistence.base.OperatorException;
 import net.ymate.platform.persistence.jdbc.IConnectionHolder;
 import net.ymate.platform.persistence.jdbc.ISession;
 import net.ymate.platform.persistence.jdbc.ISessionEvent;
@@ -27,14 +28,13 @@ import net.ymate.platform.persistence.jdbc.operator.IQueryOperator;
 import net.ymate.platform.persistence.jdbc.operator.IResultSetHandler;
 import net.ymate.platform.persistence.jdbc.operator.IUpdateBatchOperator;
 import net.ymate.platform.persistence.jdbc.operator.IUpdateOperator;
-import net.ymate.platform.persistence.jdbc.operator.OperatorException;
 import net.ymate.platform.persistence.jdbc.operator.impl.ArrayResultSetHandler;
 import net.ymate.platform.persistence.jdbc.operator.impl.QueryOperator;
 import net.ymate.platform.persistence.jdbc.operator.impl.UpdateBatchOperator;
 import net.ymate.platform.persistence.jdbc.operator.impl.UpdateOperator;
 import net.ymate.platform.persistence.jdbc.query.PageQuery;
-import net.ymate.platform.persistence.jdbc.query.PageResultSet;
 import net.ymate.platform.persistence.jdbc.transaction.Trans;
+import net.ymate.platform.persistence.support.PageResultSet;
 
 
 /**
@@ -67,7 +67,7 @@ public class DefaultSession implements ISession {
 
 	private IConnectionHolder __conn;
 
-	private EntitySupport __entitySupport;
+	private JdbcEntitySupport __entitySupport;
 
 	private ISessionEvent __sessionEvent;
 
@@ -83,9 +83,9 @@ public class DefaultSession implements ISession {
 	/**
 	 * @return 获取实体操作支持类对象
 	 */
-	private EntitySupport getEntitySupport() {
+	private JdbcEntitySupport getEntitySupport() {
 		if (__entitySupport == null) {
-			__entitySupport = new EntitySupport(this.getConnection());
+			__entitySupport = new JdbcEntitySupport(this.getConnection());
 		}
 		return __entitySupport;
 	}

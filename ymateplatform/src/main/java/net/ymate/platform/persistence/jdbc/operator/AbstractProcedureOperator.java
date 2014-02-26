@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.ymate.platform.persistence.base.OperatorException;
 import net.ymate.platform.persistence.jdbc.base.SqlParameter;
 import net.ymate.platform.persistence.jdbc.base.impl.GenericAccessor;
 import net.ymate.platform.persistence.jdbc.operator.impl.ArrayResultSetHandler;

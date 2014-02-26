@@ -30,7 +30,7 @@ import net.ymate.platform.commons.lang.BlurObject;
 import net.ymate.platform.commons.util.ClassUtils;
 import net.ymate.platform.commons.util.ClassUtils.ClassBeanWrapper;
 import net.ymate.platform.commons.util.RuntimeUtils;
-import net.ymate.platform.persistence.jdbc.operator.OperatorException;
+import net.ymate.platform.persistence.base.OperatorException;
 
 /**
  * <p>
@@ -62,17 +62,17 @@ public class ResultSetHelper {
 	/**
 	 * 简单实体模型元数据描述类缓存
 	 */
-	private static Map<String, EntityMeta> __cacheSimpleEntityMetas = new ConcurrentHashMap<String, EntityMeta>();
+	private static Map<String, JdbcEntityMeta> __cacheSimpleEntityMetas = new ConcurrentHashMap<String, JdbcEntityMeta>();
 
 	/**
 	 * @param <T> 实体类型
 	 * @param entityClass 实体类对象
 	 * @return 获取简单实体模型元数据描述类，若缓存中不存在则创建它
 	 */
-	public <T> EntityMeta getSimpleEntityMeta(Class<T> entityClass) {
-		EntityMeta _returnValue = __cacheSimpleEntityMetas.get(entityClass.getName());
+	public <T> JdbcEntityMeta getSimpleEntityMeta(Class<T> entityClass) {
+		JdbcEntityMeta _returnValue = __cacheSimpleEntityMetas.get(entityClass.getName());
 		if (_returnValue == null) {
-			_returnValue = new EntityMeta(entityClass, true);
+			_returnValue = new JdbcEntityMeta(entityClass, true);
 			__cacheSimpleEntityMetas.put(entityClass.getName(), _returnValue);
 		}
 		return _returnValue;
@@ -351,7 +351,7 @@ public class ResultSetHelper {
 	 */
 	public <T> T renderToObject(Class<T> entityClass) throws OperatorException {
 		T _returnValue;
-		EntityMeta _meta;
+		JdbcEntityMeta _meta;
 		try {
 			_returnValue = entityClass.newInstance();
 			_meta = this.getSimpleEntityMeta(entityClass);

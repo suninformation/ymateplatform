@@ -21,6 +21,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.ymate.platform.persistence.base.OperatorException;
+
 
 
 /**

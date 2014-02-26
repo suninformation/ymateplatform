@@ -23,11 +23,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.ymate.platform.base.YMP;
 import net.ymate.platform.commons.i18n.I18N;
 import net.ymate.platform.commons.util.ExpressionUtils;
+import net.ymate.platform.persistence.base.OperatorException;
 import net.ymate.platform.persistence.jdbc.IConnectionHolder;
 import net.ymate.platform.persistence.jdbc.operator.IQueryOperator;
 import net.ymate.platform.persistence.jdbc.operator.IResultSetHandler;
-import net.ymate.platform.persistence.jdbc.operator.OperatorException;
 import net.ymate.platform.persistence.jdbc.operator.impl.QueryOperator;
+import net.ymate.platform.persistence.support.PageResultSet;
 
 import org.apache.commons.lang.StringUtils;
 

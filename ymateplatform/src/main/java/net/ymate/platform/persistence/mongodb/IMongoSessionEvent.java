@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.ymate.platform.persistence.jdbc.operator;
-
+package net.ymate.platform.persistence.mongodb;
 
 /**
  * <p>
- * OperatorException
+ * IMongoSessionEvent
  * </p>
  * <p>
- * 数据库操作器异常；
+ * 
  * </p>
  * 
  * @author 刘镇(suninformation@163.com)
@@ -36,47 +35,10 @@ package net.ymate.platform.persistence.jdbc.operator;
  *          <td>0.0.0</td>
  *          <td>创建类</td>
  *          <td>刘镇</td>
- *          <td>2011-9-22下午03:48:38</td>
+ *          <td>2014年2月6日下午3:20:32</td>
  *          </tr>
  *          </table>
  */
-public class OperatorException extends Exception {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -4277478538355228159L;
-
-	/**
-	 * 构造器
-	 */
-	public OperatorException() {
-		super();
-	}
-
-	/**
-	 * 构造器
-	 * @param message
-	 */
-	public OperatorException(String message) {
-		super(message);
-	}
-
-	/**
-	 * 构造器
-	 * @param cause
-	 */
-	public OperatorException(Throwable cause) {
-		super(cause);
-	}
-
-	/**
-	 * 构造器
-	 * @param message
-	 * @param cause
-	 */
-	public OperatorException(String message, Throwable cause) {
-		super(message, cause);
-	}
+public interface IMongoSessionEvent {
 
 }

@@ -20,7 +20,7 @@ import java.sql.SQLException;
 
 import net.ymate.platform.commons.util.RuntimeUtils;
 import net.ymate.platform.persistence.jdbc.base.dialect.IDialect;
-import net.ymate.platform.persistence.jdbc.support.DataSourceCfgMeta;
+import net.ymate.platform.persistence.jdbc.support.JdbcDataSourceCfgMeta;
 
 /**
  * <p>
@@ -48,14 +48,14 @@ import net.ymate.platform.persistence.jdbc.support.DataSourceCfgMeta;
  */
 public abstract class AbstractDataSourceAdapter implements IDataSourceAdapter {
 
-	protected DataSourceCfgMeta cfgMeta;
+	protected JdbcDataSourceCfgMeta cfgMeta;
 
 	protected IDialect dialect;
 
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.IDataSourceAdapter#initialize(net.ymate.platform.persistence.jdbc.support.DataSourceCfgMeta)
 	 */
-	public void initialize(DataSourceCfgMeta cfgMeta) {
+	public void initialize(JdbcDataSourceCfgMeta cfgMeta) {
 		this.cfgMeta = cfgMeta;
 	}
 

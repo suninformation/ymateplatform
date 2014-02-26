@@ -13,20 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.ymate.platform.persistence.jdbc.annotation;
+package net.ymate.platform.persistence.mongodb.support;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import net.ymate.platform.persistence.base.OperatorException;
+import net.ymate.platform.persistence.mongodb.IMongoResultSetHandler;
+
+import com.mongodb.DBObject;
 
 /**
  * <p>
- * Table
+ * DefaultMongoResultSetHandler
  * </p>
  * <p>
- * 声明一个 Model 类所对应的数据表，若参数 name 为空，则默认采用 Model 类的简单名称；
+ * 查询结果集元素处理器接口默认实现；
  * </p>
  * 
  * @author 刘镇(suninformation@163.com)
@@ -41,18 +40,17 @@ import java.lang.annotation.Target;
  *          <td>0.0.0</td>
  *          <td>创建类</td>
  *          <td>刘镇</td>
- *          <td>2011-6-15下午09:32:13</td>
+ *          <td>2014年2月7日下午8:44:36</td>
  *          </tr>
  *          </table>
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target( { ElementType.TYPE })
-@Documented
-public @interface Table {
+public class DefaultMongoResultSetHandler implements IMongoResultSetHandler<DBObject> {
 
-	/**
-	 * @return 数据表名称，如：ym_user_info，若未提供则采用当前类名称
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.mongodb.IMongoResultSetHandler#handle(com.mongodb.DBObject)
 	 */
-	String name() default "";
+	public DBObject handle(DBObject object) throws OperatorException {
+		return object;
+	}
 
 }

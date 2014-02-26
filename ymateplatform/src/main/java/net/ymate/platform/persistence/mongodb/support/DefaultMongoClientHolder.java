@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.ymate.platform.persistence.jdbc.support;
+package net.ymate.platform.persistence.mongodb.support;
 
-import net.ymate.platform.commons.beans.impl.AnnotationBeanMetaLoader;
-import net.ymate.platform.persistence.jdbc.annotation.Repository;
+import net.ymate.platform.persistence.mongodb.IMongoClientHolder;
+
+import com.mongodb.DB;
 
 /**
  * <p>
- * RepositoryBeanMetaLoader
+ * DefaultMongoClientHolder
  * </p>
  * <p>
  * 
@@ -38,35 +39,39 @@ import net.ymate.platform.persistence.jdbc.annotation.Repository;
  *          <td>0.0.0</td>
  *          <td>创建类</td>
  *          <td>刘镇</td>
- *          <td>2012-12-27下午11:58:35</td>
+ *          <td>2014年2月6日下午3:09:06</td>
  *          </tr>
  *          </table>
  */
-public class RepositoryBeanMetaLoader extends AnnotationBeanMetaLoader<Repository> {
+public class DefaultMongoClientHolder implements IMongoClientHolder {
 
-	/**
-	 * 构造器
-	 * 
-	 * @param clazz 目标存储器类对象
-	 */
-	public RepositoryBeanMetaLoader(Class<?> clazz) {
-		super(Repository.class, clazz);
-	}
+	protected String dataSourceName;
+	protected DB db;
 
-	/**
-	 * 构造器
-	 * 
-	 * @param packageNames 目标存储器包名称集合
-	 */
-	public RepositoryBeanMetaLoader(String... packageNames) {
-		super(Repository.class, packageNames);
+	public DefaultMongoClientHolder(String dataSourceName, DB db) {
+		this.dataSourceName = dataSourceName;
+		this.db = db;
 	}
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.commons.beans.impl.AnnotationBeanMetaLoader#getAnnotationValue(java.lang.annotation.Annotation)
+	 * @see net.ymate.platform.persistence.mongodb.IMongoClientHolder#getDataSourceName()
 	 */
-	protected String getAnnotationValue(Repository clazz) {
-		return clazz.value();
+	public String getDataSourceName() {
+		return dataSourceName;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.mongodb.IMongoClientHolder#getDB()
+	 */
+	public DB getDB() {
+		return db;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.mongodb.IMongoClientHolder#release()
+	 */
+	public void release() {
+		db = null;
 	}
 
 }

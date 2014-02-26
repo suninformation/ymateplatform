@@ -43,7 +43,7 @@ import net.ymate.platform.persistence.jdbc.IConnectionHolder;
 import net.ymate.platform.persistence.jdbc.ISession;
 import net.ymate.platform.persistence.jdbc.JDBC;
 import net.ymate.platform.persistence.jdbc.operator.impl.ArrayResultSetHandler;
-import net.ymate.platform.persistence.jdbc.support.EntityMeta;
+import net.ymate.platform.persistence.jdbc.support.JdbcEntityMeta;
 import net.ymate.platform.persistence.jdbc.support.ResultSetHelper;
 
 import org.apache.commons.lang.StringUtils;
@@ -155,12 +155,12 @@ public class JdbcScaffold {
 						if (_isRemovePrefix) {
 							_tableName = _tableName.substring(_prefix.length());
 						}
-						_modelName = EntityMeta.buildFieldNameToClassAttribute(_tableName);
+						_modelName = JdbcEntityMeta.buildFieldNameToClassAttribute(_tableName);
 						break;
 					}
 				}
 				if (StringUtils.isBlank(_modelName)) {
-					_modelName = EntityMeta.buildFieldNameToClassAttribute(_tableName);
+					_modelName = JdbcEntityMeta.buildFieldNameToClassAttribute(_tableName);
 				}
 				//
 				_propMap.put("tableName", _tableName);
@@ -176,7 +176,7 @@ public class JdbcScaffold {
 					//
 					for (String pkey : _tableMeta.getPkSet()) {
 						ColumnInfo _ci = _tableMeta.getFieldMap().get(pkey);
-						_primaryKeyList.add(new Attr(_ci.getColumnType(), StringUtils.uncapitalize(EntityMeta.buildFieldNameToClassAttribute(pkey.toLowerCase())), pkey, _ci.isAutoIncrement()));
+						_primaryKeyList.add(new Attr(_ci.getColumnType(), StringUtils.uncapitalize(JdbcEntityMeta.buildFieldNameToClassAttribute(pkey.toLowerCase())), pkey, _ci.isAutoIncrement()));
 						_allFieldList.add(new Attr("String", _ci.getColumnName().toUpperCase(), _ci.getColumnName(), false));
 					}
 					for (String key : _tableMeta.getFieldMap().keySet()) {
@@ -184,15 +184,15 @@ public class JdbcScaffold {
 							continue;
 						}
 						ColumnInfo _ci = _tableMeta.getFieldMap().get(key);
-						_fieldList.add(new Attr(_ci.getColumnType(), StringUtils.uncapitalize(EntityMeta.buildFieldNameToClassAttribute(key.toLowerCase())), key, _ci.isAutoIncrement()));
+						_fieldList.add(new Attr(_ci.getColumnType(), StringUtils.uncapitalize(JdbcEntityMeta.buildFieldNameToClassAttribute(key.toLowerCase())), key, _ci.isAutoIncrement()));
 						_allFieldList.add(new Attr("String", _ci.getColumnName().toUpperCase(), _ci.getColumnName(), false));
 					}
 				} else {
 					_propMap.put("primaryKeyType", _tableMeta.getFieldMap().get(_tableMeta.getPkSet().get(0)).getColumnType());
-					_propMap.put("primaryKeyName", StringUtils.uncapitalize(EntityMeta.buildFieldNameToClassAttribute(_tableMeta.getPkSet().get(0))));
+					_propMap.put("primaryKeyName", StringUtils.uncapitalize(JdbcEntityMeta.buildFieldNameToClassAttribute(_tableMeta.getPkSet().get(0))));
 					for (String key : _tableMeta.getFieldMap().keySet()) {
 						ColumnInfo _ci = _tableMeta.getFieldMap().get(key);
-						_fieldList.add(new Attr(_ci.getColumnType(), StringUtils.uncapitalize(EntityMeta.buildFieldNameToClassAttribute(key.toLowerCase())), key, _ci.isAutoIncrement()));
+						_fieldList.add(new Attr(_ci.getColumnType(), StringUtils.uncapitalize(JdbcEntityMeta.buildFieldNameToClassAttribute(key.toLowerCase())), key, _ci.isAutoIncrement()));
 						_allFieldList.add(new Attr("String", _ci.getColumnName().toUpperCase(), _ci.getColumnName(), false));
 					}
 				}
@@ -209,7 +209,7 @@ public class JdbcScaffold {
 						//
 						for (String pkey : _tableMeta.getPkSet()) {
 							ColumnInfo _ci = _tableMeta.getFieldMap().get(pkey);
-							_primaryKeyList.add(new Attr(_ci.getColumnType(), StringUtils.uncapitalize(EntityMeta.buildFieldNameToClassAttribute(pkey.toLowerCase())), pkey, _ci.isAutoIncrement()));
+							_primaryKeyList.add(new Attr(_ci.getColumnType(), StringUtils.uncapitalize(JdbcEntityMeta.buildFieldNameToClassAttribute(pkey.toLowerCase())), pkey, _ci.isAutoIncrement()));
 						}
 					}
 					buildTargetFile("/model/" + _modelName + "PK.java", "/tmpl/model-pk.ftl", _propMap);
@@ -226,7 +226,7 @@ public class JdbcScaffold {
 		String[] _repositoryList = StringUtils.split(JDBC_SCAFFOLD_CONF.getProperty("ymp.scaffold.jdbc.repository_name_list"), "|");
 		String _repositoryName = null;
 		for (String _name : _repositoryList) {
-			_repositoryName = EntityMeta.buildFieldNameToClassAttribute(_name);
+			_repositoryName = JdbcEntityMeta.buildFieldNameToClassAttribute(_name);
 			_propMap.put("repositoryName", _repositoryName);
 			buildTargetFile("/repository/I" + _repositoryName + "Repository.java", "/tmpl/repository-interface.ftl", _propMap);
 			//

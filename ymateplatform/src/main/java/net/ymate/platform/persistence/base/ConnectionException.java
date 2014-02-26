@@ -13,21 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.ymate.platform.persistence.jdbc.operator;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-
-import net.ymate.platform.persistence.base.OperatorException;
+package net.ymate.platform.persistence.base;
 
 
 /**
  * <p>
- * IResultSetHandler
+ * ConnectionException
  * </p>
  * <p>
- * 结果集数据处理接口，用于完成对记录集原始数据的简单包装及存储处理结果集合等相关信息；
+ * 数据源连接异常；
  * </p>
  * 
  * @author 刘镇(suninformation@163.com)
@@ -42,45 +36,47 @@ import net.ymate.platform.persistence.base.OperatorException;
  *          <td>0.0.0</td>
  *          <td>创建类</td>
  *          <td>刘镇</td>
- *          <td>2010-6-2 下午02:16:09</td>
+ *          <td>2011-8-30下午12:41:20</td>
  *          </tr>
  *          </table>
  */
-public interface IResultSetHandler<T> {
+public class ConnectionException extends Exception {
 
 	/**
-	 * 执行结果集处理动作
 	 * 
-	 * @param rs 预处理的结果集对象
-	 * @param maxRow 最大记录行数，在于 0 的值才生效
-	 * @throws OperatorException
-	 * @throws SQLException
 	 */
-	public void handle(ResultSet rs, int maxRow) throws OperatorException, SQLException;
-	
+	private static final long serialVersionUID = 7648640036141581760L;
+
 	/**
-	 * @return 获取记录集行数
+	 * 构造器
 	 */
-	public int getRowCount();
-	
+	public ConnectionException() {
+		super();
+	}
+
 	/**
-	 * @return 获取每行字段数
+	 * 构造器
+	 * @param message
 	 */
-	public int getColumnCount();
-	
+	public ConnectionException(String message) {
+		super(message);
+	}
+
 	/**
-	 * @return 获取字段名称集合
+	 * 构造器
+	 * @param cause
 	 */
-	public String[] getColumnNames();
-	
+	public ConnectionException(Throwable cause) {
+		super(cause);
+	}
+
 	/**
-	 * @return 获取字段类型集合
+	 * 构造器
+	 * @param message
+	 * @param cause
 	 */
-	public int[] getColumnTypes();
-	
-	/**
-	 * @return 获取处理后的最终数据结果集合
-	 */
-	public List<T> getResultDataSet();
-	
+	public ConnectionException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
 }

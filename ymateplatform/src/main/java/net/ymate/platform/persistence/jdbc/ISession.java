@@ -17,9 +17,9 @@ package net.ymate.platform.persistence.jdbc;
 
 import java.util.List;
 
+import net.ymate.platform.persistence.base.OperatorException;
 import net.ymate.platform.persistence.jdbc.operator.IResultSetHandler;
-import net.ymate.platform.persistence.jdbc.operator.OperatorException;
-import net.ymate.platform.persistence.jdbc.query.PageResultSet;
+import net.ymate.platform.persistence.support.PageResultSet;
 
 
 /**

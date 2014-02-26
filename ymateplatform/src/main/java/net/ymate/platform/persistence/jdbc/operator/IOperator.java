@@ -17,6 +17,7 @@ package net.ymate.platform.persistence.jdbc.operator;
 
 import java.util.List;
 
+import net.ymate.platform.persistence.base.OperatorException;
 import net.ymate.platform.persistence.jdbc.IConnectionHolder;
 import net.ymate.platform.persistence.jdbc.base.IAccessorCfgEvent;
 import net.ymate.platform.persistence.jdbc.base.SqlParameter;

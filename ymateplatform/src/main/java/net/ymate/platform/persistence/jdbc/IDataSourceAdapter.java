@@ -17,8 +17,9 @@ package net.ymate.platform.persistence.jdbc;
 
 import java.sql.Connection;
 
+import net.ymate.platform.persistence.base.ConnectionException;
 import net.ymate.platform.persistence.jdbc.base.dialect.IDialect;
-import net.ymate.platform.persistence.jdbc.support.DataSourceCfgMeta;
+import net.ymate.platform.persistence.jdbc.support.JdbcDataSourceCfgMeta;
 
 /**
  * <p>
@@ -51,7 +52,7 @@ public interface IDataSourceAdapter {
 	 * 
 	 * @param cfgMeta 数据源配置参数
 	 */
-	public void initialize(DataSourceCfgMeta cfgMeta);
+	public void initialize(JdbcDataSourceCfgMeta cfgMeta);
 
 	/**
 	 * @return 获取数据库连接

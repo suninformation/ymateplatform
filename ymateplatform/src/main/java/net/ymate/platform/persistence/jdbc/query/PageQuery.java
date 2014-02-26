@@ -18,13 +18,14 @@ package net.ymate.platform.persistence.jdbc.query;
 import java.util.List;
 
 import net.ymate.platform.commons.lang.BlurObject;
+import net.ymate.platform.persistence.base.OperatorException;
 import net.ymate.platform.persistence.jdbc.IConnectionHolder;
 import net.ymate.platform.persistence.jdbc.base.SqlParameter;
 import net.ymate.platform.persistence.jdbc.operator.IQueryOperator;
 import net.ymate.platform.persistence.jdbc.operator.IResultSetHandler;
-import net.ymate.platform.persistence.jdbc.operator.OperatorException;
 import net.ymate.platform.persistence.jdbc.operator.impl.ArrayResultSetHandler;
 import net.ymate.platform.persistence.jdbc.operator.impl.QueryOperator;
+import net.ymate.platform.persistence.support.PageResultSet;
 
 /**
  * <p>

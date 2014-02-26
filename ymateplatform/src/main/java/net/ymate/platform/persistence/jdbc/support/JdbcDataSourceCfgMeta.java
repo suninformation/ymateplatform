@@ -15,15 +15,16 @@
  */
 package net.ymate.platform.persistence.jdbc.support;
 
-import java.util.Collections;
 import java.util.Map;
+
+import net.ymate.platform.persistence.support.DataSourceCfgMeta;
 
 /**
  * <p>
- * DataSourceCfgMeta
+ * JdbcDataSourceCfgMeta
  * </p>
  * <p>
- * 数据源配置元描述对象；
+ * JDBC数据源配置元描述对象；
  * </p>
  * 
  * @author 刘镇(suninformation@163.com)
@@ -42,37 +43,16 @@ import java.util.Map;
  *          </tr>
  *          </table>
  */
-public class DataSourceCfgMeta {
+public class JdbcDataSourceCfgMeta extends DataSourceCfgMeta {
 
-	private final String name;
+	private String adapterClass;
 
-	private final String adapterClass;
+	private String driverClass;
 
-	private final String driverClass;
-
-	private final String connectionUrl;
-
-	private final String userName;
-
-	private final String password;
-
-	private final Map<String, String> params;
-
-	public DataSourceCfgMeta(String name, String adapterClass, String driverClass, String connectionUrl, String userName, String password, Map<String, String> params) {
-		this.name = name;
+	public JdbcDataSourceCfgMeta(String name, String adapterClass, String driverClass, String connectionUrl, String userName, String password, Map<String, String> params) {
+		super(name, connectionUrl, userName, password, params);
 		this.adapterClass = adapterClass;
 		this.driverClass = driverClass;
-		this.connectionUrl = connectionUrl;
-		this.userName = userName;
-		this.password = password;
-		this.params = Collections.unmodifiableMap(params);
-	}
-
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
 	}
 
 	/**
@@ -87,34 +67,6 @@ public class DataSourceCfgMeta {
 	 */
 	public String getDriverClass() {
 		return driverClass;
-	}
-
-	/**
-	 * @return the connectionUrl
-	 */
-	public String getConnectionUrl() {
-		return connectionUrl;
-	}
-
-	/**
-	 * @return the userName
-	 */
-	public String getUserName() {
-		return userName;
-	}
-
-	/**
-	 * @return the password
-	 */
-	public String getPassword() {
-		return password;
-	}
-
-	/**
-	 * @return the params
-	 */
-	public Map<String, String> getParams() {
-		return params;
 	}
 
 }
