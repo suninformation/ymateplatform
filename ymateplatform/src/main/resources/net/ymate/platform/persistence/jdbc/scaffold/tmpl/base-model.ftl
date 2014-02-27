@@ -1,6 +1,6 @@
 package ${packageName}.model;
 
-import net.ymate.platform.persistence.jdbc.IEntity;
+import net.ymate.platform.persistence.base.IEntity;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;

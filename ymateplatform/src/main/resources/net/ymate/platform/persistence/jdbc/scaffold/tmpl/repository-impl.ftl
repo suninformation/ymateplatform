@@ -1,6 +1,6 @@
 package ${packageName}.repository.impl;
 
-import net.ymate.platform.persistence.jdbc.annotation.Repository;
+import net.ymate.platform.persistence.support.annotation.Repository;
 import ${packageName}.repository.I${repositoryName?cap_first}Repository;
 import net.ymate.platform.persistence.jdbc.support.AbstractEntityRepository;
 

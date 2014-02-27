@@ -1,8 +1,8 @@
 package ${packageName}.model;
 
-import net.ymate.platform.persistence.jdbc.IEntityPK;
-import net.ymate.platform.persistence.jdbc.annotation.Column;
-import net.ymate.platform.persistence.jdbc.annotation.PK;
+import net.ymate.platform.persistence.base.IEntityPK;
+import net.ymate.platform.persistence.annotation.Property;
+import net.ymate.platform.persistence.annotation.PK;
 
 /**
  * <p>
@@ -24,7 +24,7 @@ public class ${modelName?cap_first}PK implements IEntityPK {
 	private static final long serialVersionUID = 1L;
 
 	<#list primaryKeyList as field>
-	@Column(name = "${field.columnName}"<#if (field.autoIncrement)>, isAutoIncrement=true</#if>)
+	@Property(name = "${field.columnName}"<#if (field.autoIncrement)>, isAutoIncrement=true</#if>)
 	private ${field.varType} ${field.varName};
 	</#list>
 

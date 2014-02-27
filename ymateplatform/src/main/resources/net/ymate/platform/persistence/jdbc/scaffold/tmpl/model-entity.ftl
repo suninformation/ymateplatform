@@ -1,9 +1,9 @@
 package ${packageName}.model;
 
 import net.ymate.platform.persistence.jdbc.JDBC;
-import net.ymate.platform.persistence.jdbc.annotation.Column;
-import net.ymate.platform.persistence.jdbc.annotation.Id;
-import net.ymate.platform.persistence.jdbc.annotation.Table;
+import net.ymate.platform.persistence.annotation.Property;
+import net.ymate.platform.persistence.annotation.Id;
+import net.ymate.platform.persistence.annotation.Entity;
 <#if (!isUseBaseModel)>import net.ymate.platform.persistence.jdbc.support.BaseEntity;</#if>
 
 /**
@@ -17,7 +17,7 @@ import net.ymate.platform.persistence.jdbc.annotation.Table;
  * @author JdbcScaffold
  * @version 0.0.0
  */
-@Table(name = "${tableName}")
+@Entity(name = "${tableName}")
 public class ${modelName?cap_first}Model extends <#if (isUseBaseModel)>BaseModel<${primaryKeyType}><#else>BaseEntity<${modelName?cap_first}Model, ${primaryKeyType}></#if> {
 
 	/**
@@ -27,7 +27,7 @@ public class ${modelName?cap_first}Model extends <#if (isUseBaseModel)>BaseModel
 
 	<#list fieldList as field>
 	<#if primaryKeyName = field.varName>@Id</#if>
-	<#if (field.columnName!"undefined") != "undefined">@Column(name = "${field.columnName}"<#if (field.autoIncrement)>, isAutoIncrement=true</#if>)</#if>
+	<#if (field.columnName!"undefined") != "undefined">@Property(name = "${field.columnName}"<#if (field.autoIncrement)>, isAutoIncrement=true</#if>)</#if>
 	private ${field.varType} ${field.varName};
 	</#list>
 
@@ -50,14 +50,14 @@ public class ${modelName?cap_first}Model extends <#if (isUseBaseModel)>BaseModel
 	}
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.persistence.jdbc.IEntity#getId()
+	 * @see net.ymate.platform.persistence.base.IEntity#getId()
 	 */
 	public ${primaryKeyType} getId() {
 		return ${primaryKeyName};
 	}
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.persistence.jdbc.IEntity#setId(java.lang.Object)
+	 * @see net.ymate.platform.persistence.base.IEntity#setId(java.lang.Object)
 	 */
 	public void setId(${primaryKeyType} id) {
 		this.${primaryKeyName} = id;
