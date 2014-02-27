@@ -559,7 +559,7 @@ public class ClassUtils {
 		protected ClassBeanWrapper(T target) {
 			this.target = target;
 			this._fields = new HashMap<String, Field>();
-			for (Field _field : target.getClass().getDeclaredFields()) {
+			for (Field _field : getFields(target.getClass(), true)/*target.getClass().getDeclaredFields()*/) {
 				if (Modifier.isStatic(_field.getModifiers())) {
 					continue;
 				}

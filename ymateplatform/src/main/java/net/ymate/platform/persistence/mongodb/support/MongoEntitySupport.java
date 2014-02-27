@@ -88,6 +88,7 @@ public class MongoEntitySupport {
 		MongoEntityMeta _meta = getEntityMeta(entity);
 		if (_meta.isCompositeKey()) {
 			// Not Support...
+			throw new UnsupportedOperationException("Do not support composite keys of entity bean.");
 		}
 		ClassBeanWrapper<T> _returnValue = ClassUtils.wrapper(entity);
 		for (String key : _meta.getColumnNames()) {
@@ -126,6 +127,7 @@ public class MongoEntitySupport {
 		for (String _key : _meta.getColumnNames()) {
 			Object _value = _wrapper.getValue(_meta.getClassAttributeMap().get(_key));
 			if (_value == null) {
+				_returnObj.put(_key, null);
 				continue;
 			}
 			if (_key.equals(MongoDB.OPT.ID)) {

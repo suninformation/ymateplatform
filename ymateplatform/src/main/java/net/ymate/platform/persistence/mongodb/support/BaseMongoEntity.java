@@ -22,6 +22,8 @@
  */
 package net.ymate.platform.persistence.mongodb.support;
 
+import net.ymate.platform.persistence.annotation.Id;
+import net.ymate.platform.persistence.annotation.Property;
 import net.ymate.platform.persistence.base.IEntity;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -52,9 +54,21 @@ import org.apache.commons.lang.builder.ToStringStyle;
  *          <td>2014年2月16日下午6:14:48</td>
  *          </tr>
  */
-public abstract class BaseMongoEntity<T> implements IEntity<T> {
+public abstract class BaseMongoEntity implements IEntity<String> {
 
 	private static final long serialVersionUID = 7166728784513131468L;
+
+	@Id
+	@Property(name = "_id")
+	protected String id;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
