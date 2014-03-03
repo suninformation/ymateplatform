@@ -21,6 +21,7 @@ import net.ymate.platform.persistence.base.OperatorException;
 import net.ymate.platform.persistence.mongodb.MongoDB.OrderBy;
 import net.ymate.platform.persistence.support.PageResultSet;
 
+import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 
 /**
@@ -53,6 +54,16 @@ public interface IMongoQuery<T> {
 	 * @return 获取当前使用的数据库连接对象
 	 */
 	public IMongoClientHolder getClientHolder();
+
+	/**
+	 * @return 获取当前使用的集合对象
+	 */
+	public DBCollection getCollection();
+
+	/**
+	 * @return 获取当前使用的集合名称
+	 */
+	public String getCollectionName();
 
 	/**
 	 * 设置结果集数据处理对象

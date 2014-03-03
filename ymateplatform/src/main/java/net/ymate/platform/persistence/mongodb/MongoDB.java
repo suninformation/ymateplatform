@@ -230,6 +230,14 @@ public class MongoDB {
 	}
 
 	/**
+	 * @param dsName 数据源名称
+	 * @return 获取缓存的MongoDB客户端对象，若不存在则返回null
+	 */
+	public static MongoClient getCachedMongoClient(String dsName) {
+		return __DATASOURCE_CACHE.get(dsName);
+	}
+
+	/**
 	 * @param dbName 数据库名称
 	 * @return 获取默认数据源连接持有者对象
 	 * @throws ConnectionException

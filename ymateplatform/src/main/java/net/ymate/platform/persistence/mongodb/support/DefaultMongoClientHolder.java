@@ -18,6 +18,7 @@ package net.ymate.platform.persistence.mongodb.support;
 import net.ymate.platform.persistence.mongodb.IMongoClientHolder;
 
 import com.mongodb.DB;
+import com.mongodb.WriteConcern;
 
 /**
  * <p>
@@ -48,9 +49,12 @@ public class DefaultMongoClientHolder implements IMongoClientHolder {
 	protected String dataSourceName;
 	protected DB db;
 
+	protected WriteConcern concern;
+
 	public DefaultMongoClientHolder(String dataSourceName, DB db) {
 		this.dataSourceName = dataSourceName;
 		this.db = db;
+		this.concern = db.getWriteConcern();
 	}
 
 	/* (non-Javadoc)
@@ -68,10 +72,47 @@ public class DefaultMongoClientHolder implements IMongoClientHolder {
 	}
 
 	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.mongodb.IMongoClientHolder#getWriteConcern()
+	 */
+	public WriteConcern getWriteConcern() {
+		return this.concern;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.mongodb.IMongoClientHolder#setWriteConcern(com.mongodb.WriteConcern)
+	 */
+	public void setWriteConcern(WriteConcern concern) {
+		this.concern = concern;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.mongodb.IMongoClientHolder#requestStart()
+	 */
+	public void requestStart() {
+		this.db.requestStart();
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.mongodb.IMongoClientHolder#requestEnsureConnection()
+	 */
+	public void requestEnsureConnection() {
+		this.db.requestEnsureConnection();
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.mongodb.IMongoClientHolder#requestDone()
+	 */
+	public void requestDone() {
+		this.db.requestDone();
+	}
+
+	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.mongodb.IMongoClientHolder#release()
 	 */
 	public void release() {
 		db = null;
+		concern = null;
+		dataSourceName = null;
 	}
 
 }

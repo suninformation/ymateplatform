@@ -104,6 +104,20 @@ public class DefaultMongoQuery<T> implements IMongoQuery<T> {
 	}
 
 	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.mongodb.IMongoQuery#getCollection()
+	 */
+	public DBCollection getCollection() {
+		return __collection;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.mongodb.IMongoQuery#getCollectionName()
+	 */
+	public String getCollectionName() {
+		return __collectionName;
+	}
+
+	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.mongodb.IMongoQuery#setResultSetHandler(net.ymate.platform.persistence.mongodb.IMongoResultSetHandler)
 	 */
 	public void setResultSetHandler(IMongoResultSetHandler<T> handler) {

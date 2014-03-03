@@ -232,7 +232,7 @@ public class DefaultMongoSession implements IMongoSession {
 		DBObject _value = MongoEntitySupport.randerToDBObject(entity);
 		DBObject _cond = new BasicDBObject(MongoDB.OPT.ID, _value.removeField(MongoDB.OPT.ID));
 		DBObject _set = new BasicDBObject(MongoDB.OPT.SET, _value);
-		return __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entity.getClass())).update(_cond, _set);
+		return __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entity.getClass())).update(_cond, _set, false, false, __clientHolder.getWriteConcern());
 	}
 
 	/* (non-Javadoc)
@@ -254,7 +254,7 @@ public class DefaultMongoSession implements IMongoSession {
 		} else {
 			_set = new BasicDBObject(MongoDB.OPT.SET, _value);
 		}
-		return __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entity.getClass())).update(_cond, _set);
+		return __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entity.getClass())).update(_cond, _set, false, false, __clientHolder.getWriteConcern());
 	}
 
 	/* (non-Javadoc)
@@ -284,7 +284,7 @@ public class DefaultMongoSession implements IMongoSession {
 	 */
 	public <T> WriteResult insert(T entity) throws OperatorException {
 		DBObject _obj = MongoEntitySupport.randerToDBObject(entity);
-        WriteResult _result = __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entity.getClass())).insert(_obj);
+        WriteResult _result = __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entity.getClass())).insert(_obj, __clientHolder.getWriteConcern());
         String _id = _obj.get(MongoDB.OPT.ID).toString();
         ClassUtils.wrapper(entity).setValue("id", _id);
         // Events
@@ -302,7 +302,7 @@ public class DefaultMongoSession implements IMongoSession {
         for(T _entity : entities){
         	_objList.add(MongoEntitySupport.randerToDBObject(_entity));
         }
-        WriteResult _result = __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entities.get(0).getClass())).insert(_objList);
+        WriteResult _result = __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entities.get(0).getClass())).insert(_objList, __clientHolder.getWriteConcern());
 		for (int _idx = 0; _idx < _objList.size(); _idx++) {
             String _id = _objList.get(_idx).get(MongoDB.OPT.ID).toString();
             ClassUtils.wrapper(_objList.get(_idx)).setValue("id", _id);
@@ -315,7 +315,7 @@ public class DefaultMongoSession implements IMongoSession {
 	 */
 	public <T> WriteResult delete(T entity) throws OperatorException {
 		DBObject _obj = new BasicDBObject(MongoDB.OPT.ID, ClassUtils.wrapper(entity).getValue("id"));
-        return __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entity.getClass())).remove(_obj);
+        return __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entity.getClass())).remove(_obj, __clientHolder.getWriteConcern());
 	}
 
 	/* (non-Javadoc)
@@ -323,7 +323,7 @@ public class DefaultMongoSession implements IMongoSession {
 	 */
 	public <T> WriteResult delete(Class<T> entityClass, Object id) throws OperatorException {
 		DBObject _obj = new BasicDBObject(MongoDB.OPT.ID, id);
-        return __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entityClass)).remove(_obj);
+        return __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entityClass)).remove(_obj, __clientHolder.getWriteConcern());
 	}
 
 	/* (non-Javadoc)
@@ -342,7 +342,7 @@ public class DefaultMongoSession implements IMongoSession {
 	 */
 	public <T> WriteResult deleteAll(Class<T> entityClass, List<Object> ids) throws OperatorException {
 		DBObject _in = new BasicDBObject(MongoDB.OPT.IN, ids);
-		return __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entityClass)).remove(new BasicDBObject(MongoDB.OPT.ID, _in));
+		return __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entityClass)).remove(new BasicDBObject(MongoDB.OPT.ID, _in), __clientHolder.getWriteConcern());
 	}
 
 	/* (non-Javadoc)
@@ -350,7 +350,7 @@ public class DefaultMongoSession implements IMongoSession {
 	 */
 	public <T> WriteResult deleteAll(Class<T> entityClass, Object[] ids) throws OperatorException {
 		DBObject _in = new BasicDBObject(MongoDB.OPT.IN, ids);
-		return __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entityClass)).remove(new BasicDBObject(MongoDB.OPT.ID, _in));
+		return __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entityClass)).remove(new BasicDBObject(MongoDB.OPT.ID, _in), __clientHolder.getWriteConcern());
 	}
 
 }

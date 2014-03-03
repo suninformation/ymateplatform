@@ -16,6 +16,7 @@
 package net.ymate.platform.persistence.mongodb;
 
 import com.mongodb.DB;
+import com.mongodb.WriteConcern;
 
 /**
  * <p>
@@ -52,6 +53,32 @@ public interface IMongoClientHolder {
 	 * @return 获取数据库对象
 	 */
 	public DB getDB();
+
+	/**
+	 * @return
+	 */
+	public WriteConcern getWriteConcern();
+
+	/**
+	 * 
+	 * @param concern
+	 */
+	public void setWriteConcern(WriteConcern concern);
+
+	/**
+	 * 开始数据库连接
+	 */
+	public void requestStart();
+
+	/**
+	 * 保持数据库连接
+	 */
+	public void requestEnsureConnection();
+
+	/**
+	 * 结束数据库连接
+	 */
+	public void requestDone();
 
 	/**
 	 * 释放连接
