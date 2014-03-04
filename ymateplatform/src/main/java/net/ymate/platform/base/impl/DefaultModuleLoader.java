@@ -26,6 +26,7 @@ import net.ymate.platform.base.IModuleLoader;
 import net.ymate.platform.module.ConfigModule;
 import net.ymate.platform.module.JdbcModule;
 import net.ymate.platform.module.LogModule;
+import net.ymate.platform.module.MongoDBModule;
 import net.ymate.platform.module.WebMvcModule;
 
 import org.apache.commons.lang.StringUtils;
@@ -59,10 +60,11 @@ public class DefaultModuleLoader implements IModuleLoader {
 	protected static Map<String, String> __DEFAULT_MODULE_LOADER_NAMES = new HashMap<String, String>();
 
 	static {
-		// configuration|logger|jdbc|webmvc
+		// configuration|logger|jdbc|mongodb|webmvc
 		__DEFAULT_MODULE_LOADER_NAMES.put("configuration", ConfigModule.class.getName());
 		__DEFAULT_MODULE_LOADER_NAMES.put("logger", LogModule.class.getName());
 		__DEFAULT_MODULE_LOADER_NAMES.put("jdbc", JdbcModule.class.getName());
+		__DEFAULT_MODULE_LOADER_NAMES.put("mongodb", MongoDBModule.class.getName());
 		__DEFAULT_MODULE_LOADER_NAMES.put("webmvc", WebMvcModule.class.getName());
 	}
 
