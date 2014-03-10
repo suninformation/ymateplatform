@@ -131,7 +131,7 @@ public class MongoEntitySupport {
 				continue;
 			}
 			if (_key.equals(MongoDB.OPT.ID)) {
-				_returnObj.put(_key, new ObjectId((String) _value));
+				_returnObj.put(_key, new ObjectId(_value.toString()));
 			} else {
 				_returnObj.put(_key, _value);
 			}

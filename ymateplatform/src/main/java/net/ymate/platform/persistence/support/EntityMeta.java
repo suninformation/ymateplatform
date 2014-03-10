@@ -255,19 +255,21 @@ public class EntityMeta {
 	 * @return 符合JavaBean属性格式串
 	 */
 	public static String buildFieldNameToClassAttribute(String fieldName) {
-		String[] _words = StringUtils.split(fieldName, '_');
-		if (_words != null) {
-			if ( _words.length > 1) {
-				StringBuilder _returnBuilder = new StringBuilder();
-				for (String _word : _words) {
-					_returnBuilder.append(StringUtils.capitalize(_word.toLowerCase()));
+		if (StringUtils.contains(fieldName, '_')) {
+			String[] _words = StringUtils.split(fieldName, '_');
+			if (_words != null) {
+				if ( _words.length > 1) {
+					StringBuilder _returnBuilder = new StringBuilder();
+					for (String _word : _words) {
+						_returnBuilder.append(StringUtils.capitalize(_word.toLowerCase()));
+					}
+					return _returnBuilder.toString();
+				} else {
+					return StringUtils.capitalize(_words[0].toLowerCase());
 				}
-				return _returnBuilder.toString();
-			} else {
-				return StringUtils.capitalize(_words[0].toLowerCase());
 			}
 		}
-		return null;
+		return fieldName;
 	}
 
 	/**
