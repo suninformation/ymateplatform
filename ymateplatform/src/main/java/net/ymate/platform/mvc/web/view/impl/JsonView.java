@@ -23,9 +23,8 @@ import net.ymate.platform.mvc.web.view.AbstractWebView;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+
+import com.alibaba.fastjson.JSON;
 
 /**
  * <p>
@@ -62,33 +61,19 @@ public class JsonView extends AbstractWebView {
 
 	/**
 	 * 构造器
-	 * @param obj JSON对象
+	 * @param obj Java对象
 	 */
-	public JsonView(JSONObject jsonObj) {
-		this.jsonObj = jsonObj;
-	}
-
-	/**
-	 * 构造器
-	 * 
-	 * @param jsonArr JSON集合对象
-	 */
-	public JsonView(JSONArray jsonArr) {
-		this.jsonObj = jsonArr;
+	public JsonView(Object jsonObj) {
+		this.jsonObj = JSON.toJSON(jsonObj);
 	}
 
 	/**
 	 * 构造器
 	 * 
 	 * @param jsonStr JSON字符串
-	 * @throws JSONException JSON异常
 	 */
-	public JsonView(String jsonStr) throws JSONException {
-		if (StringUtils.isNotBlank(jsonStr) && jsonStr.trim().charAt(0) == '[') {
-			this.jsonObj = new JSONArray(jsonStr);
-		} else {
-			this.jsonObj = new JSONObject(jsonStr);
-		}
+	public JsonView(String jsonStr) {
+		this.jsonObj = JSON.parse(jsonStr);
 	}
 
 	/**
