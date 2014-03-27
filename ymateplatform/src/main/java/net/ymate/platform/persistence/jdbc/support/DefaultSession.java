@@ -22,7 +22,6 @@ import net.ymate.platform.commons.util.UUIDUtils;
 import net.ymate.platform.persistence.base.OperatorException;
 import net.ymate.platform.persistence.jdbc.IConnectionHolder;
 import net.ymate.platform.persistence.jdbc.ISession;
-import net.ymate.platform.persistence.jdbc.ISessionEvent;
 import net.ymate.platform.persistence.jdbc.base.SqlBatchParameter;
 import net.ymate.platform.persistence.jdbc.operator.IQueryOperator;
 import net.ymate.platform.persistence.jdbc.operator.IResultSetHandler;
@@ -34,6 +33,7 @@ import net.ymate.platform.persistence.jdbc.operator.impl.UpdateBatchOperator;
 import net.ymate.platform.persistence.jdbc.operator.impl.UpdateOperator;
 import net.ymate.platform.persistence.jdbc.query.PageQuery;
 import net.ymate.platform.persistence.jdbc.transaction.Trans;
+import net.ymate.platform.persistence.support.ISessionEvent;
 import net.ymate.platform.persistence.support.PageResultSet;
 
 
@@ -105,7 +105,7 @@ public class DefaultSession implements ISession {
 	}
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.persistence.jdbc.ISession#setSessionEvent(net.ymate.platform.persistence.jdbc.ISessionEvent)
+	 * @see net.ymate.platform.persistence.jdbc.ISession#setSessionEvent(net.ymate.platform.persistence.support.ISessionEvent)
 	 */
 	public ISession setSessionEvent(ISessionEvent event) {
 		this.__sessionEvent = event;
@@ -128,31 +128,28 @@ public class DefaultSession implements ISession {
 	 * @see net.ymate.platform.persistence.jdbc.ISession#delete(java.lang.Object)
 	 */
 	public <T> T delete(T entity) throws OperatorException {
-		if (__sessionEvent != null) {
-			// TODO SessionEvent尚未完成，参考Hibernate的实现
-		}
-		return this.getEntitySupport().delete(entity);
+		return this.getEntitySupport().delete(entity, __sessionEvent);
 	}
 
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#delete(java.lang.Class, java.lang.Object)
 	 */
 	public <T> int delete(Class<T> entityClass, Object id) throws OperatorException {
-		return this.getEntitySupport().deleteById(entityClass, id);
+		return this.getEntitySupport().deleteById(entityClass, id, __sessionEvent);
 	}
 
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#deleteAll(java.util.List)
 	 */
 	public <T> List<T> deleteAll(List<T> entities) throws OperatorException {
-		return this.getEntitySupport().deleteBatch(entities);
+		return this.getEntitySupport().deleteBatch(entities, __sessionEvent);
 	}
 
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#deleteAll(java.lang.Class, java.lang.Object[])
 	 */
 	public <T> int[] deleteAll(Class<T> entityClass, Object[] ids) throws OperatorException {
-		return this.getEntitySupport().deleteBatchByIds(entityClass, Arrays.asList(ids));
+		return this.getEntitySupport().deleteBatchByIds(entityClass, Arrays.asList(ids), __sessionEvent);
 	}
 
 	/* (non-Javadoc)
@@ -320,42 +317,42 @@ public class DefaultSession implements ISession {
 	 * @see net.ymate.platform.persistence.jdbc.ISession#insert(java.lang.Object)
 	 */
 	public <T> T insert(T entity) throws OperatorException {
-		return this.getEntitySupport().insert(entity);
+		return this.getEntitySupport().insert(entity, __sessionEvent);
 	}
 
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#insertAll(java.util.List)
 	 */
 	public <T> List<T> insertAll(List<T> entities) throws OperatorException {
-		return this.getEntitySupport().insertBatch(entities);
+		return this.getEntitySupport().insertBatch(entities, __sessionEvent);
 	}
 
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#update(java.lang.Object)
 	 */
 	public <T> T update(T entity) throws OperatorException {
-		return this.getEntitySupport().update(entity);
+		return this.getEntitySupport().update(entity, __sessionEvent);
 	}
 
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#update(java.lang.Object, java.lang.String[])
 	 */
 	public <T> T update(T entity, String[] fieldFilter) throws OperatorException {
-		return this.getEntitySupport().update(entity, fieldFilter);
+		return this.getEntitySupport().update(entity, fieldFilter, __sessionEvent);
 	}
 
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#updateAll(java.util.List)
 	 */
 	public <T> List<T> updateAll(List<T> entities) throws OperatorException {
-		return this.getEntitySupport().updateBatch(entities);
+		return this.getEntitySupport().updateBatch(entities, __sessionEvent);
 	}
 
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#updateAll(java.util.List, java.lang.String[])
 	 */
 	public <T> List<T> updateAll(List<T> entities, String[] fieldFilter) throws OperatorException {
-		return this.getEntitySupport().updateBatch(entities, fieldFilter);
+		return this.getEntitySupport().updateBatch(entities, fieldFilter, __sessionEvent);
 	}
 
 	/* (non-Javadoc)

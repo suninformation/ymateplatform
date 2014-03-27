@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.ymate.platform.persistence.mongodb;
+package net.ymate.platform.persistence.support;
+
 
 /**
  * <p>
- * IMongoSessionEvent
+ * ISessionEvent
  * </p>
  * <p>
- * 
+ * 会话事件处理接口定义类；
  * </p>
  * 
  * @author 刘镇(suninformation@163.com)
@@ -35,10 +36,52 @@ package net.ymate.platform.persistence.mongodb;
  *          <td>0.0.0</td>
  *          <td>创建类</td>
  *          <td>刘镇</td>
- *          <td>2014年2月6日下午3:20:32</td>
+ *          <td>2011-9-27下午03:46:08</td>
  *          </tr>
  *          </table>
  */
-public interface IMongoSessionEvent {
+public interface ISessionEvent {
+
+	/**
+	 * 插入操用之前事件调用
+	 * 
+	 * @param event
+	 */
+	public void onInsertBefore(SessionEventObject event);
+
+	/**
+	 * 插入操作之后事件调用
+	 * 
+	 * @param event
+	 */
+	public void onInsertAfter(SessionEventObject event);
+
+	/**
+	 * 更新操作之前事件调用
+	 * 
+	 * @param event
+	 */
+	public void onUpdateBefore(SessionEventObject event);
+
+	/**
+	 * 更新操作之后事件调用
+	 * 
+	 * @param event
+	 */
+	public void onUpdateAfter(SessionEventObject event);
+
+	/**
+	 * 删除操作之前事件调用
+	 * 
+	 * @param event
+	 */
+	public void onRemoveBefore(SessionEventObject event);
+
+	/**
+	 * 删除操作之后事件调用
+	 * 
+	 * @param event
+	 */
+	public void onRemoveAfter(SessionEventObject event);
 
 }

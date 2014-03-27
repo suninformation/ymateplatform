@@ -47,7 +47,9 @@ import net.ymate.platform.persistence.jdbc.operator.impl.QueryOperator;
 import net.ymate.platform.persistence.jdbc.operator.impl.UpdateBatchOperator;
 import net.ymate.platform.persistence.jdbc.operator.impl.UpdateOperator;
 import net.ymate.platform.persistence.jdbc.query.PageQuery;
+import net.ymate.platform.persistence.support.ISessionEvent;
 import net.ymate.platform.persistence.support.PageResultSet;
+import net.ymate.platform.persistence.support.SessionEventObject;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -254,10 +256,15 @@ public class JdbcEntitySupport {
 		}
 	}
 
-	public<T> T insert(final T entity) throws OperatorException {
+	public<T> T insert(final T entity, ISessionEvent event) throws OperatorException {
 		if (entity == null) {
 			throw new OperatorException(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.jdbc.entity_class_need_anno_id"));
 		}
+		//
+		if (event != null) {
+			event.onInsertBefore(SessionEventObject.createInsertEvent(entity));
+		}
+		//
 		final JdbcEntityMeta _meta = this.getEntityMeta(entity.getClass());
 		Map<String, AttributeInfo>  _entityMap = __doRenderEntityToMap(_meta, entity);
 		IUpdateOperator _update = new UpdateOperator(_meta.createInsertSql());
@@ -273,6 +280,11 @@ public class JdbcEntitySupport {
 		}
 		try {
 			_update.execute(this.getConnection());
+			//
+			if (event != null) {
+				event.onInsertAfter(SessionEventObject.createInsertEvent(entity));
+			}
+			//
 			return entity;
 		} finally {
 			_entityMap.clear();
@@ -280,10 +292,15 @@ public class JdbcEntitySupport {
 		}
 	}
 
-	public<T> List<T> insertBatch(final List<T> entityList) throws OperatorException {
+	public<T> List<T> insertBatch(final List<T> entityList, ISessionEvent event) throws OperatorException {
 		if (entityList == null || entityList.isEmpty()) {
 			throw new OperatorException(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.jdbc.entity_list_null"));
 		}
+		//
+		if (event != null) {
+			event.onInsertBefore(SessionEventObject.createInsertBatchEvent(entityList.get(0).getClass(), entityList));
+		}
+		//
 		final JdbcEntityMeta _meta = this.getEntityMeta(entityList.get(0).getClass());
 		IUpdateBatchOperator _update = new UpdateBatchOperator(_meta.createInsertSql());
 		if (_meta.hasAutoIncrementColumn()) {
@@ -301,6 +318,11 @@ public class JdbcEntitySupport {
 		}
 		try {
 			_update.execute(this.getConnection());
+			//
+			if (event != null) {
+				event.onInsertAfter(SessionEventObject.createInsertBatchEvent(entityList.get(0).getClass(), entityList));
+			}
+			//
 			return entityList;
 		} finally {
 			_update = null;
@@ -308,11 +330,16 @@ public class JdbcEntitySupport {
 		}
 	}
 
-	public <T> T update(T entity) throws OperatorException {
-		return update(entity, null);
+	public <T> T update(T entity, ISessionEvent event) throws OperatorException {
+		return update(entity, null, event);
 	}
 
-	public <T> T update(T entity, String[] fieldFilter) throws OperatorException {
+	public <T> T update(T entity, String[] fieldFilter, ISessionEvent event) throws OperatorException {
+		//
+		if (event != null) {
+			event.onUpdateBefore(SessionEventObject.createUpdateEvent(entity, fieldFilter));
+		}
+		//
 		JdbcEntityMeta _meta = this.getEntityMeta(entity.getClass());
 		Map<String, AttributeInfo>  _entityMap = __doRenderEntityToMap(_meta, entity);
 		IUpdateOperator _update = new UpdateOperator();
@@ -355,6 +382,11 @@ public class JdbcEntitySupport {
 		try {
 			_update.setSql(_meta.createUpdateByPkSql(fieldFilter, _pkFieldFilter.toArray(new String[_pkFieldFilter.size()])));
 			_update.execute(this.getConnection());
+			//
+			if (event != null) {
+				event.onUpdateAfter(SessionEventObject.createUpdateEvent(entity, fieldFilter));
+			}
+			//
 			return entity;
 		} finally {
 			_entityMap.clear();
@@ -365,14 +397,19 @@ public class JdbcEntitySupport {
         }
 	}
 
-	public <T> List<T> updateBatch(List<T> entityList) throws OperatorException {
-		return updateBatch(entityList, null);
+	public <T> List<T> updateBatch(List<T> entityList, ISessionEvent event) throws OperatorException {
+		return updateBatch(entityList, null, event);
 	}
 
-	public <T> List<T> updateBatch(List<T> entityList, String[] fieldFilter) throws OperatorException {
+	public <T> List<T> updateBatch(List<T> entityList, String[] fieldFilter, ISessionEvent event) throws OperatorException {
 		if (entityList == null || entityList.isEmpty()) {
 			throw new OperatorException(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.jdbc.entity_list_null"));
 		}
+		//
+		if (event != null) {
+			event.onUpdateBefore(SessionEventObject.createUpdateBatchEvent(entityList.get(0).getClass(), entityList, fieldFilter));
+		}
+		//
 		JdbcEntityMeta _meta = this.getEntityMeta(entityList.get(0).getClass());
 		IUpdateBatchOperator _update = new UpdateBatchOperator();
 		//
@@ -421,6 +458,11 @@ public class JdbcEntitySupport {
 		try {
 			_update.setSql(_meta.createUpdateByPkSql(fieldFilter, _pkFieldFilter.toArray(new String[_pkFieldFilter.size()])));
 			_update.execute(this.getConnection());
+			//
+			if (event != null) {
+				event.onUpdateAfter(SessionEventObject.createUpdateBatchEvent(entityList.get(0).getClass(), entityList, fieldFilter));
+			}
+			//
 			return entityList;
 		} finally {
 			_pkFieldFilter.clear();
@@ -433,7 +475,7 @@ public class JdbcEntitySupport {
 		}
 	}
 
-	public <T> List<T> deleteBatch(List<T> entityList) throws OperatorException {
+	public <T> List<T> deleteBatch(List<T> entityList, ISessionEvent event) throws OperatorException {
 		if (entityList == null || entityList.isEmpty()) {
 			throw new OperatorException(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.jdbc.entity_list_null"));
 		}
@@ -443,14 +485,19 @@ public class JdbcEntitySupport {
 			_wrapperEntity = ClassUtils.wrapper(_entity);
 			_ids.add(_wrapperEntity.getValue("id"));
 		}
-		this.deleteBatchByIds(entityList.get(0).getClass(), _ids);
+		this.deleteBatchByIds(entityList.get(0).getClass(), _ids, event);
 		return entityList;
 	}
 
-	public <T> int[] deleteBatchByIds(Class<T> entityClass, List<Object> ids) throws OperatorException {
+	public <T> int[] deleteBatchByIds(Class<T> entityClass, List<Object> ids, ISessionEvent event) throws OperatorException {
 		if (ids == null || ids.size() == 0) {
 			throw new OperatorException(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.jdbc.pk_list_null"));
 		}
+		//
+		if (event != null) {
+			event.onRemoveBefore(SessionEventObject.createRemoveBatchEvent(entityClass, ids));
+		}
+		//
 		JdbcEntityMeta _meta = this.getEntityMeta(entityClass);
 		IUpdateBatchOperator _update = new UpdateBatchOperator();
 		List<String> _pkFieldFilter = new ArrayList<String>();
@@ -478,6 +525,11 @@ public class JdbcEntitySupport {
 		try {
 			_update.setSql(_meta.createDeleteByPkSql(_pkFieldFilter.toArray(new String[_pkFieldFilter.size()])));
 			_update.execute(this.getConnection());
+			//
+			if (event != null) {
+				event.onRemoveAfter(SessionEventObject.createRemoveBatchEvent(entityClass, ids));
+			}
+			//
 			return _update.getBatchEffectCounts();
 		} finally {
 			_update = null;
@@ -486,18 +538,23 @@ public class JdbcEntitySupport {
 		}
 	}
 
-	public <T> T delete(T entity) throws OperatorException {
+	public <T> T delete(T entity, ISessionEvent event) throws OperatorException {
 		if (entity == null) {
 			throw new OperatorException(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.jdbc.entity_null"));
 		}
-		this.deleteById(entity.getClass(), ClassUtils.wrapper(entity).getValue("id"));
+		this.deleteById(entity.getClass(), ClassUtils.wrapper(entity).getValue("id"), event);
 		return entity;
 	}
 
-	public <T> int deleteById(Class<T> entityClass, Object id) throws OperatorException {
+	public <T> int deleteById(Class<T> entityClass, Object id, ISessionEvent event) throws OperatorException {
 		if (id == null) {
 			throw new OperatorException(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.jdbc.pk_null"));
 		}
+		//
+		if (event != null) {
+			event.onRemoveBefore(SessionEventObject.createRemoveEvent(entityClass, id));
+		}
+		//
 		JdbcEntityMeta _meta = this.getEntityMeta(entityClass);
 		IUpdateOperator _update = new UpdateOperator();
 		List<String> _pkFieldFilter = new ArrayList<String>();
@@ -521,6 +578,11 @@ public class JdbcEntitySupport {
 		try {
 			_update.setSql(_meta.createDeleteByPkSql(_pkFieldFilter.toArray(new String[_pkFieldFilter.size()])));
 			_update.execute(this.getConnection());
+			//
+			if (event != null) {
+				event.onRemoveAfter(SessionEventObject.createRemoveEvent(entityClass, id));
+			}
+			//
 			return _update.getEffectCounts();
 		} finally {
 			_update = null;

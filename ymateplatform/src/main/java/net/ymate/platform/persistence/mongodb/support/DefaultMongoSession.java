@@ -16,6 +16,7 @@
 package net.ymate.platform.persistence.mongodb.support;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.ymate.platform.commons.util.ClassUtils;
@@ -27,10 +28,11 @@ import net.ymate.platform.persistence.mongodb.IMongoClientHolder;
 import net.ymate.platform.persistence.mongodb.IMongoQuery;
 import net.ymate.platform.persistence.mongodb.IMongoResultSetHandler;
 import net.ymate.platform.persistence.mongodb.IMongoSession;
-import net.ymate.platform.persistence.mongodb.IMongoSessionEvent;
 import net.ymate.platform.persistence.mongodb.MongoDB;
 import net.ymate.platform.persistence.mongodb.MongoDB.OrderBy;
+import net.ymate.platform.persistence.support.ISessionEvent;
 import net.ymate.platform.persistence.support.PageResultSet;
+import net.ymate.platform.persistence.support.SessionEventObject;
 
 import org.bson.types.ObjectId;
 
@@ -69,7 +71,7 @@ public class DefaultMongoSession implements IMongoSession {
 
 	private IMongoClientHolder __clientHolder;
 
-	private IMongoSessionEvent __sessionEvent;
+	private ISessionEvent __sessionEvent;
 
 	/**
 	 * 构造器
@@ -96,9 +98,9 @@ public class DefaultMongoSession implements IMongoSession {
 	}
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.persistence.mongodb.IMongoSession#setSessionEvent(net.ymate.platform.persistence.mongodb.IMongoSessionEvent)
+	 * @see net.ymate.platform.persistence.mongodb.IMongoSession#setSessionEvent(net.ymate.platform.persistence.support.ISessionEvent)
 	 */
-	public IMongoSession setSessionEvent(IMongoSessionEvent event) {
+	public IMongoSession setSessionEvent(ISessionEvent event) {
 		this.__sessionEvent = event;
 		return this;
 	}
@@ -232,7 +234,18 @@ public class DefaultMongoSession implements IMongoSession {
 		DBObject _value = MongoEntitySupport.randerToDBObject(entity);
 		DBObject _cond = new BasicDBObject(MongoDB.OPT.ID, _value.removeField(MongoDB.OPT.ID));
 		DBObject _set = new BasicDBObject(MongoDB.OPT.SET, _value);
-		return __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entity.getClass())).update(_cond, _set, false, false, __clientHolder.getWriteConcern());
+		//
+		if (__sessionEvent != null) {
+			__sessionEvent.onUpdateBefore(SessionEventObject.createUpdateEvent(entity, null));
+		}
+		//
+		WriteResult _result = __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entity.getClass())).update(_cond, _set, false, false, __clientHolder.getWriteConcern());
+		//
+		if (__sessionEvent != null) {
+			__sessionEvent.onUpdateAfter(SessionEventObject.createUpdateEvent(entity, null).addExtraParam(_result));
+		}
+		//
+		return _result;
 	}
 
 	/* (non-Javadoc)
@@ -254,7 +267,18 @@ public class DefaultMongoSession implements IMongoSession {
 		} else {
 			_set = new BasicDBObject(MongoDB.OPT.SET, _value);
 		}
-		return __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entity.getClass())).update(_cond, _set, false, false, __clientHolder.getWriteConcern());
+		//
+		if (__sessionEvent != null) {
+			__sessionEvent.onUpdateBefore(SessionEventObject.createUpdateEvent(entity, fieldFilter));
+		}
+		//
+		WriteResult _result = __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entity.getClass())).update(_cond, _set, false, false, __clientHolder.getWriteConcern());
+		//
+		if (__sessionEvent != null) {
+			__sessionEvent.onUpdateAfter(SessionEventObject.createUpdateEvent(entity, fieldFilter).addExtraParam(_result));
+		}
+		//
+		return _result;
 	}
 
 	/* (non-Javadoc)
@@ -284,13 +308,19 @@ public class DefaultMongoSession implements IMongoSession {
 	 */
 	public <T> WriteResult insert(T entity) throws OperatorException {
 		DBObject _obj = MongoEntitySupport.randerToDBObject(entity);
+		//
+        if (__sessionEvent != null) {
+        	__sessionEvent.onInsertBefore(SessionEventObject.createInsertEvent(entity));
+        }
+        //
         WriteResult _result = __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entity.getClass())).insert(_obj, __clientHolder.getWriteConcern());
         String _id = _obj.get(MongoDB.OPT.ID).toString();
         ClassUtils.wrapper(entity).setValue("id", _id);
-        // Events
+        //
         if (__sessionEvent != null) {
-        	// ----
+        	__sessionEvent.onInsertAfter(SessionEventObject.createInsertEvent(entity).addExtraParam(_result));
         }
+        //
         return _result;
 	}
 
@@ -302,11 +332,21 @@ public class DefaultMongoSession implements IMongoSession {
         for(T _entity : entities){
         	_objList.add(MongoEntitySupport.randerToDBObject(_entity));
         }
+        //
+        if (__sessionEvent != null) {
+        	__sessionEvent.onInsertBefore(SessionEventObject.createInsertBatchEvent(entities.get(0).getClass(), entities));
+        }
+        //
         WriteResult _result = __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entities.get(0).getClass())).insert(_objList, __clientHolder.getWriteConcern());
 		for (int _idx = 0; _idx < _objList.size(); _idx++) {
             String _id = _objList.get(_idx).get(MongoDB.OPT.ID).toString();
             ClassUtils.wrapper(_objList.get(_idx)).setValue("id", _id);
         }
+		//
+        if (__sessionEvent != null) {
+        	__sessionEvent.onInsertAfter(SessionEventObject.createInsertBatchEvent(entities.get(0).getClass(), entities).addExtraParam(_result));
+        }
+        //
         return _result;
 	}
 
@@ -314,8 +354,20 @@ public class DefaultMongoSession implements IMongoSession {
 	 * @see net.ymate.platform.persistence.mongodb.IMongoSession#delete(java.lang.Object)
 	 */
 	public <T> WriteResult delete(T entity) throws OperatorException {
-		DBObject _obj = new BasicDBObject(MongoDB.OPT.ID, ClassUtils.wrapper(entity).getValue("id"));
-        return __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entity.getClass())).remove(_obj, __clientHolder.getWriteConcern());
+		Object _id = ClassUtils.wrapper(entity).getValue("id");
+		DBObject _obj = new BasicDBObject(MongoDB.OPT.ID, _id);
+		//
+        if (__sessionEvent != null) {
+        	__sessionEvent.onRemoveBefore(SessionEventObject.createRemoveEvent(entity.getClass(), _id));
+        }
+        //
+        WriteResult _result = __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entity.getClass())).remove(_obj, __clientHolder.getWriteConcern());
+        //
+        if (__sessionEvent != null) {
+        	__sessionEvent.onRemoveAfter(SessionEventObject.createRemoveEvent(entity.getClass(), _id).addExtraParam(_result));
+        }
+        //
+        return _result;
 	}
 
 	/* (non-Javadoc)
@@ -323,7 +375,18 @@ public class DefaultMongoSession implements IMongoSession {
 	 */
 	public <T> WriteResult delete(Class<T> entityClass, Object id) throws OperatorException {
 		DBObject _obj = new BasicDBObject(MongoDB.OPT.ID, id);
-        return __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entityClass)).remove(_obj, __clientHolder.getWriteConcern());
+		//
+        if (__sessionEvent != null) {
+        	__sessionEvent.onRemoveBefore(SessionEventObject.createRemoveEvent(entityClass, id));
+        }
+        //
+        WriteResult _result = __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entityClass)).remove(_obj, __clientHolder.getWriteConcern());
+        //
+        if (__sessionEvent != null) {
+        	__sessionEvent.onRemoveAfter(SessionEventObject.createRemoveEvent(entityClass, id).addExtraParam(_result));
+        }
+        //
+        return _result;
 	}
 
 	/* (non-Javadoc)
@@ -342,7 +405,18 @@ public class DefaultMongoSession implements IMongoSession {
 	 */
 	public <T> WriteResult deleteAll(Class<T> entityClass, List<Object> ids) throws OperatorException {
 		DBObject _in = new BasicDBObject(MongoDB.OPT.IN, ids);
-		return __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entityClass)).remove(new BasicDBObject(MongoDB.OPT.ID, _in), __clientHolder.getWriteConcern());
+		//
+        if (__sessionEvent != null) {
+        	__sessionEvent.onRemoveBefore(SessionEventObject.createRemoveBatchEvent(entityClass, ids));
+        }
+        //
+		WriteResult _result = __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entityClass)).remove(new BasicDBObject(MongoDB.OPT.ID, _in), __clientHolder.getWriteConcern());
+		//
+        if (__sessionEvent != null) {
+        	__sessionEvent.onRemoveAfter(SessionEventObject.createRemoveBatchEvent(entityClass, ids).addExtraParam(_result));
+        }
+        //
+		return _result;
 	}
 
 	/* (non-Javadoc)
@@ -350,7 +424,18 @@ public class DefaultMongoSession implements IMongoSession {
 	 */
 	public <T> WriteResult deleteAll(Class<T> entityClass, Object[] ids) throws OperatorException {
 		DBObject _in = new BasicDBObject(MongoDB.OPT.IN, ids);
-		return __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entityClass)).remove(new BasicDBObject(MongoDB.OPT.ID, _in), __clientHolder.getWriteConcern());
+		//
+        if (__sessionEvent != null) {
+        	__sessionEvent.onRemoveBefore(SessionEventObject.createRemoveBatchEvent(entityClass, Arrays.asList(ids)));
+        }
+        //
+		WriteResult _result = __clientHolder.getDB().getCollection(MongoEntitySupport.getEntityName(entityClass)).remove(new BasicDBObject(MongoDB.OPT.ID, _in), __clientHolder.getWriteConcern());
+		//
+        if (__sessionEvent != null) {
+        	__sessionEvent.onRemoveAfter(SessionEventObject.createRemoveBatchEvent(entityClass, Arrays.asList(ids)).addExtraParam(_result));
+        }
+        //
+		return _result;
 	}
 
 }

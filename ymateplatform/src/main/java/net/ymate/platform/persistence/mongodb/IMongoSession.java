@@ -19,6 +19,7 @@ import java.util.List;
 
 import net.ymate.platform.persistence.base.OperatorException;
 import net.ymate.platform.persistence.mongodb.MongoDB.OrderBy;
+import net.ymate.platform.persistence.support.ISessionEvent;
 import net.ymate.platform.persistence.support.PageResultSet;
 
 import com.mongodb.WriteResult;
@@ -65,7 +66,7 @@ public interface IMongoSession {
 	 * @param event 事件处理器接口
 	 * @return 会话对象
 	 */
-	public IMongoSession setSessionEvent(IMongoSessionEvent event);
+	public IMongoSession setSessionEvent(ISessionEvent event);
 
 	/**
 	 * 关闭/释放会话
