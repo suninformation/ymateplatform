@@ -65,8 +65,33 @@ public abstract class AbstractWebView extends AbstractView implements IWebView {
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.mvc.web.view.IWebView#setContentType(java.lang.String)
 	 */
-	public void setContentType(String contentType) {
+	public IWebView setContentType(String contentType) {
 		this.contentType = contentType;
+		return this;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.mvc.web.view.IWebView#addDateHeader(java.lang.String, long)
+	 */
+	public IWebView addDateHeader(String name, long date) {
+		WebContext.getResponse().addDateHeader(name, date);
+		return this;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.mvc.web.view.IWebView#addHeader(java.lang.String, java.lang.String)
+	 */
+	public IWebView addHeader(String name, String value) {
+		WebContext.getResponse().addHeader(name, value);
+		return this;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.ymate.platform.mvc.web.view.IWebView#addIntHeader(java.lang.String, int)
+	 */
+	public IWebView addIntHeader(String name, int value) {
+		WebContext.getResponse().addIntHeader(name, value);
+		return this;
 	}
 
 	/* (non-Javadoc)

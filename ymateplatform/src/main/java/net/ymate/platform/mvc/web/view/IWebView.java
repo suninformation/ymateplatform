@@ -69,6 +69,27 @@ public interface IWebView extends IView {
 	 * 
 	 * @param contentType 内容类型
 	 */
-	public void setContentType(String contentType);
+	public IWebView setContentType(String contentType);
+
+	/**
+	 * @param name
+	 * @param date
+	 * @return 设置请求回应头
+	 */
+	public IWebView addDateHeader(String name, long date);
+
+	/**
+	 * @param name
+	 * @param value
+	 * @return 设置请求回应头
+	 */
+	public IWebView addHeader(String name, String value);
+
+	/**
+	 * @param name
+	 * @param value
+	 * @return 设置请求回应头
+	 */
+	public IWebView addIntHeader(String name, int value);
 
 }

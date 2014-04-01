@@ -57,8 +57,9 @@ public abstract class AbstractView implements IView {
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.mvc.view.IView#addAttribute(java.lang.String, java.lang.Object)
 	 */
-	public void addAttribute(String key, Object value) {
+	public IView addAttribute(String key, Object value) {
 		this.attributes.put(key, value);
+		return this;
 	}
 
 	/* (non-Javadoc)

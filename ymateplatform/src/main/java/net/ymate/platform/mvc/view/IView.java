@@ -50,8 +50,9 @@ public interface IView {
 	 * 
 	 * @param key 属性键
 	 * @param value 属性值
+	 * @return
 	 */
-	public void addAttribute(String key, Object value);
+	public IView addAttribute(String key, Object value);
 
 	/**
 	 * 添加视图属性
