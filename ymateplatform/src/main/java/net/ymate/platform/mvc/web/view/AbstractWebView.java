@@ -18,6 +18,9 @@ package net.ymate.platform.mvc.web.view;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Map.Entry;
+
+import org.apache.commons.lang.StringUtils;
 
 import net.ymate.platform.mvc.view.AbstractView;
 import net.ymate.platform.mvc.web.WebMVC;
@@ -102,21 +105,28 @@ public abstract class AbstractWebView extends AbstractView implements IWebView {
 	 * @throws UnsupportedEncodingException  URL编码异常
 	 */
 	protected String bindUrl(String url) throws UnsupportedEncodingException  {
-		StringBuilder _urlSB = new StringBuilder(url);
-		if (!this.getAttributes().isEmpty()) {
-			if (_urlSB.indexOf("?") > 0) {
-				if (_urlSB.lastIndexOf("&", _urlSB.length() - 1) < 0) {
-					_urlSB.append("&");
-				}
+		if (this.getAttributes().isEmpty()) {
+			return url;
+		}
+		StringBuilder _paramSB = new StringBuilder(url);
+		if (url.indexOf("?") == -1) {
+			_paramSB.append("?");
+		} else {
+			_paramSB.append("&");
+		}
+		boolean _flag = true;
+		for (Entry<String, Object> entry : this.getAttributes().entrySet()) {
+			if (_flag) {
+				_flag = false;
 			} else {
-				_urlSB.append("?");
+				_paramSB.append("&");
 			}
-			for (String _key : this.getAttributes().keySet()) {
-				_urlSB.append(_key).append("=").append(URLEncoder.encode((String) this.getAttribute(_key), WebMVC.getConfig().getCharsetEncoding())).append("&");
+			_paramSB.append(entry.getKey()).append("=");
+			if (entry.getValue() != null && StringUtils.isNotEmpty(entry.getValue().toString())) {
+				_paramSB.append(URLEncoder.encode(entry.getValue().toString(), WebMVC.getConfig().getCharsetEncoding()));
 			}
 		}
-		int _lastP = _urlSB.lastIndexOf("&");
-		return (_lastP > 0 ? _urlSB.substring(0, _lastP) : _urlSB.toString());
+		return _paramSB.toString();
 	}
 
 }
