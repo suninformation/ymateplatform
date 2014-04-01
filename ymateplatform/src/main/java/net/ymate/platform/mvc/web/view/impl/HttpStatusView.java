@@ -15,8 +15,10 @@
  */
 package net.ymate.platform.mvc.web.view.impl;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
+import net.ymate.platform.mvc.web.WebMVC;
 import net.ymate.platform.mvc.web.context.WebContext;
 import net.ymate.platform.mvc.web.view.AbstractWebView;
 
@@ -53,6 +55,8 @@ public class HttpStatusView extends AbstractWebView {
 	private final String msg;
 	private final boolean __error;
 
+	private String body;
+
 	/**
 	 * 构造器
 	 * @param status HTTP返回码
@@ -85,10 +89,23 @@ public class HttpStatusView extends AbstractWebView {
 		this.__error = false;
 	}
 
+	/**
+	 * 将文本内容写入回应数据流(注:调用此方法需采用useError=false设置)
+	 * @param bodyStr
+	 * @return
+	 */
+	public HttpStatusView writeBody(String bodyStr) {
+		this.body = bodyStr;
+		return this;
+	}
+
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.mvc.web.view.AbstractWebView#renderView()
 	 */
 	protected void renderView() throws Exception {
+		if (StringUtils.isNotBlank(body)) {
+			IOUtils.write(body, WebContext.getResponse().getOutputStream(), StringUtils.defaultIfEmpty(WebMVC.getConfig().getCharsetEncoding(), WebContext.getResponse().getCharacterEncoding()));
+		}
 		if (StringUtils.isNotBlank(msg)) {
 			WebContext.getResponse().sendError(status, msg);
 		} else {
