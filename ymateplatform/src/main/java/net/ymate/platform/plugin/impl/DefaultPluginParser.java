@@ -19,13 +19,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.ymate.platform.base.YMP;
+import net.ymate.platform.commons.i18n.I18N;
 import net.ymate.platform.commons.lang.BlurObject;
 import net.ymate.platform.commons.util.FileUtils;
 import net.ymate.platform.commons.util.ResourceUtils;
@@ -73,6 +77,8 @@ public class DefaultPluginParser implements IPluginParser {
 
 	private static final Log _LOG = LogFactory.getLog(DefaultPluginParser.class);
 
+	private static final String PLUGIN_TAG = "plugin";
+	
 	private static final String ATTR_NAME = "name";
 	private static final String ATTR_ALIAS = "alias";
 	private static final String ATTR_CLASS = "class";
@@ -97,8 +103,8 @@ public class DefaultPluginParser implements IPluginParser {
 				// 首先加载当前CLASSPATH内的所有包含插件主配置文件的Jar包
 				Iterator<URL> _configURLs = ResourceUtils.getResources(__pluginFactory.getPluginConfig().getPluginManifestFile(), this.getClass(), true);
 				while (_configURLs.hasNext()) {
-					PluginMeta _meta = __doManifestFileProcess(null, _configURLs.next());
-					if (_meta != null) {
+					List<PluginMeta> _metas = __doManifestFileProcess(null, _configURLs.next());
+					for (PluginMeta _meta : _metas) {
 						_returnValue.put(_meta.getId(), _meta);
 					}
 				}
@@ -112,8 +118,8 @@ public class DefaultPluginParser implements IPluginParser {
 						if (_subDirFile.isDirectory()) {
 							File _manifestFile = new File(_subDirFile, __pluginFactory.getPluginConfig().getPluginManifestFile());
 							if (_manifestFile.exists() && _manifestFile.isFile()) {
-								PluginMeta _meta = __doManifestFileProcess(__pluginFactory.getPluginConfig().getPluginHomePath(), _manifestFile.toURI().toURL());
-								if (_meta != null) {
+								List<PluginMeta> _metas = __doManifestFileProcess(__pluginFactory.getPluginConfig().getPluginHomePath(), _manifestFile.toURI().toURL());
+								for (PluginMeta _meta : _metas) {
 									_returnValue.put(_meta.getId(), _meta);
 								}
 							}
@@ -137,49 +143,70 @@ public class DefaultPluginParser implements IPluginParser {
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	private PluginMeta __doManifestFileProcess(String pluginHomePath, URL configFileUrl) throws IOException, SAXException, ParserConfigurationException {
-		_LOG.info("分析插件配置文件: " + configFileUrl.getFile());
+	private List<PluginMeta> __doManifestFileProcess(String pluginHomePath, URL configFileUrl) throws IOException, SAXException, ParserConfigurationException {
+		_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.parse_plugin_file", configFileUrl.getFile()));
+		List<PluginMeta> _returnValue = new ArrayList<PluginMeta>();
+		//
+		List<Element> _pluginElements = new ArrayList<Element>();
+		//
 		InputStream _in = configFileUrl.openStream();
 		Document _document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(_in);
 		Element _rootElement = _document.getDocumentElement();
-		//
-		String id = _rootElement.getAttribute(ATTR_ID);
-		String name = _rootElement.getAttribute(ATTR_NAME);
-		String alias = _rootElement.getAttribute(ATTR_ALIAS);
-		String version = _rootElement.getAttribute(ATTR_VERSION);
+		if (_rootElement.getNodeName().equals(PLUGIN_TAG)) {
+			_pluginElements.add(_rootElement);
+		} else {
+			NodeList _pluginNodes = _rootElement.getElementsByTagName(PLUGIN_TAG);
+			for (int _idx = 0; _idx < _pluginNodes.getLength(); _idx++) {
+				_pluginElements.add((Element) _pluginNodes.item(_idx));
+			}
+		}
+		for (Element _pluginElement : _pluginElements) {
+			PluginMeta _pluginMeta = __doPluginElementProcess(_pluginElement, pluginHomePath, configFileUrl);
+			if (_pluginMeta != null) {
+				_returnValue.add(_pluginMeta);
+			}
+		}
+		return _returnValue;
+	}
+
+	private PluginMeta __doPluginElementProcess(Element pluginElement, String pluginHomePath, URL configFileUrl) {
+		String id = pluginElement.getAttribute(ATTR_ID);
+		String name = pluginElement.getAttribute(ATTR_NAME);
+		String alias = pluginElement.getAttribute(ATTR_ALIAS);
+		String version = pluginElement.getAttribute(ATTR_VERSION);
 		if (StringUtils.isBlank(id) || StringUtils.isBlank(name)) {
-			_LOG.warn("插件配置文件 " + configFileUrl.getFile() + " 中的 id 或 name 属性未设置, 此插件将被忽略.");
+			_LOG.warn(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.plugin_will_be_ignored", configFileUrl.getFile()));
 			return null;
 		}
 		//
 		boolean disabled = false;
-		NodeList _disabledNodes = _rootElement.getElementsByTagName(ATTR_DISABLED);
+		NodeList _disabledNodes = pluginElement.getElementsByTagName(ATTR_DISABLED);
 		if (_disabledNodes.getLength() > 0) {
 			Node _node = _disabledNodes.item(0);
 			disabled = new BlurObject(_node.getTextContent()).toBooleanValue();
 		}
 		if (disabled) {
-			_LOG.warn("插件配置文件 " + configFileUrl.getFile() + " 中的 disabled 属性已开启, 此插件将被忽略.");
+			_LOG.warn(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.plugin_will_be_disabled", configFileUrl.getFile()));
 			return null;
 		}
-		String initClass = _rootElement.getAttribute(ATTR_CLASS);
-		String author = _rootElement.getAttribute(ATTR_AUTHOR);
-		String email = _rootElement.getAttribute(ATTR_EMAIL);
+		String initClass = pluginElement.getAttribute(ATTR_CLASS);
+		String author = pluginElement.getAttribute(ATTR_AUTHOR);
+		String email = pluginElement.getAttribute(ATTR_EMAIL);
 		String description = "";
-		NodeList _descriptionNodes  =_rootElement.getElementsByTagName(ATTR_DESCRIPTION);
+		NodeList _descriptionNodes  =pluginElement.getElementsByTagName(ATTR_DESCRIPTION);
 		if (_descriptionNodes.getLength() > 0) {
 			Node _node = _descriptionNodes.item(0);
 			description = _node.getTextContent();
 		}
 		boolean automatic = false;
-		NodeList _automacticNodes = _rootElement.getElementsByTagName(ATTR_AUTOMATIC);
+		NodeList _automacticNodes = pluginElement.getElementsByTagName(ATTR_AUTOMATIC);
 		if (_automacticNodes.getLength() > 0) {
 			Node _node = _automacticNodes.item(0);
 			automatic = new BlurObject(_node.getTextContent()).toBooleanValue();
 		}
 		Object _extraObj = null;
 		if (__pluginFactory.getPluginConfig().getPluginExtraParserClassImpl() != null) {
-			NodeList _extraNodes = _rootElement.getElementsByTagName(ATTR_EXTRA_PART);
+			NodeList _extraNodes = pluginElement.getElementsByTagName(ATTR_EXTRA_PART);
 			if (_extraNodes.getLength() > 0) {
 				_extraObj = __pluginFactory.getPluginConfig().getPluginExtraParserClassImpl().doExtarParser(_extraNodes.item(0));
 			}
