@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.ymate.platform.persistence.jdbc.JDBC;
+import net.ymate.platform.persistence.jdbc.base.dialect.IDialect;
 import net.ymate.platform.persistence.support.EntityMeta;
 
 import org.apache.commons.lang.StringUtils;
@@ -69,38 +70,39 @@ public class JdbcEntityMeta extends EntityMeta {
 	}
 
 	/**
+	 * @param dialect 指定数据库方言
 	 * @return 构建根据主键检索数据库SQL
 	 */
-	public String createSelectByPkSql() {
-		return createSelectByPkSql(null, null);
+	public String createSelectByPkSql(IDialect dialect) {
+		return createSelectByPkSql(dialect, null, null);
 	}
 
-	public String createSelectByPkSql(String[] fieldFilter, String[] pkFieldFilter) {
+	public String createSelectByPkSql(IDialect dialect, String[] fieldFilter, String[] pkFieldFilter) {
 		String _sql = "select #FIELDS from #TABLENAME where #PK";
-		_sql = _sql.replaceAll("#FIELDS", __doGenerateFieldsFormatStr(fieldFilter != null && fieldFilter.length > 0 ? Arrays.asList(fieldFilter) : this.getColumnNames()));
-		_sql = _sql.replaceAll("#TABLENAME", this.getTableName());
-		_sql = _sql.replaceAll("#PK", __doGeneratePrimaryKeyFormatStr(pkFieldFilter != null && pkFieldFilter.length > 0 ? Arrays.asList(pkFieldFilter) : this.getPrimaryKeys()));
+		_sql = _sql.replaceAll("#FIELDS", __doGenerateFieldsFormatStr(dialect, fieldFilter != null && fieldFilter.length > 0 ? Arrays.asList(fieldFilter) : this.getColumnNames()));
+		_sql = _sql.replaceAll("#TABLENAME", dialect.wapperQuotedIdent(this.getTableName()));
+		_sql = _sql.replaceAll("#PK", __doGeneratePrimaryKeyFormatStr(dialect, pkFieldFilter != null && pkFieldFilter.length > 0 ? Arrays.asList(pkFieldFilter) : this.getPrimaryKeys()));
 		return _sql;
 	}
 
 	/**
 	 * @return 构建检索数据库全部记录的SQL
 	 */
-	public String createSelectAllSql() {
-		return createSelectAllSql(null);
+	public String createSelectAllSql(IDialect dialect) {
+		return createSelectAllSql(dialect, null);
 	}
 
-	public String createSelectAllSql(String[] fieldFilter) {
+	public String createSelectAllSql(IDialect dialect, String[] fieldFilter) {
 		String _sql = "select #FIELDS from #TABLENAME ";
-		_sql = _sql.replaceAll("#FIELDS", __doGenerateFieldsFormatStr(fieldFilter != null && fieldFilter.length > 0 ? Arrays.asList(fieldFilter) : this.getColumnNames()));
-		_sql = _sql.replaceAll("#TABLENAME", this.getTableName());
+		_sql = _sql.replaceAll("#FIELDS", __doGenerateFieldsFormatStr(dialect, fieldFilter != null && fieldFilter.length > 0 ? Arrays.asList(fieldFilter) : this.getColumnNames()));
+		_sql = _sql.replaceAll("#TABLENAME", dialect.wapperQuotedIdent(this.getTableName()));
 		return _sql;
 	}
 
 	/**
 	 * @return 构建数据库记录插入的SQL
 	 */
-	public String createInsertSql() {
+	public String createInsertSql(IDialect dialect) {
 		if (this.hasAutoIncrementColumn()) {
 			// 剔除自动生成的主键字段
 			List<String> _fieldFilter = new ArrayList<String>();
@@ -111,15 +113,15 @@ public class JdbcEntityMeta extends EntityMeta {
 				}
 				_fieldFilter.add(_columnName);
 			}
-			return createInsertSql(_fieldFilter.toArray(new String[_fieldFilter.size()]));
+			return createInsertSql(dialect, _fieldFilter.toArray(new String[_fieldFilter.size()]));
 		}
-		return createInsertSql(null);
+		return createInsertSql(dialect, null);
 	}
 
-	public String createInsertSql(String[] fieldFilter) {
+	public String createInsertSql(IDialect dialect, String[] fieldFilter) {
 		String sql = "insert into #TABLENAME (#FIELDS) values (#VALUES)";
-		sql = sql.replaceAll("#TABLENAME", this.getTableName());
-		sql = sql.replaceAll("#FIELDS", __doGenerateFieldsFormatStr(fieldFilter != null && fieldFilter.length > 0 ? Arrays.asList(fieldFilter) : this.getColumnNames()));
+		sql = sql.replaceAll("#TABLENAME", dialect.wapperQuotedIdent(this.getTableName()));
+		sql = sql.replaceAll("#FIELDS", __doGenerateFieldsFormatStr(dialect, fieldFilter != null && fieldFilter.length > 0 ? Arrays.asList(fieldFilter) : this.getColumnNames()));
 		sql = sql.replaceAll("#VALUES",__doGenerateFieldsValueFormatStr(fieldFilter != null && fieldFilter.length > 0 ? Arrays.asList(fieldFilter) : this.getColumnNames()));
 		return sql;
 	}
@@ -127,46 +129,49 @@ public class JdbcEntityMeta extends EntityMeta {
 	/**
 	 * @return 构建数据库记录更新的SQL
 	 */
-	public String createUpdateByPkSql() {
-		return createUpdateByPkSql(null, null);
+	public String createUpdateByPkSql(IDialect dialect) {
+		return createUpdateByPkSql(dialect, null, null);
 	}
 
-	public String createUpdateByPkSql(String[] fieldFilter, String[] pkFieldFilter) {
+	public String createUpdateByPkSql(IDialect dialect, String[] fieldFilter, String[] pkFieldFilter) {
 		String _sql = "update #TABLENAME set #FIELDS where #PK";
-		_sql = _sql.replaceAll("#FIELDS", __doGenerateFieldsValueUpdateFormatStr(fieldFilter != null && fieldFilter.length > 0 ? Arrays.asList(fieldFilter) : this.getColumnNames()));
-		_sql = _sql.replaceAll("#TABLENAME", this.getTableName());
-		_sql = _sql.replaceAll("#PK", __doGeneratePrimaryKeyFormatStr(pkFieldFilter != null && pkFieldFilter.length > 0 ? Arrays.asList(pkFieldFilter) : this.getPrimaryKeys()));
+		_sql = _sql.replaceAll("#FIELDS", __doGenerateFieldsValueUpdateFormatStr(dialect, fieldFilter != null && fieldFilter.length > 0 ? Arrays.asList(fieldFilter) : this.getColumnNames()));
+		_sql = _sql.replaceAll("#TABLENAME", dialect.wapperQuotedIdent(this.getTableName()));
+		_sql = _sql.replaceAll("#PK", __doGeneratePrimaryKeyFormatStr(dialect, pkFieldFilter != null && pkFieldFilter.length > 0 ? Arrays.asList(pkFieldFilter) : this.getPrimaryKeys()));
 		return _sql;
 	}
 
 	/**
 	 * @return 构建数据库记录删除的SQL
 	 */
-	public String createDeleteByPkSql() {
-		return createDeleteByPkSql(null);
+	public String createDeleteByPkSql(IDialect dialect) {
+		return createDeleteByPkSql(dialect, null);
 	}
 
-	public String createDeleteByPkSql(String[] pkFieldFilter) {
+	public String createDeleteByPkSql(IDialect dialect, String[] pkFieldFilter) {
 		String sql = "delete from #TABLENAME where #PK";
-		sql = sql.replaceAll("#TABLENAME", this.getTableName());
-		sql = sql.replaceAll("#PK", __doGeneratePrimaryKeyFormatStr(pkFieldFilter != null && pkFieldFilter.length > 0 ? Arrays.asList(pkFieldFilter) : this.getPrimaryKeys()));
+		sql = sql.replaceAll("#TABLENAME", dialect.wapperQuotedIdent(this.getTableName()));
+		sql = sql.replaceAll("#PK", __doGeneratePrimaryKeyFormatStr(dialect, pkFieldFilter != null && pkFieldFilter.length > 0 ? Arrays.asList(pkFieldFilter) : this.getPrimaryKeys()));
 		return sql;
 	}
 
-	private String __doGeneratePrimaryKeyFormatStr(List<String> primaryKeyNames) {
+	private String __doGeneratePrimaryKeyFormatStr(IDialect dialect, List<String> primaryKeyNames) {
 		StringBuilder _pkStr = new StringBuilder();
 		for (String pkName : primaryKeyNames) {
 			if (_pkStr.length() > 0) {
 				_pkStr.append(" and ");
 			}
-			_pkStr.append(pkName).append("=?");
+			_pkStr.append(dialect.wapperQuotedIdent(pkName)).append("=?");
 		}
 		return _pkStr.toString();
 	}
 
-	private String __doGenerateFieldsFormatStr(List<String> fields) {
-		String _returnValue = fields.toString();
-		return _returnValue.substring(1, _returnValue.length() - 1);
+	private String __doGenerateFieldsFormatStr(IDialect dialect, List<String> fields) {
+		StringBuilder _fieldsSB = new StringBuilder();
+		for (String _field : fields) {
+			_fieldsSB.append(dialect.wapperQuotedIdent(_field)).append(",");
+		}
+		return _fieldsSB.substring(0, _fieldsSB.length() - 1);
 	}
 
 	private String __doGenerateFieldsValueFormatStr(List<String> fields) {
@@ -180,13 +185,13 @@ public class JdbcEntityMeta extends EntityMeta {
 		return _returnValue.toString();
 	}
 
-	private String __doGenerateFieldsValueUpdateFormatStr(List<String> fields) {
+	private String __doGenerateFieldsValueUpdateFormatStr(IDialect dialect, List<String> fields) {
 		StringBuilder _returnValue = new StringBuilder();
 		for (String _field : fields) {
 			if (this.getPrimaryKeys().contains(_field)) {
 				continue;
 			}
-			_returnValue.append(_field).append("=?");
+			_returnValue.append(dialect.wapperQuotedIdent(_field)).append("=?");
 			_returnValue.append(",");
 		}
 		return _returnValue.substring(0, _returnValue.length() - 1);

@@ -48,6 +48,13 @@ import java.util.List;
 public abstract class AbstractDialect implements IDialect {
 
 	/* (non-Javadoc)
+	 * @see net.ymate.platform.persistence.jdbc.base.dialect.IDialect#wapperQuotedIdent(java.lang.String)
+	 */
+	public String wapperQuotedIdent(String source) {
+		return source;
+	}
+
+	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.base.IDialect#getGeneratedKey(java.sql.Statement)
 	 */
 	public Object[] getGeneratedKey(Statement statement) throws SQLException {

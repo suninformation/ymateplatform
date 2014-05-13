@@ -145,7 +145,7 @@ public class JdbcEntitySupport {
 		T _returnValue = null;
 		ResultSetHelper _helper = null;
 		try {
-			_opt.setSql(_meta.createSelectByPkSql(fieldFilter, _pkFieldFilter.toArray(new String[_pkFieldFilter.size()])));
+			_opt.setSql(_meta.createSelectByPkSql(__conn.getDialect(), fieldFilter, _pkFieldFilter.toArray(new String[_pkFieldFilter.size()])));
 			_opt.execute(this.getConnection());
 			if (_opt.isResultSetAvailable()) {
 				// 处理结果集->对象
@@ -169,7 +169,7 @@ public class JdbcEntitySupport {
 	public <T> List<T> selectByCond(Class<T> entityClass, String whereStr, Object[] values, String[] fieldFilter) throws OperatorException {
 		JdbcEntityMeta _meta = this.getEntityMeta(entityClass);
 		IQueryOperator<Object[]> _opt = new QueryOperator<Object[]>(new ArrayResultSetHandler());
-		String _sql = _meta.createSelectAllSql(fieldFilter);
+		String _sql = _meta.createSelectAllSql(__conn.getDialect(), fieldFilter);
 		// 拼装SQL
 		if (StringUtils.isNotBlank(whereStr)) {
 			if (!StringUtils.trim(whereStr).toLowerCase().startsWith("where")) {
@@ -229,7 +229,7 @@ public class JdbcEntitySupport {
 				result.add(__doRenderToEntity(entityClass, _meta, rs, fieldFilter));
 			}
 		}, currentPage, pageSize);
-		String _sql = _meta.createSelectAllSql(fieldFilter);
+		String _sql = _meta.createSelectAllSql(__conn.getDialect(), fieldFilter);
 		// 拼装SQL
 		if (StringUtils.isNotBlank(whereStr)) {
 			if (!StringUtils.trim(whereStr).toLowerCase().startsWith("where")) {
@@ -267,7 +267,7 @@ public class JdbcEntitySupport {
 		//
 		final JdbcEntityMeta _meta = this.getEntityMeta(entity.getClass());
 		Map<String, AttributeInfo>  _entityMap = __doRenderEntityToMap(_meta, entity);
-		IUpdateOperator _update = new UpdateOperator(_meta.createInsertSql());
+		IUpdateOperator _update = new UpdateOperator(_meta.createInsertSql(__conn.getDialect()));
 		if (_meta.hasAutoIncrementColumn()) {
 			_update.setAccessorCfgEvent(new EntitryAccessorCfgEvent(_meta, entity));
 		}
@@ -302,7 +302,7 @@ public class JdbcEntitySupport {
 		}
 		//
 		final JdbcEntityMeta _meta = this.getEntityMeta(entityList.get(0).getClass());
-		IUpdateBatchOperator _update = new UpdateBatchOperator(_meta.createInsertSql());
+		IUpdateBatchOperator _update = new UpdateBatchOperator(_meta.createInsertSql(__conn.getDialect()));
 		if (_meta.hasAutoIncrementColumn()) {
 			_update.setAccessorCfgEvent(new EntitryAccessorCfgEvent(_meta, entityList));
 		}
@@ -380,7 +380,7 @@ public class JdbcEntitySupport {
 			}
 		}
 		try {
-			_update.setSql(_meta.createUpdateByPkSql(fieldFilter, _pkFieldFilter.toArray(new String[_pkFieldFilter.size()])));
+			_update.setSql(_meta.createUpdateByPkSql(__conn.getDialect(), fieldFilter, _pkFieldFilter.toArray(new String[_pkFieldFilter.size()])));
 			_update.execute(this.getConnection());
 			//
 			if (event != null) {
@@ -456,7 +456,7 @@ public class JdbcEntitySupport {
 			_entityMap.clear();
 		}
 		try {
-			_update.setSql(_meta.createUpdateByPkSql(fieldFilter, _pkFieldFilter.toArray(new String[_pkFieldFilter.size()])));
+			_update.setSql(_meta.createUpdateByPkSql(__conn.getDialect(), fieldFilter, _pkFieldFilter.toArray(new String[_pkFieldFilter.size()])));
 			_update.execute(this.getConnection());
 			//
 			if (event != null) {
@@ -523,7 +523,7 @@ public class JdbcEntitySupport {
 			_update.addBatchParameter(_batchParam);
 		}
 		try {
-			_update.setSql(_meta.createDeleteByPkSql(_pkFieldFilter.toArray(new String[_pkFieldFilter.size()])));
+			_update.setSql(_meta.createDeleteByPkSql(__conn.getDialect(), _pkFieldFilter.toArray(new String[_pkFieldFilter.size()])));
 			_update.execute(this.getConnection());
 			//
 			if (event != null) {
@@ -576,7 +576,7 @@ public class JdbcEntitySupport {
 			}
 		}
 		try {
-			_update.setSql(_meta.createDeleteByPkSql(_pkFieldFilter.toArray(new String[_pkFieldFilter.size()])));
+			_update.setSql(_meta.createDeleteByPkSql(__conn.getDialect(), _pkFieldFilter.toArray(new String[_pkFieldFilter.size()])));
 			_update.execute(this.getConnection());
 			//
 			if (event != null) {
@@ -605,7 +605,7 @@ public class JdbcEntitySupport {
 		}
 		SQLHelper.create(
 				_query,
-				"SELECT count(1) FROM " + _meta.getTableName() + " ${whereStr}").replace("whereStr", _sql)
+				"SELECT count(1) FROM " + __conn.getDialect().wapperQuotedIdent(_meta.getTableName()) + " ${whereStr}").replace("whereStr", _sql)
 				.addParameters(params).bindSQL();
 		ResultSetHelper _rs = null;
 		try {

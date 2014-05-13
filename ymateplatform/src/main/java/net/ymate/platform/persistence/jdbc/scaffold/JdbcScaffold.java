@@ -327,7 +327,7 @@ public class JdbcScaffold {
 					System.err.println("Database table \"" + tableName + "\" does not set the primary key, ignored");
 				} else {
 					_statement = _connHolder.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-					_resultSet = _statement.executeQuery("select * from " + tableName);
+					_resultSet = _statement.executeQuery("select * from " + _connHolder.getDialect().wapperQuotedIdent(tableName));
 					ResultSetMetaData _rsMetaData = _resultSet.getMetaData();
 					for (int _idx = 1; _idx <= _rsMetaData.getColumnCount(); _idx++) {
 						_tableFields.put(_rsMetaData.getColumnName(_idx).toLowerCase(), new ColumnInfo(_rsMetaData.getColumnName(_idx).toLowerCase(), compressType(_rsMetaData.getColumnClassName(_idx)), _rsMetaData.isAutoIncrement(_idx)));

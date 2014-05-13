@@ -50,6 +50,12 @@ public interface IDialect {
 	public abstract String getDialectName();
 
 	/**
+	 * @param source 字段名或表名称
+	 * @return 返回添加引用标识符的字段或表名称，防止字段或表名与关键字冲突，此接口方法默认实现按原样返回
+	 */
+	public abstract String wapperQuotedIdent(String source);
+
+	/**
 	 * @param sql 原SQL语句
 	 * @param limit
 	 * @param offset
