@@ -21,16 +21,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.ymate.platform.commons.util.ClassUtils;
 import net.ymate.platform.persistence.base.ConnectionException;
+import net.ymate.platform.persistence.base.OperatorException;
 import net.ymate.platform.persistence.jdbc.base.dialect.IDialect;
 import net.ymate.platform.persistence.jdbc.base.dialect.impl.MySqlDialect;
 import net.ymate.platform.persistence.jdbc.base.dialect.impl.OracleDialect;
 import net.ymate.platform.persistence.jdbc.base.dialect.impl.SQLServer2005Dialect;
 import net.ymate.platform.persistence.jdbc.support.C3p0DataSourceAdapter;
-import net.ymate.platform.persistence.jdbc.support.JdbcDataSourceCfgMeta;
 import net.ymate.platform.persistence.jdbc.support.DbcpDataSourceAdapter;
 import net.ymate.platform.persistence.jdbc.support.DefaultConnectionHolder;
 import net.ymate.platform.persistence.jdbc.support.DefaultDataSourceAdapter;
 import net.ymate.platform.persistence.jdbc.support.DefaultSession;
+import net.ymate.platform.persistence.jdbc.support.JdbcDataSourceCfgMeta;
 import net.ymate.platform.persistence.jdbc.support.JndiDataSourceAdapter;
 import net.ymate.platform.persistence.jdbc.transaction.ITransaction;
 import net.ymate.platform.persistence.jdbc.transaction.Trans;
@@ -217,6 +218,39 @@ public class JDBC {
 	 */
 	public static ISession openSession(String dsName) throws ConnectionException {
 		return new DefaultSession(getConnectionHolder(dsName));
+	}
+
+	/**
+	 * 创建会话对象并回调会话执行器接口，保证会话被安全关闭
+	 * 
+	 * @param executor 会话执行器接口
+	 * @throws ConnectionException
+	 * @throws OperatorException
+	 */
+	public static void openSession(ISessionExecutor executor) throws ConnectionException, OperatorException {
+		ISession _session = openSession();
+		try {
+			executor.execute(_session);
+		} finally {
+			_session.close();
+		}
+	}
+
+	/**
+	 * 创建会话对象并回调会话执行器接口，保证会话被安全关闭
+	 * 
+	 * @param dsName 数据源名称
+	 * @param executor 会话执行器接口
+	 * @throws ConnectionException
+	 * @throws OperatorException
+	 */
+	public static void openSession(String dsName, ISessionExecutor executor) throws ConnectionException, OperatorException {
+		ISession _session = openSession(dsName);
+		try {
+			executor.execute(_session);
+		} finally {
+			_session.close();
+		}
 	}
 
 	/**
