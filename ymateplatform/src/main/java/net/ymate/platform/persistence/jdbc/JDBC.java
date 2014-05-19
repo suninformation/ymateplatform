@@ -227,10 +227,10 @@ public class JDBC {
 	 * @throws ConnectionException
 	 * @throws OperatorException
 	 */
-	public static void openSession(ISessionExecutor executor) throws ConnectionException, OperatorException {
+	public static <T> T openSession(ISessionExecutor<T> executor) throws ConnectionException, OperatorException {
 		ISession _session = openSession();
 		try {
-			executor.execute(_session);
+			return executor.execute(_session);
 		} finally {
 			_session.close();
 		}
@@ -241,13 +241,14 @@ public class JDBC {
 	 * 
 	 * @param dsName 数据源名称
 	 * @param executor 会话执行器接口
+	 * @return
 	 * @throws ConnectionException
 	 * @throws OperatorException
 	 */
-	public static void openSession(String dsName, ISessionExecutor executor) throws ConnectionException, OperatorException {
+	public static <T> T openSession(String dsName, ISessionExecutor<T> executor) throws ConnectionException, OperatorException {
 		ISession _session = openSession(dsName);
 		try {
-			executor.execute(_session);
+			return executor.execute(_session);
 		} finally {
 			_session.close();
 		}

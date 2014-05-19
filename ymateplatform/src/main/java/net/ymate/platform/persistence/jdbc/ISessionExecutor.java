@@ -41,14 +41,15 @@ import net.ymate.platform.persistence.base.OperatorException;
  *          </tr>
  *          </table>
  */
-public interface ISessionExecutor {
+public interface ISessionExecutor<T> {
 
 	/**
 	 * 执行会话处理过程
 	 * 
 	 * @param session 会话对象
+	 * @return
 	 * @throws OperatorException
 	 */
-	public void execute(ISession session) throws OperatorException;
+	public T execute(ISession session) throws OperatorException;
 
 }
