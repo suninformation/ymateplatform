@@ -80,7 +80,11 @@ public class JdbcEntityMeta extends EntityMeta {
 	public String createSelectByPkSql(IDialect dialect, String[] fieldFilter, String[] pkFieldFilter) {
 		String _sql = "select #FIELDS from #TABLENAME where #PK";
 		_sql = _sql.replaceAll("#FIELDS", __doGenerateFieldsFormatStr(dialect, fieldFilter != null && fieldFilter.length > 0 ? Arrays.asList(fieldFilter) : this.getColumnNames()));
-		_sql = _sql.replaceAll("#TABLENAME", dialect.wapperQuotedIdent(this.getTableName()));
+		if (dialect.getDialectName().equals("Oracle")) {
+			_sql = _sql.replaceAll("#TABLENAME", this.getTableName());
+		} else {
+			_sql = _sql.replaceAll("#TABLENAME", dialect.wapperQuotedIdent(this.getTableName()));
+		}
 		_sql = _sql.replaceAll("#PK", __doGeneratePrimaryKeyFormatStr(dialect, pkFieldFilter != null && pkFieldFilter.length > 0 ? Arrays.asList(pkFieldFilter) : this.getPrimaryKeys()));
 		return _sql;
 	}
@@ -95,7 +99,11 @@ public class JdbcEntityMeta extends EntityMeta {
 	public String createSelectAllSql(IDialect dialect, String[] fieldFilter) {
 		String _sql = "select #FIELDS from #TABLENAME ";
 		_sql = _sql.replaceAll("#FIELDS", __doGenerateFieldsFormatStr(dialect, fieldFilter != null && fieldFilter.length > 0 ? Arrays.asList(fieldFilter) : this.getColumnNames()));
-		_sql = _sql.replaceAll("#TABLENAME", dialect.wapperQuotedIdent(this.getTableName()));
+		if (dialect.getDialectName().equals("Oracle")) {
+			_sql = _sql.replaceAll("#TABLENAME", this.getTableName());
+		} else {
+			_sql = _sql.replaceAll("#TABLENAME", dialect.wapperQuotedIdent(this.getTableName()));
+		}
 		return _sql;
 	}
 
@@ -120,7 +128,11 @@ public class JdbcEntityMeta extends EntityMeta {
 
 	public String createInsertSql(IDialect dialect, String[] fieldFilter) {
 		String sql = "insert into #TABLENAME (#FIELDS) values (#VALUES)";
-		sql = sql.replaceAll("#TABLENAME", dialect.wapperQuotedIdent(this.getTableName()));
+		if (dialect.getDialectName().equals("Oracle")) {
+			sql = sql.replaceAll("#TABLENAME", this.getTableName());
+		} else {
+			sql = sql.replaceAll("#TABLENAME", dialect.wapperQuotedIdent(this.getTableName()));
+		}
 		sql = sql.replaceAll("#FIELDS", __doGenerateFieldsFormatStr(dialect, fieldFilter != null && fieldFilter.length > 0 ? Arrays.asList(fieldFilter) : this.getColumnNames()));
 		sql = sql.replaceAll("#VALUES",__doGenerateFieldsValueFormatStr(fieldFilter != null && fieldFilter.length > 0 ? Arrays.asList(fieldFilter) : this.getColumnNames()));
 		return sql;
@@ -136,7 +148,11 @@ public class JdbcEntityMeta extends EntityMeta {
 	public String createUpdateByPkSql(IDialect dialect, String[] fieldFilter, String[] pkFieldFilter) {
 		String _sql = "update #TABLENAME set #FIELDS where #PK";
 		_sql = _sql.replaceAll("#FIELDS", __doGenerateFieldsValueUpdateFormatStr(dialect, fieldFilter != null && fieldFilter.length > 0 ? Arrays.asList(fieldFilter) : this.getColumnNames()));
-		_sql = _sql.replaceAll("#TABLENAME", dialect.wapperQuotedIdent(this.getTableName()));
+		if (dialect.getDialectName().equals("Oracle")) {
+			_sql = _sql.replaceAll("#TABLENAME", this.getTableName());
+		} else {
+			_sql = _sql.replaceAll("#TABLENAME", dialect.wapperQuotedIdent(this.getTableName()));
+		}
 		_sql = _sql.replaceAll("#PK", __doGeneratePrimaryKeyFormatStr(dialect, pkFieldFilter != null && pkFieldFilter.length > 0 ? Arrays.asList(pkFieldFilter) : this.getPrimaryKeys()));
 		return _sql;
 	}
@@ -150,7 +166,11 @@ public class JdbcEntityMeta extends EntityMeta {
 
 	public String createDeleteByPkSql(IDialect dialect, String[] pkFieldFilter) {
 		String sql = "delete from #TABLENAME where #PK";
-		sql = sql.replaceAll("#TABLENAME", dialect.wapperQuotedIdent(this.getTableName()));
+		if (dialect.getDialectName().equals("Oracle")) {
+			sql = sql.replaceAll("#TABLENAME", this.getTableName());
+		} else {
+			sql = sql.replaceAll("#TABLENAME", dialect.wapperQuotedIdent(this.getTableName()));
+		}
 		sql = sql.replaceAll("#PK", __doGeneratePrimaryKeyFormatStr(dialect, pkFieldFilter != null && pkFieldFilter.length > 0 ? Arrays.asList(pkFieldFilter) : this.getPrimaryKeys()));
 		return sql;
 	}
