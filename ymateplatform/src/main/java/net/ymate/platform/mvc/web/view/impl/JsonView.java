@@ -63,8 +63,8 @@ public class JsonView extends AbstractWebView {
 	 * 构造器
 	 * @param obj Java对象
 	 */
-	public JsonView(Object jsonObj) {
-		this.jsonObj = JSON.toJSON(jsonObj);
+	public JsonView(Object obj) {
+		this.jsonObj = JSON.toJSON(obj);
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class JsonView extends AbstractWebView {
 		if (StringUtils.isNotBlank(getContentType())) {
 			response.setContentType(getContentType());
 		} else if (this.withContentType) {
-			if (this.jsonpCallback != null) {
+			if (this.jsonpCallback == null) {
 				response.setContentType(JSON_CONTENT_TYPE);
 			} else {
 				response.setContentType(JAVASCRIPT_CONTENT_TYPE);
