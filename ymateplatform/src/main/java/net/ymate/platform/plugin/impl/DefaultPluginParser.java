@@ -18,8 +18,10 @@ package net.ymate.platform.plugin.impl;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -34,11 +36,12 @@ import net.ymate.platform.commons.lang.BlurObject;
 import net.ymate.platform.commons.util.FileUtils;
 import net.ymate.platform.commons.util.ResourceUtils;
 import net.ymate.platform.commons.util.RuntimeUtils;
+
 import net.ymate.platform.plugin.IPluginFactory;
 import net.ymate.platform.plugin.IPluginParser;
+import net.ymate.platform.plugin.PluginClassLoader;
 import net.ymate.platform.plugin.PluginMeta;
 import net.ymate.platform.plugin.PluginParserException;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -103,7 +106,8 @@ public class DefaultPluginParser implements IPluginParser {
 				// 首先加载当前CLASSPATH内的所有包含插件主配置文件的Jar包
 				Iterator<URL> _configURLs = ResourceUtils.getResources(__pluginFactory.getPluginConfig().getPluginManifestFile(), this.getClass(), true);
 				while (_configURLs.hasNext()) {
-					List<PluginMeta> _metas = __doManifestFileProcess(null, _configURLs.next());
+                    URL _configURL = _configURLs.next();
+					List<PluginMeta> _metas = __doManifestFileProcess(__pluginFactory.getPluginClassLoader(), null, _configURL);
 					for (PluginMeta _meta : _metas) {
 						_returnValue.put(_meta.getId(), _meta);
 					}
@@ -116,13 +120,24 @@ public class DefaultPluginParser implements IPluginParser {
                     File[] _subDirFiles = _pluginDirFile.listFiles();
 					for (File _subDirFile : _subDirFiles != null ? _subDirFiles : new File[0]) {
 						if (_subDirFile.isDirectory()) {
+                            ClassLoader _currentLoader = __doCreatePluginClassLoader(_subDirFile.getPath());
+                            // 如果插件目录中存在主配置文件，则优先处理
 							File _manifestFile = new File(_subDirFile, __pluginFactory.getPluginConfig().getPluginManifestFile());
 							if (_manifestFile.exists() && _manifestFile.isFile()) {
-								List<PluginMeta> _metas = __doManifestFileProcess(__pluginFactory.getPluginConfig().getPluginHomePath(), _manifestFile.toURI().toURL());
+								List<PluginMeta> _metas = __doManifestFileProcess(_currentLoader, _subDirFile.getPath(), _manifestFile.toURI().toURL());
 								for (PluginMeta _meta : _metas) {
 									_returnValue.put(_meta.getId(), _meta);
 								}
-							}
+							} else {
+                                // 否则扫描类路径和JAR包中资源
+                                Enumeration<URL> _configURLs = _currentLoader.getResources(__pluginFactory.getPluginConfig().getPluginManifestFile());
+                                while (_configURLs.hasMoreElements()) {
+                                    List<PluginMeta> _metas = __doManifestFileProcess(_currentLoader, _subDirFile.getPath(), _configURLs.nextElement());
+                                    for (PluginMeta _meta : _metas) {
+                                        _returnValue.put(_meta.getId(), _meta);
+                                    }
+                                }
+                            }
 						}
 					}
 				}
@@ -133,17 +148,49 @@ public class DefaultPluginParser implements IPluginParser {
 		return _returnValue;
 	}
 
+    /**
+     * 创建基于插件HOME的插件类加载器
+     *
+     * @param path
+     * @return
+     * @throws MalformedURLException
+     */
+    private ClassLoader __doCreatePluginClassLoader(String path) throws MalformedURLException {
+        _LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.create_plugin_loader", path));
+        ArrayList<URL> _libList = new ArrayList<URL>();
+        // 设置JAR包路径
+        File _pluginLibDir = new File(FileUtils.fixSeparator(path) + "lib");
+        if (_pluginLibDir.exists() && _pluginLibDir.isDirectory()) {
+            File[] _libFiles = _pluginLibDir.listFiles();
+            for (File _libFile : _libFiles != null ? _libFiles : new File[0]) {
+                if (_libFile.isFile() && _libFile.getAbsolutePath().endsWith("jar")) {
+                    _libList.add(_libFile.toURI().toURL());
+                    _LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.plugin_load_jar_file", path, _libFile.getPath()));
+                }
+            }
+        }
+        // 设置类文件路径
+        _pluginLibDir = new File(FileUtils.fixSeparator(path) + "classes");
+        if (_pluginLibDir.exists() && _pluginLibDir.isDirectory()) {
+            _libList.add(_pluginLibDir.toURI().toURL());
+            _LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.plugin_load_classpath", path, _pluginLibDir.getPath()));
+        }
+        _LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.create_plugin_loader_final", path));
+        return new PluginClassLoader(_libList.toArray(new URL[0]), __pluginFactory.getPluginClassLoader());
+    }
+
 	/**
 	 * 分析插件主配置文件
-	 * 
-	 * @param pluginHomePath
+	 *
+     * @param classLoader
+	 * @param pluginPath
 	 * @param configFileUrl
 	 * @return
 	 * @throws IOException
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	private List<PluginMeta> __doManifestFileProcess(String pluginHomePath, URL configFileUrl) throws IOException, SAXException, ParserConfigurationException {
+	private List<PluginMeta> __doManifestFileProcess(ClassLoader classLoader, String pluginPath, URL configFileUrl) throws IOException, SAXException, ParserConfigurationException {
 		_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.parse_plugin_file", configFileUrl.getFile()));
 		List<PluginMeta> _returnValue = new ArrayList<PluginMeta>();
 		//
@@ -161,7 +208,7 @@ public class DefaultPluginParser implements IPluginParser {
 			}
 		}
 		for (Element _pluginElement : _pluginElements) {
-			PluginMeta _pluginMeta = __doPluginElementProcess(_pluginElement, pluginHomePath, configFileUrl);
+			PluginMeta _pluginMeta = __doPluginElementProcess(classLoader, _pluginElement, pluginPath, configFileUrl);
 			if (_pluginMeta != null) {
 				_returnValue.add(_pluginMeta);
 			}
@@ -169,7 +216,7 @@ public class DefaultPluginParser implements IPluginParser {
 		return _returnValue;
 	}
 
-	private PluginMeta __doPluginElementProcess(Element pluginElement, String pluginHomePath, URL configFileUrl) {
+	private PluginMeta __doPluginElementProcess(ClassLoader classLoader, Element pluginElement, String pluginPath, URL configFileUrl) {
 		String id = pluginElement.getAttribute(ATTR_ID);
 		String name = pluginElement.getAttribute(ATTR_NAME);
 		String alias = pluginElement.getAttribute(ATTR_ALIAS);
@@ -211,10 +258,12 @@ public class DefaultPluginParser implements IPluginParser {
 				_extraObj = __pluginFactory.getPluginConfig().getPluginExtraParserClassImpl().doExtarParser(_extraNodes.item(0));
 			}
 		}
-		String _path = (StringUtils.isBlank(pluginHomePath) || FileUtils.toFile(configFileUrl) == null) ? "" : FileUtils.toFile(configFileUrl).getParent();
-		PluginMeta _pluginMeta = new PluginMeta(this.__pluginFactory, id, name, alias, initClass, version, _path, author, email, _extraObj, description);
+		PluginMeta _pluginMeta = new PluginMeta(classLoader, id, name, alias, initClass, version, pluginPath, author, email, _extraObj, description);
 		_pluginMeta.setAutomatic(automatic);
 		_pluginMeta.setDisabled(disabled);
+        if (configFileUrl.getProtocol().equals("jar")) {
+            _pluginMeta.setPluginFile(new File(StringUtils.substringBetween(configFileUrl.getFile(), "file:", "!")));
+        }
 		return _pluginMeta;
 	}
 

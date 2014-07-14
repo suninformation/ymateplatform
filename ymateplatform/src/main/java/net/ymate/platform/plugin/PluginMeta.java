@@ -58,8 +58,6 @@ public class PluginMeta {
 
 	private static final Log _LOG = LogFactory.getLog(PluginMeta.class);
 
-	private IPluginFactory pluginFactory;
-
 	/** 插件唯一ID */
 	private String id;
 
@@ -99,15 +97,19 @@ public class PluginMeta {
 	/** 插件描述 **/
 	private String description;
 
+    private File pluginFile;
+
 	/**
 	 * 构造器
+     * @param classLoader
 	 */
-	public PluginMeta() {
+	public PluginMeta(ClassLoader classLoader) {
+        this.classLoader = classLoader;
 	}
 
 	/**
 	 * 构造器
-	 * @param pluginFactory
+     * @param classLoader
 	 * @param id
 	 * @param name
 	 * @param alias
@@ -119,8 +121,8 @@ public class PluginMeta {
 	 * @param extraObj
 	 * @param description
 	 */
-	public PluginMeta(IPluginFactory pluginFactory, String id, String name, String alias, String initClass, String version, String path, String author, String email, Object extraObj, String description) {
-		this.pluginFactory = pluginFactory;
+	public PluginMeta(ClassLoader classLoader, String id, String name, String alias, String initClass, String version, String path, String author, String email, Object extraObj, String description) {
+		this.classLoader = classLoader;
 		this.id = id;
 		this.name = name;
 		this.alias = alias;
@@ -202,38 +204,6 @@ public class PluginMeta {
 	}
 
 	public ClassLoader getClassLoader() {
-		if (classLoader == null) {
-			_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.create_plugin_loader", this.getId()));
-			if (StringUtils.isNotBlank(getPath())) {
-				ArrayList<URL> _libList = new ArrayList<URL>();
-				try {
-					// 设置JAR包路径
-                    File _pluginLibDir = new File(FileUtils.fixSeparator(this.getPath()) + "lib");
-					if (_pluginLibDir.exists() && _pluginLibDir.isDirectory()) {
-                        File[] _libFiles = _pluginLibDir.listFiles();
-						for (File _libFile : _libFiles != null ? _libFiles : new File[0]) {
-							if (_libFile.isFile() && _libFile.getAbsolutePath().endsWith("jar")) {
-								_libList.add(_libFile.toURI().toURL());
-								_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.plugin_load_jar_file", this.getId(), _libFile.getPath()));
-							}
-						}
-					}
-					// 设置类文件路径
-					_pluginLibDir = new File(FileUtils.fixSeparator(this.getPath()) + "classes");
-					if (_pluginLibDir.exists() && _pluginLibDir.isDirectory()) {
-						_libList.add(_pluginLibDir.toURI().toURL());
-						_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.plugin_load_classpath", this.getId(), _pluginLibDir.getPath()));
-					}
-				} catch (MalformedURLException e) {
-					_LOG.warn(RuntimeUtils.unwrapThrow(e));
-				}
-				URL[] urls = _libList.toArray(new URL[_libList.size()]);
-				classLoader = new PluginClassLoader(urls, pluginFactory.getPluginClassLoader());
-			} else {
-				classLoader = pluginFactory.getPluginClassLoader();
-			}
-			_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.create_plugin_loader_final", this.getId()));
-		}
 		return classLoader;
 	}
 
@@ -257,4 +227,11 @@ public class PluginMeta {
 		return description;
 	}
 
+    public File getPluginFile() {
+        return pluginFile;
+    }
+
+    public void setPluginFile(File pluginFile) {
+        this.pluginFile = pluginFile;
+    }
 }
