@@ -54,8 +54,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ResourceUtils {
 
-	private static final Log _LOG = LogFactory.getLog(ResourceUtils.class);
-
 	/**
 	 * 
 	 * @param resourceName
@@ -112,16 +110,12 @@ public class ResourceUtils {
 	 * 
 	 * @param resourceName
 	 * @param callingClass
-	 * @return
+	 * @return 以流的方式加载类资源，若加载失败则返回null
+     * @throws IOException
 	 */
-	public static InputStream getResourceAsStream(String resourceName, Class<?> callingClass) {
+	public static InputStream getResourceAsStream(String resourceName, Class<?> callingClass) throws IOException {
 		URL url = getResource(resourceName, callingClass);
-		try {
-			return (url != null) ? url.openStream() : null;
-		} catch (IOException e) {
-			_LOG.warn("", RuntimeUtils.unwrapThrow(e));
-		}
-		return null;
+		return (url != null) ? url.openStream() : null;
 	}
 
 	/**
@@ -132,20 +126,21 @@ public class ResourceUtils {
 	 * @throws ClassNotFoundException
 	 */
 	public static Class<?> loadClass(String className, Class<?> callingClass) throws ClassNotFoundException {
+        Class<?> _targetClass = null;
 		try {
-			return Thread.currentThread().getContextClassLoader().loadClass(className);
+            _targetClass = Thread.currentThread().getContextClassLoader().loadClass(className);
 		} catch (ClassNotFoundException e) {
 			try {
-				return Class.forName(className);
+                _targetClass = Class.forName(className);
 			} catch (ClassNotFoundException ex) {
 				try {
-					return ClassUtils.getDefaultClassLoader().loadClass(className);
+                    _targetClass = ClassUtils.getDefaultClassLoader().loadClass(className);
 				} catch (ClassNotFoundException exc) {
-					 _LOG.warn("", RuntimeUtils.unwrapThrow(exc));
+                    _targetClass = callingClass.getClassLoader().loadClass(className);
 				}
 			}
 		}
-		return callingClass.getClassLoader().loadClass(className);
+		return _targetClass;
 	}
 
 	protected static class AggregateIterator<E> implements Iterator<E> {
