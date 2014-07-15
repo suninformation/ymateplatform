@@ -84,11 +84,11 @@ public abstract class MVC {
 			__META_PROCESSOR = processor == null ? new DefaultRequestProcessor() : processor;
 			__META_PROCESSOR.initialize();
 			//
-			__PLUGIN_FACTORY = Plugins.createPluginFactory(new DefaultPluginConfig(__MVC_CONFIG.getPluginExtraParser(), 
-					__MVC_CONFIG.getPluginHome(), 
-					MVC.getConfig().getExtendParams().get("optional.plugins_manifest_file"), true));
-			
-			__IS_INITED = true;
+            __PLUGIN_FACTORY = Plugins.createPluginFactory(new DefaultPluginConfig(__MVC_CONFIG.getPluginExtraParser(),
+                    __MVC_CONFIG.getPluginHome(),
+                    MVC.getConfig().getExtendParams().get("optional.plugins_manifest_file"), true, true));
+
+            __IS_INITED = true;
 			if (__MVC_CONFIG.isI18n()) {
 				// 初始化国际化资源管理器
 				I18N.initialize(__MVC_CONFIG.getLocale());

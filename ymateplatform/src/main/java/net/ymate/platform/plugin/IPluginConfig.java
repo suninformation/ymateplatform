@@ -62,6 +62,11 @@ public interface IPluginConfig {
 	 */
 	public boolean isIncludeClassPath();
 
+    /**
+     * @return 是否允许插件自动启动
+     */
+    public boolean isAllowAutomatic();
+
 	/**
 	 * @return 返回插件存放路径
 	 */

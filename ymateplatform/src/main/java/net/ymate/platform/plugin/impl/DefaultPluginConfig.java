@@ -58,6 +58,8 @@ public final class DefaultPluginConfig implements IPluginConfig {
 
 	private boolean __includeClassPath;
 
+    private boolean __allowAutomatic;
+
 	private String __pluginHome;
 
 	private String __manifestFile;
@@ -65,9 +67,10 @@ public final class DefaultPluginConfig implements IPluginConfig {
 	/**
 	 * 构造器
 	 * @param includeClassPath
+     * @param allowAutomatic
 	 */
-	public DefaultPluginConfig(boolean includeClassPath) {
-		this(new DefaultPluginFactory(), new DefaultPluginParser(), null, null, null, includeClassPath);
+	public DefaultPluginConfig(boolean includeClassPath, boolean allowAutomatic) {
+		this(new DefaultPluginFactory(), new DefaultPluginParser(), null, null, null, includeClassPath, allowAutomatic);
 	}
 
 	/**
@@ -75,9 +78,10 @@ public final class DefaultPluginConfig implements IPluginConfig {
 	 * @param extraParser
 	 * @param pluginHome
 	 * @param includeClassPath
+     * @param allowAutomatic
 	 */
-	public DefaultPluginConfig(IPluginExtraParser extraParser, String pluginHome, boolean includeClassPath) {
-		this(new DefaultPluginFactory(), new DefaultPluginParser(), extraParser, pluginHome, null, includeClassPath);
+	public DefaultPluginConfig(IPluginExtraParser extraParser, String pluginHome, boolean includeClassPath, boolean allowAutomatic) {
+		this(new DefaultPluginFactory(), new DefaultPluginParser(), extraParser, pluginHome, null, includeClassPath, allowAutomatic);
 	}
 
 	/**
@@ -86,18 +90,20 @@ public final class DefaultPluginConfig implements IPluginConfig {
 	 * @param pluginHome
 	 * @param manifestFile
 	 * @param includeClassPath
+     * @param allowAutomatic
 	 */
-	public DefaultPluginConfig(IPluginExtraParser extraParser, String pluginHome, String manifestFile, boolean includeClassPath) {
-		this(new DefaultPluginFactory(), new DefaultPluginParser(), extraParser, pluginHome, manifestFile, includeClassPath);
+	public DefaultPluginConfig(IPluginExtraParser extraParser, String pluginHome, String manifestFile, boolean includeClassPath, boolean allowAutomatic) {
+		this(new DefaultPluginFactory(), new DefaultPluginParser(), extraParser, pluginHome, manifestFile, includeClassPath, allowAutomatic);
 	}
 
 	/**
 	 * 构造器
 	 * @param pluginHome
 	 * @param includeClassPath
+     * @param allowAutomatic
 	 */
-	public DefaultPluginConfig(String pluginHome, boolean includeClassPath) {
-		this(null, pluginHome, null, includeClassPath);
+	public DefaultPluginConfig(String pluginHome, boolean includeClassPath, boolean allowAutomatic) {
+		this(null, pluginHome, null, includeClassPath, allowAutomatic);
 	}
 
 	/**
@@ -105,9 +111,10 @@ public final class DefaultPluginConfig implements IPluginConfig {
 	 * @param pluginHome
 	 * @param manifestFile
 	 * @param includeClassPath
+     * @param allowAutomatic
 	 */
-	public DefaultPluginConfig(String pluginHome, String manifestFile, boolean includeClassPath) {
-		this(null, pluginHome, manifestFile, includeClassPath);
+	public DefaultPluginConfig(String pluginHome, String manifestFile, boolean includeClassPath, boolean allowAutomatic) {
+		this(null, pluginHome, manifestFile, includeClassPath, allowAutomatic);
 	}
 
 	/**
@@ -118,12 +125,14 @@ public final class DefaultPluginConfig implements IPluginConfig {
 	 * @param pluginHome
 	 * @param manifestFile
 	 * @param includeClassPath
+     * @param allowAutomatic
 	 */
-	public DefaultPluginConfig(IPluginFactory factory, IPluginParser parser, IPluginExtraParser extraParser, String pluginHome, String manifestFile, boolean includeClassPath) {
+	public DefaultPluginConfig(IPluginFactory factory, IPluginParser parser, IPluginExtraParser extraParser, String pluginHome, String manifestFile, boolean includeClassPath, boolean allowAutomatic) {
 		__pluginFactoryImpl = factory;
 		__pluginParserImpl = parser;
 		__extraParserImpl = extraParser;
 		__includeClassPath = includeClassPath;
+        __allowAutomatic = allowAutomatic;
 		__pluginHome = pluginHome;
 		__manifestFile = StringUtils.defaultIfEmpty(manifestFile, PLUGIN_MAINIFEST_FILE);
 	}
@@ -156,9 +165,13 @@ public final class DefaultPluginConfig implements IPluginConfig {
 		return __includeClassPath;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.ymate.platform.plugin.IPluginConfig#getPluginHomePath()
-	 */
+    public boolean isAllowAutomatic() {
+        return __allowAutomatic;
+    }
+
+    /* (non-Javadoc)
+     * @see net.ymate.platform.plugin.IPluginConfig#getPluginHomePath()
+     */
 	public String getPluginHomePath() {
 		return __pluginHome;
 	}

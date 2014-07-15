@@ -55,7 +55,7 @@ public class Plugins {
 	 * @throws PluginException
 	 */
 	public static IPluginFactory createPluginFactory() throws PluginException {
-		return createPluginFactory(new DefaultPluginConfig(true));
+		return createPluginFactory(new DefaultPluginConfig(true, true));
 	}
 
 	/**
@@ -71,12 +71,14 @@ public class Plugins {
 		}
 		IPluginFactory _factory = config.getPluginFactoryClassImpl();
 		_factory.initialize(config);
-		// 将所有设置为自动运行的插件启动起来...
-		for (PluginMeta _meta : _factory.getPluginMetas()) {
-			if (_meta.isAutomatic()) {
-				_factory.getPlugin(_meta.getId());
-			}
-		}
+        if (config.isAllowAutomatic()) {
+            // 将所有设置为自动运行的插件启动起来...
+            for (PluginMeta _meta : _factory.getPluginMetas()) {
+                if (_meta.isAutomatic()) {
+                    _factory.getPlugin(_meta.getId());
+                }
+            }
+        }
 		return _factory;
 	}
 
