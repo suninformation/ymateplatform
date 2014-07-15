@@ -42,6 +42,7 @@ import net.ymate.platform.plugin.IPluginParser;
 import net.ymate.platform.plugin.PluginClassLoader;
 import net.ymate.platform.plugin.PluginMeta;
 import net.ymate.platform.plugin.PluginParserException;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -221,10 +222,15 @@ public class DefaultPluginParser implements IPluginParser {
 		String name = pluginElement.getAttribute(ATTR_NAME);
 		String alias = pluginElement.getAttribute(ATTR_ALIAS);
 		String version = pluginElement.getAttribute(ATTR_VERSION);
-		if (StringUtils.isBlank(id) || StringUtils.isBlank(name)) {
+        String initClass = pluginElement.getAttribute(ATTR_CLASS);
+		if (StringUtils.isBlank(alias) || StringUtils.isBlank(name) || StringUtils.isBlank(initClass)) {
 			_LOG.warn(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.plugin_will_be_ignored", configFileUrl.getFile()));
 			return null;
 		}
+        if (StringUtils.isBlank(id)) {
+            // 若插件ID为填写则使用初始化类名称进行MD5加密后的值做为ID
+            id = DigestUtils.md5Hex(initClass);
+        }
 		//
 		boolean disabled = false;
 		NodeList _disabledNodes = pluginElement.getElementsByTagName(ATTR_DISABLED);
@@ -236,7 +242,6 @@ public class DefaultPluginParser implements IPluginParser {
 			_LOG.warn(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.plugin_will_be_disabled", configFileUrl.getFile()));
 			return null;
 		}
-		String initClass = pluginElement.getAttribute(ATTR_CLASS);
 		String author = pluginElement.getAttribute(ATTR_AUTHOR);
 		String email = pluginElement.getAttribute(ATTR_EMAIL);
 		String description = "";
