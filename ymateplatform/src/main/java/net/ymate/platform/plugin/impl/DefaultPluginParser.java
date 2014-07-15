@@ -223,7 +223,7 @@ public class DefaultPluginParser implements IPluginParser {
 		String alias = pluginElement.getAttribute(ATTR_ALIAS);
 		String version = pluginElement.getAttribute(ATTR_VERSION);
         String initClass = pluginElement.getAttribute(ATTR_CLASS);
-		if (StringUtils.isBlank(alias) || StringUtils.isBlank(name) || StringUtils.isBlank(initClass)) {
+		if ((StringUtils.isBlank(alias) || StringUtils.isBlank(name)) && StringUtils.isBlank(initClass)) {
 			_LOG.warn(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.plugin_will_be_ignored", configFileUrl.getFile()));
 			return null;
 		}

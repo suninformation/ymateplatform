@@ -135,9 +135,9 @@ public class DefaultPluginFactory implements IPluginFactory {
 		try {
 			PluginMeta _pluginMeta = __PLUGINMETA_MAPS.get(pluginId);
 			if (_pluginMeta == null || StringUtils.isBlank(_pluginMeta.getInitClass())) {
-				throw new PluginInstanceException(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.create_impl_exception", pluginId));
+				throw new PluginInstanceException(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.create_impl_exception", _pluginMeta.getInitClass()));
 			} else {
-				_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.create_plugin_impl", pluginId));
+				_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.create_plugin_impl", _pluginMeta.getInitClass()));
 				IPlugin _pluginObj = (IPlugin) _pluginMeta.getClassLoader().loadClass(_pluginMeta.getInitClass()).newInstance();
 				if (_pluginObj != null) {
 					// 判断当前组件类是否实现了配置接口
@@ -145,9 +145,9 @@ public class DefaultPluginFactory implements IPluginFactory {
 						// 获取当前组件的配置对象并尝试直接加载组件配置
 						PluginUtils.fillCfg(((IConfigurable) _pluginObj).getConfig(), _pluginObj);
 					}
-					_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.plugin_impl_init", pluginId));
+					_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.plugin_impl_init", _pluginMeta.getInitClass()));
 					_pluginObj.doInit(new PluginContext(_pluginMeta));
-					_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.plugin_impl_startup", pluginId));
+					_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.plugin_impl_startup", _pluginMeta.getInitClass()));
 					_pluginObj.doStart();
 					__PLUGIN_MAPS.put(_pluginMeta.getId(), _pluginObj);
 					//
@@ -159,7 +159,7 @@ public class DefaultPluginFactory implements IPluginFactory {
 						__PLUGIN_INTERFACE_WITH_PID.put(_interfaceName, _pluginMeta.getId());
 					}
 				}
-				_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.create_plugin_impl_final", pluginId));
+				_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.create_plugin_impl_final", _pluginMeta.getInitClass()));
 				return _pluginObj;
 			}
 		} catch (ClassNotFoundException e) {
@@ -280,10 +280,10 @@ public class DefaultPluginFactory implements IPluginFactory {
 			IPlugin _p = null;
 			try {
 				_p = this.__PLUGIN_MAPS.get(pluginId);
-				_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.destory_plugin", pluginId));
+				_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.destory_plugin", _p.getPluginMeta().getInitClass()));
 				_p.destroy();
 			} catch (Exception e) {
-				Logs.warn(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.destory_plugin_exception", pluginId), RuntimeUtils.unwrapThrow(e));
+				Logs.warn(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.destory_plugin_exception", _p.getPluginMeta().getInitClass()), RuntimeUtils.unwrapThrow(e));
 			} finally {
 				_p = null;
 			}
