@@ -103,17 +103,20 @@ public class DefaultPluginParser implements IPluginParser {
 	public Map<String, PluginMeta> doParser() throws PluginParserException {
 		Map<String, PluginMeta> _returnValue = new HashMap<String, PluginMeta>();
 		try {
-			if (__pluginFactory.getPluginConfig().isIncludeClassPath()) {
-				// 首先加载当前CLASSPATH内的所有包含插件主配置文件的Jar包
-				Iterator<URL> _configURLs = ResourceUtils.getResources(__pluginFactory.getPluginConfig().getPluginManifestFile(), this.getClass(), true);
-				while (_configURLs.hasNext()) {
-                    URL _configURL = _configURLs.next();
-					List<PluginMeta> _metas = __doManifestFileProcess(__pluginFactory.getPluginClassLoader(), null, _configURL);
-					for (PluginMeta _meta : _metas) {
-						_returnValue.put(_meta.getId(), _meta);
-					}
-				}
-			}
+            // 首先加载当前CLASSPATH内的所有包含插件主配置文件的Jar包
+            List<String> _excludePluginIds = new ArrayList<String>();
+            Iterator<URL> _configURLs = ResourceUtils.getResources(__pluginFactory.getPluginConfig().getPluginManifestFile(), this.getClass(), true);
+            while (_configURLs.hasNext()) {
+                URL _configURL = _configURLs.next();
+                List<PluginMeta> _metas = __doManifestFileProcess(__pluginFactory.getPluginClassLoader(), null, _configURL);
+                // 若设置为包含CLASSPATH内插件则加载，否则添加至排除集合中
+                for (PluginMeta _meta : _metas) {
+                    if (__pluginFactory.getPluginConfig().isIncludeClassPath()) {
+                        _returnValue.put(_meta.getId(), _meta);
+                    }
+                    _excludePluginIds.add(_meta.getId());
+                }
+            }
 			// 然后尝试加载由PLUGIN_HOME指定的插件目录
 			if (StringUtils.isNotBlank(__pluginFactory.getPluginConfig().getPluginHomePath())) {
 				File _pluginDirFile = new File(__pluginFactory.getPluginConfig().getPluginHomePath());
@@ -131,10 +134,14 @@ public class DefaultPluginParser implements IPluginParser {
 								}
 							} else {
                                 // 否则扫描类路径和JAR包中资源
-                                Enumeration<URL> _configURLs = _currentLoader.getResources(__pluginFactory.getPluginConfig().getPluginManifestFile());
-                                while (_configURLs.hasMoreElements()) {
-                                    List<PluginMeta> _metas = __doManifestFileProcess(_currentLoader, _subDirFile.getPath(), _configURLs.nextElement());
+                                Enumeration<URL> _pluginConfigURLs = _currentLoader.getResources(__pluginFactory.getPluginConfig().getPluginManifestFile());
+                                while (_pluginConfigURLs.hasMoreElements()) {
+                                    List<PluginMeta> _metas = __doManifestFileProcess(_currentLoader, _subDirFile.getPath(), _pluginConfigURLs.nextElement());
                                     for (PluginMeta _meta : _metas) {
+                                        if (_excludePluginIds.contains(_meta.getId())) {
+                                            // CLASSPATH中的插件Jar包会被重复加载，在这里判断当前插件是否在排除列表中
+                                            break;
+                                        }
                                         _returnValue.put(_meta.getId(), _meta);
                                     }
                                 }
