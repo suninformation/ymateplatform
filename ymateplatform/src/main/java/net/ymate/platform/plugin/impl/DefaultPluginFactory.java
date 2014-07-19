@@ -146,7 +146,7 @@ public class DefaultPluginFactory implements IPluginFactory {
 						PluginUtils.fillCfg(((IConfigurable) _pluginObj).getConfig(), _pluginObj);
 					}
 					_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.plugin_impl_init", _pluginMeta.getInitClass()));
-					_pluginObj.doInit(new PluginContext(_pluginMeta));
+					_pluginObj.doInit(new PluginContext(this, _pluginMeta));
 					_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.plugin_impl_startup", _pluginMeta.getInitClass()));
 					_pluginObj.doStart();
 					__PLUGIN_MAPS.put(_pluginMeta.getId(), _pluginObj);

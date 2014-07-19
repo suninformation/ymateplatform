@@ -41,13 +41,17 @@ package net.ymate.platform.plugin;
  */
 public class PluginContext {
 
+    private IPluginFactory __pluginFactory;
 	private PluginMeta __pluginMeta;
 
-	/**
-	 * 构造器
-	 * @param pluginMeta
-	 */
-	public PluginContext(PluginMeta pluginMeta) {
+    /**
+     * 构造器
+     *
+     * @param pluginFactory
+     * @param pluginMeta
+     */
+	public PluginContext(IPluginFactory pluginFactory, PluginMeta pluginMeta) {
+        this.__pluginFactory = pluginFactory;
 		this.__pluginMeta = pluginMeta;
 	}
 
@@ -57,5 +61,9 @@ public class PluginContext {
 	public PluginMeta getPluginMeta() {
 		return this.__pluginMeta;
 	}
+
+    public IPluginFactory getPluginFactory() {
+        return this.__pluginFactory;
+    }
 
 }

@@ -50,6 +50,11 @@ public interface IPlugin {
 	 */
 	public void doInit(PluginContext context) throws PluginException;
 
+    /**
+     * @return 插件工厂对象
+     */
+    public IPluginFactory getPluginFactory();
+
 	/**
 	 * @return 插件配置信息元数据描述对象
 	 */

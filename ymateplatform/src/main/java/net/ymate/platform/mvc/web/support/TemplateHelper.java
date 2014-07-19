@@ -85,16 +85,15 @@ public class TemplateHelper {
 	}
 
 	/**
-	 * @return 插件模板基准路径
+	 * @return 插件模板基准路径，以'/WEB-INF'开始，以'/'结束
 	 */
 	public static String getPluginViewPath() {
 		if (__PLUGIN_VIEW_PATH == null) {
 			synchronized (__LOCKER) {
 				String _pHome = WebMVC.getConfig().getPluginHome();
-				if (StringUtils.isNotBlank(_pHome)) {
-					if (!_pHome.equals("/WEB-INF/plugins/") && _pHome.contains("/WEB-INF/")) {
-						_pHome = StringUtils.substring(_pHome, _pHome.indexOf("/WEB-INF/"));
-					}
+                String _cond = File.separator + "WEB-INF" + File.separator;
+				if (StringUtils.isNotBlank(_pHome) && _pHome.contains(_cond)) {
+					_pHome = StringUtils.substring(_pHome, _pHome.indexOf(_cond));
 					__PLUGIN_VIEW_PATH = FileUtils.fixSeparator(_pHome);
 				} else {
 					__PLUGIN_VIEW_PATH = "/WEB-INF/plugins/"; // 为了适应Web环境JSP文件的特殊性(即不能引用工程路径外的JSP文件), 建议采用默认"/WEB-INF/plugins/
@@ -116,20 +115,11 @@ public class TemplateHelper {
 		        //
 				List<TemplateLoader> _tmpLoaders = new ArrayList<TemplateLoader>();
 				try {
-					File _tmpFile = null;
-					if (getRootViewPath().contains("/WEB-INF/")) {
-						_tmpFile = new File(RuntimeUtils.getRootPath(), StringUtils.substringAfter(getRootViewPath(), "/WEB-INF/"));
-					} else {
-						_tmpFile = new File(getRootViewPath());
-					}
-					_tmpLoaders.add(new FileTemplateLoader(_tmpFile));
+					_tmpLoaders.add(new FileTemplateLoader(new File(RuntimeUtils.getRootPath(), StringUtils.substringAfter(getRootViewPath(), "/WEB-INF/"))));
 					//
-					if (getPluginViewPath().contains("/WEB-INF/")) {
-						_tmpFile = new File(RuntimeUtils.getRootPath(), StringUtils.substringAfter(getPluginViewPath(), "/WEB-INF/"));
-					} else {
-						_tmpFile = new File(getPluginViewPath());
-					}
-					_tmpLoaders.add(new FileTemplateLoader(_tmpFile));
+					_tmpLoaders.add(new FileTemplateLoader(new File(RuntimeUtils.getRootPath(), StringUtils.substringAfter(getPluginViewPath(), "/WEB-INF/"))));
+                    //
+                    _tmpLoaders.add(new FileTemplateLoader((new File(WebMVC.getConfig().getPluginHome()))));
 				} catch (IOException e) {
 					throw new Error(RuntimeUtils.unwrapThrow(e));
 				}

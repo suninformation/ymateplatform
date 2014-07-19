@@ -50,9 +50,13 @@ public abstract class AbstractPlugin implements IPlugin {
 		this.__context = context;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.ymate.platform.plugin.IPlugin#getPluginMeta()
-	 */
+    public IPluginFactory getPluginFactory() {
+        return this.__context.getPluginFactory();
+    }
+
+    /* (non-Javadoc)
+     * @see net.ymate.platform.plugin.IPlugin#getPluginMeta()
+     */
 	public PluginMeta getPluginMeta() {
 		return this.__context.getPluginMeta();
 	}

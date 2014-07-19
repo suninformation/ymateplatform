@@ -60,21 +60,7 @@ public class PluginUtils {
 	 * @return 智能搜索插件所在类路径配置文件真实资源路径
 	 */
 	public static String getResourcePath(String cfgFile, IPlugin plugin) {
-		if (plugin != null) {
-			// 先在插件所在目录查找
-			if (StringUtils.isNotBlank(plugin.getPluginMeta().getPath())) {
-				File _result = new File(plugin.getPluginMeta().getPath(), cfgFile);
-				if (_result.isAbsolute() && _result.exists() && _result.canRead()) {
-					return _result.getPath();
-				}
-			}
-			// 然后在插件所在类路径中查找
-			URL _targetFileURL = ResourceUtils.getResource(cfgFile, plugin.getClass());
-			if (_targetFileURL != null) {
-	    		return _targetFileURL.toString();
-	    	}
-		}
-		return null;
+        return getResourceFile(cfgFile, plugin).getPath();
 	}
 
 	/**
@@ -83,21 +69,22 @@ public class PluginUtils {
 	 * @return 智能搜索插件所在类路径配置资源文件对象
 	 */
 	public static File getResourceFile(String cfgFile, IPlugin plugin) {
-		if (plugin != null) {
-			// 先在插件所在目录查找
-			if (StringUtils.isNotBlank(plugin.getPluginMeta().getPath())) {
-				File _result = new File(plugin.getPluginMeta().getPath(), cfgFile);
-				if (_result.isAbsolute() && _result.exists() && _result.canRead()) {
-					return _result;
-				}
-			}
-			// 然后在插件所在类路径中查找
-			URL _targetFileURL = ResourceUtils.getResource(cfgFile, plugin.getClass());
-			if (_targetFileURL != null) {
-	    		return FileUtils.toFile(_targetFileURL);
-	    	}
-		}
-		return null;
+        if (plugin != null) {
+            // 先在插件所在目录查找
+            String _path = StringUtils.defaultIfEmpty(plugin.getPluginMeta().getPath(), plugin.getPluginFactory().getPluginConfig().getPluginHomePath());
+            if (StringUtils.isNotBlank(_path)) {
+                File _result = new File(new File(_path, StringUtils.defaultIfEmpty(plugin.getPluginMeta().getAlias(), plugin.getPluginMeta().getId())), cfgFile);
+                if (_result.exists() && _result.isAbsolute()&& _result.canRead()) {
+                    return _result;
+                }
+            }
+            // 然后在插件所在类路径中查找
+            URL _targetFileURL = ResourceUtils.getResource(cfgFile, plugin.getClass());
+            if (_targetFileURL != null) {
+                return FileUtils.toFile(_targetFileURL);
+            }
+        }
+        return null;
 	}
 
 	/**
