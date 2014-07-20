@@ -95,7 +95,7 @@ public abstract class MVC {
             __IS_INITED = true;
             __PLUGIN_FACTORY = Plugins.createPluginFactory(new DefaultPluginConfig(__MVC_CONFIG.getPluginExtraParser(),
                     __MVC_CONFIG.getPluginHome(),
-                    MVC.getConfig().getExtendParams().get("optional.plugins_manifest_file"), true, true));
+                    MVC.getConfig().getExtendParams().get(Optional.PLUGIN_MANIFEST_FILE), true, true));
             //
 			_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.mvc.module_init_final"));
 		}

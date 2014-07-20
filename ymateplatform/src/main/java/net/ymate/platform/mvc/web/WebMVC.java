@@ -25,6 +25,7 @@ import net.ymate.platform.commons.i18n.I18N;
 import net.ymate.platform.commons.i18n.II18NEventHandler;
 import net.ymate.platform.commons.lang.BlurObject;
 import net.ymate.platform.configuration.Cfgs;
+import net.ymate.platform.mvc.Optional;
 import net.ymate.platform.mvc.MVC;
 import net.ymate.platform.mvc.web.context.WebContext;
 import net.ymate.platform.mvc.web.impl.WebRequestProcessor;
@@ -77,7 +78,7 @@ public class WebMVC extends MVC {
 	public static void initialize(IWebMvcConfig config) {
 		__doInitialize(config, new WebRequestProcessor());
 		if (config.isI18n()) {
-			final String _localKey = StringUtils.defaultIfEmpty(config.getExtendParams().get("optional.i18n_language_key"), "lang");
+			final String _localKey = StringUtils.defaultIfEmpty(config.getExtendParams().get(Optional.I18N_LANGUAGE_KEY), "lang");
 			I18N.setEventHandler(new II18NEventHandler() {
 
 				public Locale loadCurrentLocale() {
