@@ -73,7 +73,7 @@ public class TemplateHelper {
 		if (__ROOT_VIEW_PATH == null) {
 			synchronized (__LOCKER) {
 				String _viewBasePath = StringUtils.trimToNull(WebMVC.getConfig().getViewPath());
-				if (_viewBasePath == null || !_viewBasePath.startsWith("/WEB-INF/")) {
+				if (_viewBasePath == null || !(_viewBasePath = _viewBasePath.replaceAll("\\\\", "/")).startsWith("/WEB-INF/")) {
 					_viewBasePath = "/WEB-INF/templates/";
 				} else if (!_viewBasePath.endsWith("/")) {
 					_viewBasePath += "/";
@@ -91,10 +91,11 @@ public class TemplateHelper {
 		if (__PLUGIN_VIEW_PATH == null) {
 			synchronized (__LOCKER) {
 				String _pHome = WebMVC.getConfig().getPluginHome();
-                String _cond = File.separator + "WEB-INF" + File.separator;
-				if (StringUtils.isNotBlank(_pHome) && _pHome.contains(_cond)) {
-					_pHome = StringUtils.substring(_pHome, _pHome.indexOf(_cond));
-					__PLUGIN_VIEW_PATH = FileUtils.fixSeparator(_pHome);
+				if (StringUtils.isNotBlank(_pHome) && (_pHome = _pHome.replaceAll("\\\\", "/")).contains("/WEB-INF/")) {
+                    __PLUGIN_VIEW_PATH = StringUtils.substring(_pHome, _pHome.indexOf("/WEB-INF/"));
+                    if (!__PLUGIN_VIEW_PATH.endsWith("/")) {
+                        __PLUGIN_VIEW_PATH += "/";
+                    }
 				} else {
 					__PLUGIN_VIEW_PATH = "/WEB-INF/plugins/"; // 为了适应Web环境JSP文件的特殊性(即不能引用工程路径外的JSP文件), 建议采用默认"/WEB-INF/plugins/
 				}
