@@ -602,6 +602,27 @@ public class ClassUtils {
 			return methodAccess.invoke(this.target, "get" + StringUtils.capitalize(fieldName));
 		}
 
+        /**
+         * 拷贝当前对象的成员属性值到dist对象
+         *
+         * @param dist
+         * @param <D>
+         * @return
+         */
+        public <D> D copy(D dist) {
+            ClassBeanWrapper<D> _wrapDist = wrapper(dist);
+            for (String _fieldName : getFieldNames()) {
+                if (_wrapDist.getFieldNames().contains(_fieldName)) {
+                    try {
+                        _wrapDist.setValue(_fieldName, getValue(_fieldName));
+                    } catch (Exception e) {
+                        continue;
+                    }
+                }
+            }
+            return _wrapDist.getTarget();
+        }
+
 	}
 
 }
