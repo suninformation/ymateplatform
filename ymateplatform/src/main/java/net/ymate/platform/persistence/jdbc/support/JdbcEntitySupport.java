@@ -343,14 +343,18 @@ public class JdbcEntitySupport {
 		JdbcEntityMeta _meta = this.getEntityMeta(entity.getClass());
 		Map<String, AttributeInfo>  _entityMap = __doRenderEntityToMap(_meta, entity);
 		IUpdateOperator _update = new UpdateOperator();
+
+        List<String> _fieldFilter = null;
 		//
 		if (fieldFilter != null && fieldFilter.length > 0) {
             if (isExcluded) {
+                _fieldFilter = new ArrayList<String>();
                 List<String> _excludedField = Arrays.asList(fieldFilter);
                 for (String _columnName : _meta.getColumnNames()) {
                     if (_meta.getPrimaryKeys().contains(_columnName) || _excludedField.contains(_columnName)) {
                         continue;
                     }
+                    _fieldFilter.add(_columnName);
                     this.__addUpdateParam(_entityMap.get(_columnName), _update);
                 }
             } else {
@@ -390,7 +394,7 @@ public class JdbcEntitySupport {
 			}
 		}
 		try {
-			_update.setSql(_meta.createUpdateByPkSql(__conn.getDialect(), fieldFilter, _pkFieldFilter.toArray(new String[_pkFieldFilter.size()])));
+			_update.setSql(_meta.createUpdateByPkSql(__conn.getDialect(), _fieldFilter != null ? _fieldFilter.toArray(new String[0]) : fieldFilter, _pkFieldFilter.toArray(new String[_pkFieldFilter.size()])));
 			_update.execute(this.getConnection());
 			//
 			if (event != null) {
@@ -425,16 +429,21 @@ public class JdbcEntitySupport {
 		//
 		Map<String, AttributeInfo>  _entityMap = null;
 		List<String> _pkFieldFilter = new ArrayList<String>();
+
+        List<String> _fieldFilter = null;
+
 		for (T entity : entityList) {
 			SqlBatchParameter _batchParam = new SqlBatchParameter();
 			_entityMap = __doRenderEntityToMap(_meta, entity);
 			if (fieldFilter != null && fieldFilter.length > 0) {
                 if (isExcluded) {
+                    _fieldFilter = new ArrayList<String>();
                     List<String> _excludedField = Arrays.asList(fieldFilter);
                     for (String _columnName : _meta.getColumnNames()) {
                         if (_meta.getPrimaryKeys().contains(_columnName) || _excludedField.contains(_columnName)) {
                             continue;
                         }
+                        _fieldFilter.add(_columnName);
                         this.__addBatchParam(_batchParam, _entityMap.get(_columnName));
                     }
                 } else {
@@ -476,7 +485,7 @@ public class JdbcEntitySupport {
 			_entityMap.clear();
 		}
 		try {
-			_update.setSql(_meta.createUpdateByPkSql(__conn.getDialect(), fieldFilter, _pkFieldFilter.toArray(new String[_pkFieldFilter.size()])));
+			_update.setSql(_meta.createUpdateByPkSql(__conn.getDialect(), _fieldFilter != null ? _fieldFilter.toArray(new String[0]) : fieldFilter, _pkFieldFilter.toArray(new String[_pkFieldFilter.size()])));
 			_update.execute(this.getConnection());
 			//
 			if (event != null) {
