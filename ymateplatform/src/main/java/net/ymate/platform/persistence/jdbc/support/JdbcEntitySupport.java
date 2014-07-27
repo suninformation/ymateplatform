@@ -331,10 +331,10 @@ public class JdbcEntitySupport {
 	}
 
 	public <T> T update(T entity, ISessionEvent event) throws OperatorException {
-		return update(entity, null, event);
+		return update(entity, null, false, event);
 	}
 
-	public <T> T update(T entity, String[] fieldFilter, ISessionEvent event) throws OperatorException {
+	public <T> T update(T entity, String[] fieldFilter, boolean isExcluded, ISessionEvent event) throws OperatorException {
 		//
 		if (event != null) {
 			event.onUpdateBefore(SessionEventObject.createUpdateEvent(entity, fieldFilter));
@@ -345,12 +345,22 @@ public class JdbcEntitySupport {
 		IUpdateOperator _update = new UpdateOperator();
 		//
 		if (fieldFilter != null && fieldFilter.length > 0) {
-			for (String _columnName : fieldFilter) {
-				if (_meta.getPrimaryKeys().contains(_columnName)) {
-					continue;
-				}
-				this.__addUpdateParam(_entityMap.get(_columnName), _update);
-			}
+            if (isExcluded) {
+                List<String> _excludedField = Arrays.asList(fieldFilter);
+                for (String _columnName : _meta.getColumnNames()) {
+                    if (_meta.getPrimaryKeys().contains(_columnName) || _excludedField.contains(_columnName)) {
+                        continue;
+                    }
+                    this.__addUpdateParam(_entityMap.get(_columnName), _update);
+                }
+            } else {
+                for (String _columnName : fieldFilter) {
+                    if (_meta.getPrimaryKeys().contains(_columnName)) {
+                        continue;
+                    }
+                    this.__addUpdateParam(_entityMap.get(_columnName), _update);
+                }
+            }
 		} else {
 			for (String _columnName : _meta.getColumnNames()) {
 				if (_meta.getPrimaryKeys().contains(_columnName)) {
@@ -398,10 +408,10 @@ public class JdbcEntitySupport {
 	}
 
 	public <T> List<T> updateBatch(List<T> entityList, ISessionEvent event) throws OperatorException {
-		return updateBatch(entityList, null, event);
+		return updateBatch(entityList, null, false, event);
 	}
 
-	public <T> List<T> updateBatch(List<T> entityList, String[] fieldFilter, ISessionEvent event) throws OperatorException {
+	public <T> List<T> updateBatch(List<T> entityList, String[] fieldFilter, boolean isExcluded, ISessionEvent event) throws OperatorException {
 		if (entityList == null || entityList.isEmpty()) {
 			throw new OperatorException(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.jdbc.entity_list_null"));
 		}
@@ -419,12 +429,22 @@ public class JdbcEntitySupport {
 			SqlBatchParameter _batchParam = new SqlBatchParameter();
 			_entityMap = __doRenderEntityToMap(_meta, entity);
 			if (fieldFilter != null && fieldFilter.length > 0) {
-				for (String _columnName : fieldFilter) {
-					if (_meta.getPrimaryKeys().contains(_columnName)) {
-						continue;
-					}
-					this.__addBatchParam(_batchParam, _entityMap.get(_columnName));
-				}
+                if (isExcluded) {
+                    List<String> _excludedField = Arrays.asList(fieldFilter);
+                    for (String _columnName : _meta.getColumnNames()) {
+                        if (_meta.getPrimaryKeys().contains(_columnName) || _excludedField.contains(_columnName)) {
+                            continue;
+                        }
+                        this.__addBatchParam(_batchParam, _entityMap.get(_columnName));
+                    }
+                } else {
+                    for (String _columnName : fieldFilter) {
+                        if (_meta.getPrimaryKeys().contains(_columnName)) {
+                            continue;
+                        }
+                        this.__addBatchParam(_batchParam, _entityMap.get(_columnName));
+                    }
+                }
 			} else {
 				for (String _columnName : _meta.getColumnNames()) {
 					if (_meta.getPrimaryKeys().contains(_columnName)) {

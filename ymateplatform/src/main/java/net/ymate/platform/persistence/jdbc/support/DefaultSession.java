@@ -338,12 +338,16 @@ public class DefaultSession implements ISession {
 	 * @see net.ymate.platform.persistence.jdbc.ISession#update(java.lang.Object, java.lang.String[])
 	 */
 	public <T> T update(T entity, String[] fieldFilter) throws OperatorException {
-		return this.getEntitySupport().update(entity, fieldFilter, __sessionEvent);
+		return this.getEntitySupport().update(entity, fieldFilter, false, __sessionEvent);
 	}
 
-	/* (non-Javadoc)
-	 * @see net.ymate.platform.persistence.jdbc.ISession#updateAll(java.util.List)
-	 */
+    public <T> T update(T entity, String[] fieldFilter, boolean isExcluded) throws OperatorException {
+        return this.getEntitySupport().update(entity, fieldFilter, isExcluded, __sessionEvent);
+    }
+
+    /* (non-Javadoc)
+     * @see net.ymate.platform.persistence.jdbc.ISession#updateAll(java.util.List)
+     */
 	public <T> List<T> updateAll(List<T> entities) throws OperatorException {
 		return this.getEntitySupport().updateBatch(entities, __sessionEvent);
 	}
@@ -352,12 +356,16 @@ public class DefaultSession implements ISession {
 	 * @see net.ymate.platform.persistence.jdbc.ISession#updateAll(java.util.List, java.lang.String[])
 	 */
 	public <T> List<T> updateAll(List<T> entities, String[] fieldFilter) throws OperatorException {
-		return this.getEntitySupport().updateBatch(entities, fieldFilter, __sessionEvent);
+		return this.getEntitySupport().updateBatch(entities, fieldFilter, false, __sessionEvent);
 	}
 
-	/* (non-Javadoc)
-	 * @see net.ymate.platform.persistence.jdbc.ISession#getAmount(java.lang.Class, java.lang.String, java.lang.Object[])
-	 */
+    public <T> List<T> updateAll(List<T> entities, String[] fieldFilter, boolean isExcluded) throws OperatorException {
+        return this.getEntitySupport().updateBatch(entities, fieldFilter, isExcluded, __sessionEvent);
+    }
+
+    /* (non-Javadoc)
+     * @see net.ymate.platform.persistence.jdbc.ISession#getAmount(java.lang.Class, java.lang.String, java.lang.Object[])
+     */
 	public <T> long getAmount(Class<T> entityClass, String whereStr, Object[] params) throws OperatorException {
 		return this.getEntitySupport().getAmount(entityClass, whereStr, params);
 	}

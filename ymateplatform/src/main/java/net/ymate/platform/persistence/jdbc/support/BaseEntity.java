@@ -113,13 +113,17 @@ public abstract class BaseEntity<Entity extends IEntity<PK>, PK> implements IEnt
 
 	@SuppressWarnings("unchecked")
 	public Entity update(String... fieldFilter) throws OperatorException, ConnectionException {
-		ISession _session = JDBC.openSession(getDataSourceName());
-		try {
-			return _session.update((Entity) this, fieldFilter);
-		} finally {
-			_session.close();
-		}
+		return update(false, fieldFilter);
 	}
+
+    public Entity update(boolean isExcluded, String... fieldFilter) throws OperatorException, ConnectionException {
+        ISession _session = JDBC.openSession(getDataSourceName());
+        try {
+            return _session.update((Entity) this, fieldFilter, isExcluded);
+        } finally {
+            _session.close();
+        }
+    }
 
 	@SuppressWarnings("unchecked")
 	public Entity delete() throws OperatorException, ConnectionException {

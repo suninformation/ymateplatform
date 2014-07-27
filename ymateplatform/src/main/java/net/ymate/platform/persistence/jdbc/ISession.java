@@ -236,6 +236,16 @@ public interface ISession {
 	 */
 	public <T> T update(T entity, String[] fieldFilter) throws OperatorException;
 
+    /**
+     * @param entity 实体对象
+     * @param fieldFilter 更新字段过滤集合
+     * @param isExcluded 指定更新字段过滤集合是否为排除字段集合
+     * @param <T> 指定结果集数据类型
+     * @return 根据实体执行SQL更新，返回更新后的实体对象
+     * @throws OperatorException
+     */
+    public <T> T update(T entity, String[] fieldFilter, boolean isExcluded) throws OperatorException;
+
 	/**
 	 * @param <T> 指定结果集数据类型
 	 * @param entities 实体对象集合
@@ -252,6 +262,16 @@ public interface ISession {
 	 * @throws OperatorException
 	 */
 	public <T> List<T> updateAll(List<T> entities, String[] fieldFilter) throws OperatorException;
+
+    /**
+     * @param entities 实体对象集合
+     * @param fieldFilter 更新字段过滤集合
+     * @param isExcluded 指定更新字段过滤集合是否为排除字段集合
+     * @param <T> 指定结果集数据类型
+     * @return 根据实体执行SQL批量更新，返回更新后的实体对象集合
+     * @throws OperatorException
+     */
+    public <T> List<T> updateAll(List<T> entities, String[] fieldFilter, boolean isExcluded) throws OperatorException;
 
 	/**
 	 * @param <T> 指定结果集数据类型
