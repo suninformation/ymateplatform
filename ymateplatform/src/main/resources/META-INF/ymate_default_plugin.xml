@@ -1,22 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin id="ymateframework-base" 
-		name="ymateframework-base" 
-		alias="ymf_base" 
-		class="net.ymate.framework.base.FrameworkBasePlugin" 
-		author="suninformation" 
-		email="suninformation@163.com" 
-		version="0.1.0">
+<plugins author="suninformation"
+         email="suninformation@163.com"
+         version="0.1.0">
 
-	<!-- 是否加载时自动启动运行 -->
-	<automatic>true</automatic>
+    <plugin id="plugin_a"
+            name="PluginA"
+            alias="simpleA"
+            class="net.ymate.plugin.simple.SimpleAPlugin"
+            author="suninformation"
+            email="suninformation@163.com"
+            version="0.2.0">
 
-	<!-- 是否禁用当前插件, 禁用的插件将不被加载 -->
-	<disabled>false</disabled>
+        <!-- 是否加载时自动启动运行 -->
+        <automatic>true</automatic>
 
-	<!-- 插件扩展内容部分 -->
-	<extra-part></extra-part>
+        <!-- 是否禁用当前插件, 禁用的插件将不被加载 -->
+        <disabled>false</disabled>
 
-	<!-- 插件描述文字 -->
-	<description></description>
+        <!-- 插件扩展内容部分 -->
+        <extra-part></extra-part>
 
-</plugin>
+        <!-- 插件描述文字 -->
+        <description></description>
+
+    </plugin>
+
+    <plugin name="PluginB"
+            alias="simpleB"
+            class="net.ymate.plugin.simple.SimpleBPlugin">
+
+        <!-- 是否加载时自动启动运行 -->
+        <automatic>true</automatic>
+
+        <!-- 是否禁用当前插件, 禁用的插件将不被加载 -->
+        <disabled>false</disabled>
+
+        <!-- 插件扩展内容部分 -->
+        <extra-part></extra-part>
+
+        <!-- 插件描述文字 -->
+        <description></description>
+
+    </plugin>
+</plugins>

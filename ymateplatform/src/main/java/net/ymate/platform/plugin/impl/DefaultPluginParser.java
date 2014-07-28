@@ -207,9 +207,24 @@ public class DefaultPluginParser implements IPluginParser {
 		InputStream _in = configFileUrl.openStream();
 		Document _document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(_in);
 		Element _rootElement = _document.getDocumentElement();
+        // 插件组
+        boolean _pluginGroupFlag = false;
+        String _pluginAuthor = _rootElement.getAttribute(ATTR_AUTHOR);
+        String _pluginEmail = _rootElement.getAttribute(ATTR_EMAIL);
+        String _pluginVersion = _rootElement.getAttribute(ATTR_VERSION);
+        boolean _authorNotNull = StringUtils.isNotBlank(_pluginAuthor);
+        boolean _emailNotNull = StringUtils.isNotBlank(_pluginEmail);
+        boolean _versionNotNull = StringUtils.isNotBlank(_pluginVersion);
+        //
 		if (_rootElement.getNodeName().equals(PLUGIN_TAG)) {
 			_pluginElements.add(_rootElement);
 		} else {
+            // 当前插件主配置文件包含多个插件配置，即插件组
+            _pluginGroupFlag = true;
+            _pluginAuthor = _rootElement.getAttribute(ATTR_AUTHOR);
+            _pluginEmail = _rootElement.getAttribute(ATTR_EMAIL);
+            _pluginVersion = _rootElement.getAttribute(ATTR_VERSION);
+            //
 			NodeList _pluginNodes = _rootElement.getElementsByTagName(PLUGIN_TAG);
 			for (int _idx = 0; _idx < _pluginNodes.getLength(); _idx++) {
 				_pluginElements.add((Element) _pluginNodes.item(_idx));
@@ -218,6 +233,18 @@ public class DefaultPluginParser implements IPluginParser {
 		for (Element _pluginElement : _pluginElements) {
 			PluginMeta _pluginMeta = __doPluginElementProcess(classLoader, _pluginElement, pluginPath, configFileUrl);
 			if (_pluginMeta != null) {
+                // 若为插件组，则尝试完善插件描述对象属性信息
+                if (_pluginGroupFlag) {
+                    if (_authorNotNull && StringUtils.isBlank(_pluginMeta.getAuthor())) {
+                        _pluginMeta.setAuthor(_pluginAuthor);
+                    }
+                    if (_emailNotNull && StringUtils.isBlank(_pluginMeta.getEmail())) {
+                        _pluginMeta.setEmail(_pluginEmail);
+                    }
+                    if (_versionNotNull && StringUtils.isBlank(_pluginMeta.getVersion())) {
+                        _pluginMeta.setVersion(_pluginVersion);
+                    }
+                }
 				_returnValue.add(_pluginMeta);
 			}
 		}
