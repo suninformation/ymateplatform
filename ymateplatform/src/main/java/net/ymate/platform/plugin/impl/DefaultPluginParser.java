@@ -284,7 +284,7 @@ public class DefaultPluginParser implements IPluginParser {
 			Node _node = _descriptionNodes.item(0);
 			description = _node.getTextContent();
 		}
-		boolean automatic = false;
+		boolean automatic = true;
 		NodeList _automacticNodes = pluginElement.getElementsByTagName(ATTR_AUTOMATIC);
 		if (_automacticNodes.getLength() > 0) {
 			Node _node = _automacticNodes.item(0);
