@@ -21,11 +21,13 @@ import java.security.AccessControlException;
 
 import net.ymate.platform.base.YMP;
 import net.ymate.platform.commons.i18n.I18N;
+import net.ymate.platform.commons.util.ClassUtils;
 import net.ymate.platform.commons.util.FileUtils;
 import net.ymate.platform.commons.util.ResourceUtils;
 import net.ymate.platform.commons.util.RuntimeUtils;
 import net.ymate.platform.commons.util.SystemEnvUtils;
 import net.ymate.platform.configuration.annotation.Configuration;
+import net.ymate.platform.configuration.annotation.ConfigurationProvider;
 import net.ymate.platform.configuration.provider.IConfigurationProvider;
 
 import org.apache.commons.lang.StringUtils;
@@ -261,28 +263,47 @@ public class Cfgs {
 	 * @return 是否成功装载配置
 	 */
 	public static synchronized boolean fillCfg(IConfiguration config, String cfgFileName, boolean needSearch) {
-		if (__IS_INITED) {
-			if (config == null) {
-				return false;
-			}
-			try {
-				IConfigurationProvider _provider = __CFG_CONFIG.getConfigurationProviderClassImpl();
-				if (needSearch) {
-					_provider.load(smartSearch(cfgFileName));
-				} else {
-					_provider.load(cfgFileName);
-				}
-				config.initialize(_provider);
-				return true;
-			} catch (ConfigurationLoadException e) {
-				RuntimeUtils.unwrapThrow(e).printStackTrace(System.err);
-				return false;
-			}
-		} else {
-			System.err.println(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.configuration.module_not_init"));
-		}
-		return false;
+		return fillCfg(null, config, cfgFileName, needSearch);
 	}
+
+    /**
+     * 根据自定义配置提供者填充配置对象
+     *
+     * @param providerClass 配置提供者类对象，若为空则采用框架默认
+     * @param config 配置对象，不可为空
+     * @param cfgFileName 配置所需要的装载参数
+     * @param needSearch 是否采用智能搜索
+     * @return 是否成功装载配置
+     */
+    public static synchronized boolean fillCfg(Class<? extends IConfigurationProvider> providerClass, IConfiguration config, String cfgFileName, boolean needSearch) {
+        if (__IS_INITED) {
+            if (config == null) {
+                return false;
+            }
+            try {
+                IConfigurationProvider _provider = null;
+                if (providerClass != null) {
+                    _provider = ClassUtils.impl(providerClass, IConfigurationProvider.class);
+                }
+                if (_provider == null) {
+                    _provider = __CFG_CONFIG.getConfigurationProviderClassImpl();
+                }
+                if (needSearch) {
+                    _provider.load(smartSearch(cfgFileName));
+                } else {
+                    _provider.load(cfgFileName);
+                }
+                config.initialize(_provider);
+                return true;
+            } catch (ConfigurationLoadException e) {
+                RuntimeUtils.unwrapThrow(e).printStackTrace(System.err);
+                return false;
+            }
+        } else {
+            System.err.println(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.configuration.module_not_init"));
+        }
+        return false;
+    }
 
 	public static boolean fillCfg(IConfiguration config, String cfgFileName) {
 		return fillCfg(config, cfgFileName, true);
@@ -305,7 +326,8 @@ public class Cfgs {
 			if (StringUtils.isBlank(_cfgFileName)) {
 				_cfgFileName = "cfgs/" + config.getClass().getSimpleName().toLowerCase() + config.getCfgTagName() + ".xml";
 			}
-			return fillCfg(config, _cfgFileName, needSearch);
+            ConfigurationProvider _providerClass = config.getClass().getAnnotation(ConfigurationProvider.class);
+			return fillCfg((_providerClass != null ? _providerClass.value() : null), config, _cfgFileName, needSearch);
 		}
 		return false;
 	}

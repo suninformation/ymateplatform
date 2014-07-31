@@ -23,6 +23,7 @@ import net.ymate.platform.commons.util.ResourceUtils;
 import net.ymate.platform.configuration.Cfgs;
 import net.ymate.platform.configuration.IConfiguration;
 import net.ymate.platform.configuration.annotation.Configuration;
+import net.ymate.platform.configuration.annotation.ConfigurationProvider;
 import net.ymate.platform.plugin.IPlugin;
 
 import org.apache.commons.lang.StringUtils;
@@ -118,7 +119,8 @@ public class PluginUtils {
 				_cfgFileName = "cfgs/" + config.getClass().getSimpleName().toLowerCase() + config.getCfgTagName() + ".xml";
 			}
 			_cfgFileName = getResourcePath(_cfgFileName, plugin);
-			return Cfgs.fillCfg(config, _cfgFileName, _cfgFileName == null);
+            ConfigurationProvider _providerClass = config.getClass().getAnnotation(ConfigurationProvider.class);
+			return Cfgs.fillCfg((_providerClass != null ? _providerClass.value() : null), config, _cfgFileName, _cfgFileName == null);
 		}
 		return false;
 	}
