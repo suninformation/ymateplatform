@@ -296,7 +296,7 @@ public class Cfgs {
                 config.initialize(_provider);
                 return true;
             } catch (ConfigurationLoadException e) {
-                RuntimeUtils.unwrapThrow(e).printStackTrace(System.err);
+                System.err.println("Warnring: " + e.getMessage() + " [" + StringUtils.trimToEmpty(cfgFileName) + "]");
                 return false;
             }
         } else {
