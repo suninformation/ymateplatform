@@ -26,7 +26,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.ymate.platform.base.YMP;
+import net.ymate.platform.commons.i18n.I18N;
 import net.ymate.platform.commons.util.RuntimeUtils;
+import net.ymate.platform.configuration.Cfgs;
 import net.ymate.platform.mvc.support.RequestExecutor;
 import net.ymate.platform.mvc.view.IView;
 import net.ymate.platform.mvc.web.IWebErrorHandler;
@@ -39,6 +42,8 @@ import net.ymate.platform.mvc.web.view.impl.HttpStatusView;
 import net.ymate.platform.mvc.web.view.impl.JspView;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -66,7 +71,7 @@ import org.apache.commons.lang.StringUtils;
  */
 public class DispatchHelper {
 
-//	private static final Log _LOG = LogFactory.getLog(DispatchHelper.class);
+	private static final Log _LOG = LogFactory.getLog(DispatchHelper.class);
 
 	public static final String DEFAULT_METHOD_PARAM = "_method";
 
@@ -79,6 +84,11 @@ public class DispatchHelper {
 
 	private String baseViewFilePath;
 
+    /**
+     * 允许Convention请求访问的URL映射
+     */
+    private ConventionMappingCfg conventMappingCfg;
+
 	/**
 	 * 构造器
 	 * 
@@ -88,6 +98,11 @@ public class DispatchHelper {
 		prefix = StringUtils.defaultIfEmpty(config.getInitParameter("prefix"), "");
         methodParam = StringUtils.defaultIfEmpty(config.getInitParameter("methodParam"), DEFAULT_METHOD_PARAM);
         baseViewFilePath = RuntimeUtils.getRootPath() + StringUtils.substringAfter(TemplateHelper.getRootViewPath(), "/WEB-INF/");
+        //
+        conventMappingCfg = new ConventionMappingCfg();
+        if (WebMVC.getConfig().isConventionModel() && Cfgs.isInited()) {
+            Cfgs.fillCfg(conventMappingCfg);
+        }
 	}
 
 	/**
@@ -123,29 +138,34 @@ public class DispatchHelper {
 				}
 			} else if (WebMVC.getConfig().isConventionModel()
 					&& StringUtils.trimToEmpty(WebMVC.getConfig().getUrlSuffix()).endsWith(WebContext.getWebRequestContext().getSuffix())) {
+
 				// 先尝试调用自定义的约定优于配置的URL请求映射处理过程
 				if (WebMVC.getConfig().getErrorHandlerClassImpl() != null) {
-					IView _view = WebMVC.getConfig().getErrorHandlerClassImpl().onConvention(context.getRequestMapping());
+					IView _view = WebMVC.getConfig().getErrorHandlerClassImpl().onConvention(context.getRequestMapping(), conventMappingCfg);
 					if (_view != null) {
 						_view.render();
 						return;
 					}
 				}
-				// 采用系统默认方式处理约定优于配置的URL请求映射
-				String[] _fileTypes = { ".jsp", ".ftl" };
-				File _targetFile = null;
-				for (String _fileType : _fileTypes) {
-					_targetFile = new File(getBaseViewFilePath(), context.getRequestMapping() + _fileType);
-					if (_targetFile != null && _targetFile.exists()) {
-						if (".jsp".equals(_fileType)) {
-							new JspView().render();
-							return;
-						} else if (".ftl".equals(_fileType)) {
-							new FreeMarkerView().render();
-							return;
-						}
-					}
-				}
+                // 若存在convention_mapping.cfg.xml配置文件，则只有配置文件内的mapping地址才能正常访问
+                if (!conventMappingCfg.isInited() || conventMappingCfg.getBoolean(context.getRequestMapping())) {
+                    // 采用系统默认方式处理约定优于配置的URL请求映射
+                    String[] _fileTypes = { ".jsp", ".ftl" };
+                    File _targetFile = null;
+                    for (String _fileType : _fileTypes) {
+                        _targetFile = new File(getBaseViewFilePath(), context.getRequestMapping() + _fileType);
+                        if (_targetFile != null && _targetFile.exists()) {
+                            _LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.mvc.convention_request_execute", context.getRequestMapping()));
+                            if (".jsp".equals(_fileType)) {
+                                new JspView().render();
+                                return;
+                            } else if (".ftl".equals(_fileType)) {
+                                new FreeMarkerView().render();
+                                return;
+                            }
+                        }
+                    }
+                }
 			}
 			// 到这儿就只能404了
 			new HttpStatusView(HttpServletResponse.SC_NOT_FOUND).render();
