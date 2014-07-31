@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<properties>
+    <category name="general">
+        <property name="/test" value="true" />
+        <property name="/test/page" value="false" />
+        <property name="/demo/test" value="true" />
+    </category>
+</properties>
