@@ -19,9 +19,7 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.ymate.platform.base.YMP;
@@ -94,6 +92,18 @@ public class ResultSetHelper {
 	private boolean __clearFlag = false;
 
 	private String __columnNames[] = null;
+
+    public static ResultSetHelper bind(Object[] data) {
+        List<Object[]> _data = new ArrayList<Object[]>();
+        _data.add(data);
+        return bind(_data);
+    }
+
+    public static ResultSetHelper bind(Map<String, Object> data) {
+        List<Map<String, Object>> _data = new ArrayList<Map<String, Object>>();
+        _data.add(data);
+        return bind(_data);
+    }
 
 	/**
 	 * @param dataSet 结果数据集合
