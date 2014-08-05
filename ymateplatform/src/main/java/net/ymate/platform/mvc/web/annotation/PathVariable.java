@@ -58,7 +58,7 @@ public @interface PathVariable {
 	/**
 	 * @return 是否为必须，参数不允许空
 	 */
-	boolean required() default true;
+	boolean required() default false;
 
 	/**
 	 * @return 默认值

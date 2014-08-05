@@ -52,7 +52,7 @@ public @interface RequestHeader {
 
 	String value() default "";
 
-	boolean required() default true;
+	boolean required() default false;
 
 	String defaultValue() default "";
 

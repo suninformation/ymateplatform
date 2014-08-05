@@ -57,7 +57,7 @@ public @interface RequestParam {
 	 */
 	String prefix() default "";
 
-	boolean required() default true;
+	boolean required() default false;
 
 	String defaultValue() default "";
 
