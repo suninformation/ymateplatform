@@ -86,6 +86,7 @@ public class DefaultPluginFactory implements IPluginFactory {
 	static {
 		__EXCLUDED_CLASS_NAME_SET = new HashSet<String>();
 		__EXCLUDED_CLASS_NAME_SET.add(IPlugin.class.getName());
+        __EXCLUDED_CLASS_NAME_SET.add(IConfigurable.class.getName());
 	}
 
 	/**
