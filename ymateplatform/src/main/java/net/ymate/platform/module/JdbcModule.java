@@ -60,7 +60,7 @@ public class JdbcModule extends AbstractModule {
 	public void initialize(final Map<String, String> moduleCfgs) throws Exception {
 		final boolean _showSql = new BlurObject(moduleCfgs.get("base.show_sql")).toBooleanValue();
 		final Set<JdbcDataSourceCfgMeta> _metas = new HashSet<JdbcDataSourceCfgMeta>();
-		for (String _name : StringUtils.split(StringUtils.trimToEmpty(moduleCfgs.get("base.datasource_list")), "|")) {
+		for (String _name : StringUtils.split(StringUtils.defaultIfEmpty(StringUtils.trimToEmpty(moduleCfgs.get("base.datasource_list")), "default"), "|")) {
 			String _adaptorClass = moduleCfgs.get("datasource." + _name + ".adapter_class");
 			String _driverClass = moduleCfgs.get("datasource." + _name + ".driver_class");
 			String _connectionUrl = moduleCfgs.get("datasource." + _name + ".connection_url");
