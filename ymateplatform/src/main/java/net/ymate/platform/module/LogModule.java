@@ -84,7 +84,11 @@ public class LogModule extends AbstractModule {
 					} else {
 						_logOutputF = RuntimeUtils.getRootPath() + "logs";
 					}
-				} else if (_logOutputF.contains("${user.dir}")) {
+				}
+                if (StringUtils.isBlank(_logOutputF)) {
+                    _logOutputF = "${user.dir}/logs";
+                }
+                if (_logOutputF.contains("${user.dir}")) {
 					_logOutputF = doParseVariableUserDir(_logOutputF);
 				}
 				return _logOutputF;
