@@ -75,7 +75,7 @@ public class DefaultMvcConfig implements IMvcConfig {
 	 * @param extraParser
 	 * @param errorHandler
 	 * @param locale
-	 * @param isI18n
+	 * @param i18n
 	 * @param charsetEncoding
 	 * @param pluginHome
 	 * @param extendParams
