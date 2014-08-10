@@ -60,8 +60,8 @@ public class ConfigModule extends AbstractModule {
 		Cfgs.initialize(new ICfgConfig() {
 
 			public String getConfigHome() {
-				String _configHomeF = moduleCfgs.get("config_home");
-				if (StringUtils.isBlank(_configHomeF) || _configHomeF.equalsIgnoreCase("${root}")) {
+				String _configHomeF = StringUtils.defaultIfEmpty(moduleCfgs.get("config_home"), "${root}");
+				if (_configHomeF.equalsIgnoreCase("${root}")) {
 					_configHomeF = RuntimeUtils.getRootPath();
 				}
 				return _configHomeF;
