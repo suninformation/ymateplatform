@@ -15,6 +15,7 @@
  */
 package net.ymate.platform.persistence.jdbc;
 
+import java.sql.Driver;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -89,6 +90,8 @@ public class JDBC {
 
 	protected static Map<String, Class<? extends IDialect>> __DIALECT = new HashMap<String, Class<? extends IDialect>>();
 
+    protected static Map<String, String> __DRIVER_CLASS = new HashMap<String, String>();
+
 	static {
 		__DIALECT.put("oracle", OracleDialect.class);
 		__DIALECT.put("mysql", MySqlDialect.class);
@@ -98,6 +101,15 @@ public class JDBC {
 		__DEFAULT_ADAPTER_NAMES.put("c3p0", C3p0DataSourceAdapter.class.getName());
 		__DEFAULT_ADAPTER_NAMES.put("dbcp", DbcpDataSourceAdapter.class.getName());
 		__DEFAULT_ADAPTER_NAMES.put("jndi", JndiDataSourceAdapter.class.getName());
+        //
+        __DRIVER_CLASS.put("mysql", "com.mysql.jdbc.Driver");
+        __DRIVER_CLASS.put("oracle", "oracle.jdbc.OracleDriver");
+        __DRIVER_CLASS.put("sqlserver", "com.microsoft.sqlserver.jdbc.SQLServerDriver");
+        __DRIVER_CLASS.put("sqlite", "org.sqlite.JDBC");
+        __DRIVER_CLASS.put("postgresql", "org.postgresql.Driver");
+        __DRIVER_CLASS.put("hsqldb", "org.hsqldb.jdbcDriver");
+        __DRIVER_CLASS.put("db2", "com.ibm.db2.jcc.DB2Driver");
+        __DRIVER_CLASS.put("h2", "org.h2.Driver");
 	}
 
 	/**
@@ -202,6 +214,24 @@ public class JDBC {
 	public static Class<? extends IDialect> getDialectClass(String dialectName) {
 		return __DIALECT.get(dialectName.toLowerCase());
 	}
+
+    /**
+     * 注册自定义数据库驱动
+     *
+     * @param driverName
+     * @param driverClass
+     */
+    public static void registerDriverClass(String driverName, Class<? extends Driver> driverClass) {
+        __DRIVER_CLASS.put(driverName, driverClass.getName());
+    }
+
+    /**
+     * @param driverName
+     * @return 获取数据库驱动类名称
+     */
+    public static String getDriverClassName(String driverName) {
+        return __DRIVER_CLASS.get(driverName);
+    }
 
 	/**
 	 * @return 采用默认数据源构建会话对象

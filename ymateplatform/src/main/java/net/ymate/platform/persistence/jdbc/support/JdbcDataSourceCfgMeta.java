@@ -17,6 +17,7 @@ package net.ymate.platform.persistence.jdbc.support;
 
 import java.util.Map;
 
+import net.ymate.platform.persistence.jdbc.JDBC;
 import net.ymate.platform.persistence.support.DataSourceCfgMeta;
 
 /**
@@ -52,7 +53,11 @@ public class JdbcDataSourceCfgMeta extends DataSourceCfgMeta {
 	public JdbcDataSourceCfgMeta(String name, String adapterClass, String driverClass, String connectionUrl, String userName, String password, Map<String, String> params) {
 		super(name, connectionUrl, userName, password, params);
 		this.adapterClass = adapterClass;
-		this.driverClass = driverClass;
+        //
+		this.driverClass = JDBC.getDriverClassName(driverClass.toLowerCase());
+        if (this.driverClass == null) {
+            this.driverClass = driverClass;
+        }
 	}
 
 	/**
