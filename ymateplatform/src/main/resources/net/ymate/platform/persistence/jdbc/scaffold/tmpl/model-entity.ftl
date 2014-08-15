@@ -8,7 +8,7 @@ import net.ymate.platform.persistence.annotation.Entity;
 
 /**
  * <p>
- * ${modelName?cap_first}Model
+ * ${modelName?cap_first}<#if (isUseClassSuffix)>Model</#if>
  * </p>
  * <p>
  * Code Generator By yMatePlatform  ${lastUpdateTime?string("yyyy-MM-dd a HH:mm:ss")}
@@ -18,7 +18,7 @@ import net.ymate.platform.persistence.annotation.Entity;
  * @version 0.0.0
  */
 @Entity(name = "${tableName}")
-public class ${modelName?cap_first}Model extends <#if (isUseBaseModel)>BaseModel<${primaryKeyType}><#else>BaseEntity<${modelName?cap_first}Model, ${primaryKeyType}></#if> {
+public class ${modelName?cap_first}<#if (isUseClassSuffix)>Model</#if> extends <#if (isUseBaseModel)>BaseModel<${primaryKeyType}><#else>BaseEntity<${modelName?cap_first}<#if (isUseClassSuffix)>Model</#if>, ${primaryKeyType}></#if> {
 
 	/**
 	 * 
@@ -34,8 +34,22 @@ public class ${modelName?cap_first}Model extends <#if (isUseBaseModel)>BaseModel
 	/**
 	 * 构造器
 	 */
-	public ${modelName?cap_first}Model() {
+	public ${modelName?cap_first}<#if (isUseClassSuffix)>Model</#if>() {
 	}
+
+    <#if (notNullableFieldList?size > 0)>
+    /**
+     * 构造器
+    <#list notNullableFieldList as field>
+     *	@param ${field.varName}
+    </#list>
+     */
+    public ${modelName?cap_first}<#if (isUseClassSuffix)>Model</#if>(<#list notNullableFieldList as field>${field.varType} ${field.varName}<#if field_has_next>, </#if></#list>) {
+        <#list notNullableFieldList as field>
+        this.${field.varName} = ${field.varName};
+        </#list>
+    }
+    </#if>
 
 	/**
 	 * 构造器
@@ -43,7 +57,7 @@ public class ${modelName?cap_first}Model extends <#if (isUseBaseModel)>BaseModel
 	 *	@param ${field.varName}
 	</#list>
 	 */
-	public ${modelName?cap_first}Model(<#list fieldList as field>${field.varType} ${field.varName}<#if field_has_next>, </#if></#list>) {
+	public ${modelName?cap_first}<#if (isUseClassSuffix)>Model</#if>(<#list fieldList as field>${field.varType} ${field.varName}<#if field_has_next>, </#if></#list>) {
 		<#list fieldList as field>
 		this.${field.varName} = ${field.varName};
 		</#list>
@@ -87,7 +101,7 @@ public class ${modelName?cap_first}Model extends <#if (isUseBaseModel)>BaseModel
 	 * FIELDS
 	 * </p>
 	 * <p>
-	 * ${modelName?cap_first}Model 字段常量表
+	 * ${modelName?cap_first}<#if (isUseClassSuffix)>Model</#if> 字段常量表
 	 * </p>
 	 * 
 	 * @author JdbcScaffold
