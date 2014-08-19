@@ -69,21 +69,29 @@ public class RuntimeUtils {
 	 * @return 获取应用根路径（若WEB工程则基于.../WEB-INF/返回，若普通工程则返回类所在路径）
 	 */
 	public static String getRootPath() {
-		URL _rootURL = RuntimeUtils.class.getClassLoader().getResource("/");
-		boolean _isWeb = false;
-		if (_rootURL == null) {
-			_rootURL = RuntimeUtils.class.getClassLoader().getResource("");
-		} else {
-			_isWeb = true;
-		}
-		String _rootPath = _isWeb ? StringUtils.substringBefore(_rootURL.getPath(), "classes/") : _rootURL.getPath();
-		if (isWindows()) {
-			if (_rootPath.startsWith("/")) {
-				_rootPath = _rootPath.substring(1);
-			}
-		}
-		return _rootPath;
+		return getRootPath(true);
 	}
+
+    /**
+     * @param safe 若WEB工程是否保留WEB-INF
+     * @return 返回应用根路径
+     */
+    public static String getRootPath(boolean safe) {
+        URL _rootURL = RuntimeUtils.class.getClassLoader().getResource("/");
+        boolean _isWeb = false;
+        if (_rootURL == null) {
+            _rootURL = RuntimeUtils.class.getClassLoader().getResource("");
+        } else {
+            _isWeb = true;
+        }
+        String _rootPath = _isWeb ? StringUtils.substringBefore(_rootURL.getPath(), safe ? "classes/" : "WEB-INF/") : _rootURL.getPath();
+        if (isWindows()) {
+            if (_rootPath.startsWith("/")) {
+                _rootPath = _rootPath.substring(1);
+            }
+        }
+        return _rootPath;
+    }
 
 	/**
 	 * 根据格式化字符串，生成运行时异常
