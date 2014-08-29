@@ -15,12 +15,15 @@
  */
 package net.ymate.platform.persistence.support;
 
-import java.util.List;
-
 import net.ymate.platform.commons.beans.IBeanMeta;
 import net.ymate.platform.commons.beans.IBeanMetaLoader;
 import net.ymate.platform.commons.beans.impl.AnnotationBeanFactory;
+import net.ymate.platform.persistence.jdbc.support.IEntityRepository;
 import net.ymate.platform.persistence.support.annotation.Repository;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -48,7 +51,18 @@ import net.ymate.platform.persistence.support.annotation.Repository;
  */
 public class RepositoryBeanFactory extends AnnotationBeanFactory {
 
-	public RepositoryBeanFactory(String...packageNames) {
+    private Set<String> __exculdedClassNameSet = new HashSet<String>();
+
+    public RepositoryBeanFactory() {
+        __exculdedClassNameSet.add(IEntityRepository.class.getName());
+    }
+
+    @Override
+    protected Set<String> getExcludedClassNameSet() {
+        return __exculdedClassNameSet;
+    }
+
+    public RepositoryBeanFactory(String...packageNames) {
 		this.packageNames = packageNames;
 		this.doLoadBeanMeta();
 	}
