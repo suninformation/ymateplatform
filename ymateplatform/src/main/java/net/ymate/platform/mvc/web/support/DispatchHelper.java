@@ -148,7 +148,13 @@ public class DispatchHelper {
 					}
 				}
                 // 若存在convention_mapping.cfg.xml配置文件，则只有配置文件内的mapping地址才能正常访问
-                if (!conventMappingCfg.isInited() || conventMappingCfg.getBoolean(context.getRequestMapping())) {
+                if (conventMappingCfg.matchRequestMapping(context.getRequestMapping())) {
+                    // 执行Convention自定义拦截器，注：此拦截器接口方法中的RequestMeta对象为null值
+                    IView _view = conventMappingCfg.doFilterChain(context.getRequestMapping());
+                    if (_view != null) {
+                        _view.render();
+                        return;
+                    }
                     // 采用系统默认方式处理约定优于配置的URL请求映射
                     String[] _fileTypes = { ".jsp", ".ftl" };
                     File _targetFile = null;

@@ -21,6 +21,7 @@ import net.ymate.platform.base.YMP;
 import net.ymate.platform.commons.i18n.I18N;
 import net.ymate.platform.mvc.context.IRequestContext;
 import net.ymate.platform.mvc.impl.DefaultRequestProcessor;
+import net.ymate.platform.mvc.support.IControllerBeanFactory;
 import net.ymate.platform.mvc.support.RequestExecutor;
 import net.ymate.platform.plugin.IPluginFactory;
 import net.ymate.platform.plugin.Plugins;
@@ -137,6 +138,13 @@ public abstract class MVC {
 	public static IPluginFactory getPluginFactory() {
 		return __PLUGIN_FACTORY;
 	}
+
+    /**
+     * @return 返回MVC框架控制器对象工厂
+     */
+    public static IControllerBeanFactory getControllerBeanFactory() {
+        return __META_PROCESSOR.getControllerBeanFactory();
+    }
 
 	/**
 	 * 注册控制器类

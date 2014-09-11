@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <properties>
+    <!-- ConventionMapping授权访问列表 -->
     <category name="general">
+        <!-- RequestMapping请求路径 -->
         <property name="/test" value="true" />
         <property name="/test/page" value="false" />
         <property name="/demo/test" value="true" />
+    </category>
+    <!-- Convention过滤器(拦截器)定义 -->
+    <category name="filters">
+        <property name="_sessionCheck" value="net.ymate.simple.filter.SessionCheckFilter" />
+        <property name="_ajaxCheck" value="net.ymate.simple.filter.AjaxRequestCheckFilter" />
+    </category>
+    <!-- 指定RequestMapping请求路径过滤器(拦截器)列表 -->
+    <category name="/test">
+        <property name="_sessionCheck" value="" />
+        <property name="_ajaxCheck" value="" />
     </category>
 </properties>

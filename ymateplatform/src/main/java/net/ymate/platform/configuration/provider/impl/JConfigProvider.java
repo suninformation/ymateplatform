@@ -218,9 +218,9 @@ public class JConfigProvider implements IConfigurationProvider {
 		if (keysSize == 1) {
 			properties = config.getProperties();
 		} else if (keysSize == 2) {
-			properties = config.getProperties(keys[1]);
+			properties = config.getProperties(keys[0]);
 		}
-		int headLength = keyHead.length();
+		int headLength = keysSize == 1 ? keys[0].length() : keys[1].length();
 		if (properties != null && !properties.isEmpty()) {
 			for (Object name : properties.keySet()) {
 				if (name != null && name.toString().startsWith(keysSize == 1 ? keys[0] : keys[1])) {
