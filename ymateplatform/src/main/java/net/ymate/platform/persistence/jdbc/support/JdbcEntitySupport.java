@@ -20,7 +20,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.ymate.platform.base.YMP;
@@ -124,14 +128,16 @@ public class JdbcEntitySupport {
 	public <T> T selectById(Class<T> entityClass, Object id, String[] fieldFilter) throws OperatorException {
 		JdbcEntityMeta _meta = this.getEntityMeta(entityClass);
 		IQueryOperator<Object[]> _opt = new QueryOperator<Object[]>(new ArrayResultSetHandler());
-		Set<String> _pkFieldFilter = new HashSet<String>();
+		List<String> _pkFieldFilter = new ArrayList<String>();
 		for (String _pkField : _meta.getPrimaryKeys()) {
 			if (_meta.isCompositeKey()) {
 				Object _pkFieldValue = ClassUtils.wrapper(id).getValue(_meta.getClassAttributeMap().get(_pkField));
 				// 仅处理主键值不为NULL的字段
 				if (_pkFieldValue != null) {
 					_opt.addParameter(_pkFieldValue);
-					_pkFieldFilter.add(_pkField);
+                    if (!_pkFieldFilter.contains(_pkField)) {
+                        _pkFieldFilter.add(_pkField);
+                    }
 				}
 			} else {
 				_opt.addParameter(id);
@@ -370,7 +376,7 @@ public class JdbcEntitySupport {
 			}
 		}
 		//
-        Set<String> _pkFieldFilter = new HashSet<String>();
+		List<String> _pkFieldFilter = new ArrayList<String>();
 		ClassBeanWrapper<T> _wrapperEntity = ClassUtils.wrapper(entity);
 		ClassBeanWrapper<?> _wrapperId = null;
 		for (String _pkField : _meta.getPrimaryKeys()) {
@@ -382,7 +388,9 @@ public class JdbcEntitySupport {
 				// 仅处理主键值不为NULL的字段
 				if (_pkFieldValue != null) {
 					_update.addParameter(_pkFieldValue);
-					_pkFieldFilter.add(_pkField);
+                    if (!_pkFieldFilter.contains(_pkField)) {
+                        _pkFieldFilter.add(_pkField);
+                    }
 				}
 			} else {
 				_update.addParameter(_wrapperEntity.getValue("id"));
@@ -424,7 +432,7 @@ public class JdbcEntitySupport {
 		IUpdateBatchOperator _update = new UpdateBatchOperator();
 		//
 		Map<String, AttributeInfo>  _entityMap = null;
-        Set<String> _pkFieldFilter = new HashSet<String>();
+		List<String> _pkFieldFilter = new ArrayList<String>();
 
         List<String> _fieldFilter = null;
 
@@ -470,7 +478,9 @@ public class JdbcEntitySupport {
 					// 仅处理主键值不为NULL的字段
 					if (_pkFieldValue != null) {
 						_batchParam.addParameter(_pkFieldValue);
-						_pkFieldFilter.add(_pkField);
+                        if (!_pkFieldFilter.contains(_pkField)) {
+                            _pkFieldFilter.add(_pkField);
+                        }
 					}
 				} else {
 					_batchParam.addParameter(_wrapperEntity.getValue("id"));
@@ -525,7 +535,7 @@ public class JdbcEntitySupport {
 		//
 		JdbcEntityMeta _meta = this.getEntityMeta(entityClass);
 		IUpdateBatchOperator _update = new UpdateBatchOperator();
-        Set<String> _pkFieldFilter = new HashSet<String>();
+		List<String> _pkFieldFilter = new ArrayList<String>();
 		for (Object _idObj : ids) {
 			SqlBatchParameter _batchParam = new SqlBatchParameter();
 			ClassBeanWrapper<?> _wrapperId = null;
@@ -538,7 +548,9 @@ public class JdbcEntitySupport {
 					// 仅处理主键值不为NULL的字段
 					if (_pkFieldValue != null) {
 						_batchParam.addParameter(_pkFieldValue);
-						_pkFieldFilter.add(_pkField);
+                        if (!_pkFieldFilter.contains(_pkField)) {
+                            _pkFieldFilter.add(_pkField);
+                        }
 					}
 				} else {
 					_batchParam.addParameter(_idObj);
@@ -582,7 +594,7 @@ public class JdbcEntitySupport {
 		//
 		JdbcEntityMeta _meta = this.getEntityMeta(entityClass);
 		IUpdateOperator _update = new UpdateOperator();
-        Set<String> _pkFieldFilter = new HashSet<String>();
+		List<String> _pkFieldFilter = new ArrayList<String>();
 		ClassBeanWrapper<?> _wrapperId = null;
 		for (String _pkField : _meta.getPrimaryKeys()) {
 			if (_meta.isCompositeKey()) {
@@ -593,7 +605,9 @@ public class JdbcEntitySupport {
 				// 仅处理主键值不为NULL的字段
 				if (_pkFieldValue != null) {
 					_update.addParameter(_pkFieldValue);
-					_pkFieldFilter.add(_pkField);
+                    if (!_pkFieldFilter.contains(_pkField)) {
+                        _pkFieldFilter.add(_pkField);
+                    }
 				}
 			} else {
 				_update.addParameter(id);
