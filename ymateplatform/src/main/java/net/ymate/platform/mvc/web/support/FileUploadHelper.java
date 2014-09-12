@@ -154,7 +154,6 @@ public class FileUploadHelper {
 	/**
 	 * 采用文件流的方式处理上传文件（即将上传文件流对象交给用户做进一步处理）
 	 * 
-	 * @param webRequest
 	 * @param processer
 	 * @throws IOException 
 	 * @throws FileUploadException 
@@ -206,9 +205,7 @@ public class FileUploadHelper {
 	/**
 	 * 采用文件方式处理上传文件（即先将文件上传后，再交给用户已上传文件对象集合）
 	 * 
-	 * @param webRequest
-	 * @param processer
-	 * @throws FileUploadException 
+	 * @throws FileUploadException
 	 */
 	private UploadFormWrapper UploadFileAsDiskBased() throws FileUploadException {
 		DiskFileItemFactory _factory = new DiskFileItemFactory();
