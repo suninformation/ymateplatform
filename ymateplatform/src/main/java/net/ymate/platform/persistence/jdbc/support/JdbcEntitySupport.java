@@ -20,11 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.ymate.platform.base.YMP;
@@ -128,7 +124,7 @@ public class JdbcEntitySupport {
 	public <T> T selectById(Class<T> entityClass, Object id, String[] fieldFilter) throws OperatorException {
 		JdbcEntityMeta _meta = this.getEntityMeta(entityClass);
 		IQueryOperator<Object[]> _opt = new QueryOperator<Object[]>(new ArrayResultSetHandler());
-		List<String> _pkFieldFilter = new ArrayList<String>();
+		Set<String> _pkFieldFilter = new HashSet<String>();
 		for (String _pkField : _meta.getPrimaryKeys()) {
 			if (_meta.isCompositeKey()) {
 				Object _pkFieldValue = ClassUtils.wrapper(id).getValue(_meta.getClassAttributeMap().get(_pkField));
@@ -374,7 +370,7 @@ public class JdbcEntitySupport {
 			}
 		}
 		//
-		List<String> _pkFieldFilter = new ArrayList<String>();
+        Set<String> _pkFieldFilter = new HashSet<String>();
 		ClassBeanWrapper<T> _wrapperEntity = ClassUtils.wrapper(entity);
 		ClassBeanWrapper<?> _wrapperId = null;
 		for (String _pkField : _meta.getPrimaryKeys()) {
@@ -428,7 +424,7 @@ public class JdbcEntitySupport {
 		IUpdateBatchOperator _update = new UpdateBatchOperator();
 		//
 		Map<String, AttributeInfo>  _entityMap = null;
-		List<String> _pkFieldFilter = new ArrayList<String>();
+        Set<String> _pkFieldFilter = new HashSet<String>();
 
         List<String> _fieldFilter = null;
 
@@ -529,7 +525,7 @@ public class JdbcEntitySupport {
 		//
 		JdbcEntityMeta _meta = this.getEntityMeta(entityClass);
 		IUpdateBatchOperator _update = new UpdateBatchOperator();
-		List<String> _pkFieldFilter = new ArrayList<String>();
+        Set<String> _pkFieldFilter = new HashSet<String>();
 		for (Object _idObj : ids) {
 			SqlBatchParameter _batchParam = new SqlBatchParameter();
 			ClassBeanWrapper<?> _wrapperId = null;
@@ -586,7 +582,7 @@ public class JdbcEntitySupport {
 		//
 		JdbcEntityMeta _meta = this.getEntityMeta(entityClass);
 		IUpdateOperator _update = new UpdateOperator();
-		List<String> _pkFieldFilter = new ArrayList<String>();
+        Set<String> _pkFieldFilter = new HashSet<String>();
 		ClassBeanWrapper<?> _wrapperId = null;
 		for (String _pkField : _meta.getPrimaryKeys()) {
 			if (_meta.isCompositeKey()) {
