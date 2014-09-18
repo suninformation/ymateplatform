@@ -214,7 +214,7 @@ public class JdbcEntityMeta extends EntityMeta {
 			_returnValue.append(dialect.wapperQuotedIdent(_field)).append("=?");
 			_returnValue.append(",");
 		}
-		return _returnValue.substring(0, _returnValue.length() - 1);
+		return _returnValue.length() >= 1 ? _returnValue.substring(0, _returnValue.length() - 1) : _returnValue.toString();
 	}
 
 	/**
