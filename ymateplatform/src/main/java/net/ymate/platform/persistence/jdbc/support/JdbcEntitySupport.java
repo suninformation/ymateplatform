@@ -754,8 +754,11 @@ public class JdbcEntitySupport {
 			} else {
                 Class<?> _attrType = _wrapperEntity.getFieldType(_attrFnName);
                 Object _attrValue = _wrapperEntity.getValue(_attrFnName);
+                // 如果实体属性值为null
                 if (_attrValue == null) {
-                    _attrValue = meta.getColumnMap().get(fn).getDefaultValue();
+                    // 则尝试提取注解中的默认值
+                    String _defValue = meta.getColumnMap().get(fn).getDefaultValue();
+                    _attrValue = _defValue.equalsIgnoreCase("@NULL") ? null : _defValue;
                 }
 				_returnValue.put(fn, new AttributeInfo(_attrValue, _attrType));
 			}
