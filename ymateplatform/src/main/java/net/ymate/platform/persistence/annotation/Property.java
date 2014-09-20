@@ -65,4 +65,9 @@ public @interface Property {
 	 */
 	String sequenceName() default "";
 
+    /**
+     * @return 返回字段默认值，若参数值为“@NULL”则表示该字段为null
+     */
+    String defaultValue() default "@NULL";
+
 }

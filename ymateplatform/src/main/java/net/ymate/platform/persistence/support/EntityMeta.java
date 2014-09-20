@@ -64,7 +64,7 @@ public class EntityMeta {
 	private Class<?> __primaryKeyClass;
 	private List<String> __primaryKeys = new ArrayList<String>();
 	private List<String> __autoIncrementColumns = new ArrayList<String>();
-	private List<ColumnInfo> __columns = new ArrayList<ColumnInfo>();
+	private Map<String, ColumnInfo> __columnMap = new HashMap<String, ColumnInfo>();
 	//
 	private boolean __isCompositeKey;
 	//
@@ -127,7 +127,7 @@ public class EntityMeta {
 		for (Field _f : ClassUtils.getFields(entityClass, true)) {
 			Property _c = _f.getAnnotation(Property.class);
 			if (_c != null) {
-				this.getColumns().add(new ColumnInfo(_c.name(), _f.getName(), _c.isAutoIncrement(), _c.sequenceName()));
+				this.getColumnMap().put(_c.name(), new ColumnInfo(_c.name(), _f.getName(), _c.defaultValue(), _c.isAutoIncrement(), _c.sequenceName()));
 				String _cName = StringUtils.defaultIfEmpty(_c.name(), _f.getName());
 				this.getColumnNames().add(_cName);
 				this.getClassAttributeMap().put(_cName, buildFieldNameToClassAttribute(_cName));
@@ -153,7 +153,7 @@ public class EntityMeta {
 						// PK @Column
 						Property _pkC = _pkF.getAnnotation(Property.class);
 						if (_pkC != null) {
-							this.getColumns().add(new ColumnInfo(_pkC.name(), _pkF.getName(), _pkC.isAutoIncrement(), _pkC.sequenceName()));
+							this.getColumnMap().put(_pkC.name(), new ColumnInfo(_pkC.name(), _pkF.getName(), _pkC.defaultValue(), _pkC.isAutoIncrement(), _pkC.sequenceName()));
 							String _cName = StringUtils.defaultIfEmpty(_pkC.name(), _pkF.getName());
 							this.getColumnNames().add(_cName);
 							this.getClassAttributeMap().put(_cName, buildFieldNameToClassAttribute(_cName));
@@ -214,10 +214,10 @@ public class EntityMeta {
 	}
 
 	/**
-	 * @return the columns
+	 * @return the columnMap
 	 */
-	public List<ColumnInfo> getColumns() {
-		return __columns;
+	public Map<String, ColumnInfo> getColumnMap() {
+		return __columnMap;
 	}
 
 	/**
@@ -302,6 +302,7 @@ public class EntityMeta {
 		private String fieldName;
 		private boolean autoIncrement;
 		private String sequenceName;
+        private String defaultValue;
 
 		/**
 		 * 构造器
@@ -313,12 +314,14 @@ public class EntityMeta {
 		 * 构造器
 		 * @param columnName
 		 * @param fieldName
+         * @param defaultValue
 		 * @param autoIncrement
 		 * @param sequenceName
 		 */
-		public ColumnInfo(String columnName, String fieldName, boolean autoIncrement, String sequenceName) {
+		public ColumnInfo(String columnName, String fieldName, String defaultValue, boolean autoIncrement, String sequenceName) {
 			this.columnName = columnName;
 			this.fieldName = fieldName;
+            this.defaultValue = defaultValue;
 			this.autoIncrement = autoIncrement;
 			this.sequenceName = sequenceName;
 		}
@@ -355,6 +358,13 @@ public class EntityMeta {
 			this.sequenceName = sequenceName;
 		}
 
-	}
+        public String getDefaultValue() {
+            return defaultValue;
+        }
+
+        public void setDefaultValue(String defaultValue) {
+            this.defaultValue = defaultValue;
+        }
+    }
 
 }

@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
@@ -169,36 +170,36 @@ public class JdbcScaffold {
 					_propMap.put("primaryKeyName", StringUtils.uncapitalize((String) _propMap.get("primaryKeyType")));
 					List<Attr> _primaryKeyList = new ArrayList<Attr>();
 					_propMap.put("primaryKeyList", _primaryKeyList);
-                    Attr _pkAttr = new Attr((String) _propMap.get("primaryKeyType"), (String) _propMap.get("primaryKeyName"), null, false, 0);
+                    Attr _pkAttr = new Attr((String) _propMap.get("primaryKeyType"), (String) _propMap.get("primaryKeyName"), null, false, 0, null);
 					_fieldList.add(_pkAttr);
                     _fieldListForNotNullable.add(_pkAttr);
 					//
 					for (String pkey : _tableMeta.getPkSet()) {
 						ColumnInfo _ci = _tableMeta.getFieldMap().get(pkey);
-						_primaryKeyList.add(new Attr(_ci.getColumnType(), StringUtils.uncapitalize(JdbcEntityMeta.buildFieldNameToClassAttribute(pkey.toLowerCase())), pkey, _ci.isAutoIncrement(), _ci.getNullable()));
-						_allFieldList.add(new Attr("String", _ci.getColumnName().toUpperCase(), _ci.getColumnName(), false, 0));
+						_primaryKeyList.add(new Attr(_ci.getColumnType(), StringUtils.uncapitalize(JdbcEntityMeta.buildFieldNameToClassAttribute(pkey.toLowerCase())), pkey, _ci.isAutoIncrement(), _ci.getNullable(), _ci.getDefaultValue()));
+						_allFieldList.add(new Attr("String", _ci.getColumnName().toUpperCase(), _ci.getColumnName(), false, 0, _ci.getDefaultValue()));
 					}
 					for (String key : _tableMeta.getFieldMap().keySet()) {
 						if (_tableMeta.getPkSet().contains(key)) {
 							continue;
 						}
 						ColumnInfo _ci = _tableMeta.getFieldMap().get(key);
-                        Attr _attr = new Attr(_ci.getColumnType(), StringUtils.uncapitalize(JdbcEntityMeta.buildFieldNameToClassAttribute(key.toLowerCase())), key, _ci.isAutoIncrement(), _ci.getNullable());
+                        Attr _attr = new Attr(_ci.getColumnType(), StringUtils.uncapitalize(JdbcEntityMeta.buildFieldNameToClassAttribute(key.toLowerCase())), key, _ci.isAutoIncrement(), _ci.getNullable(), _ci.getDefaultValue());
 						_fieldList.add(_attr);
                         _fieldListForNotNullable.add(_attr);
-						_allFieldList.add(new Attr("String", _ci.getColumnName().toUpperCase(), _ci.getColumnName(), _ci.isAutoIncrement(), _ci.getNullable()));
+						_allFieldList.add(new Attr("String", _ci.getColumnName().toUpperCase(), _ci.getColumnName(), _ci.isAutoIncrement(), _ci.getNullable(), _ci.getDefaultValue()));
 					}
 				} else {
 					_propMap.put("primaryKeyType", _tableMeta.getFieldMap().get(_tableMeta.getPkSet().get(0)).getColumnType());
 					_propMap.put("primaryKeyName", StringUtils.uncapitalize(JdbcEntityMeta.buildFieldNameToClassAttribute(_tableMeta.getPkSet().get(0))));
 					for (String key : _tableMeta.getFieldMap().keySet()) {
 						ColumnInfo _ci = _tableMeta.getFieldMap().get(key);
-                        Attr _attr = new Attr(_ci.getColumnType(), StringUtils.uncapitalize(JdbcEntityMeta.buildFieldNameToClassAttribute(key.toLowerCase())), key, _ci.isAutoIncrement(), _ci.getNullable());
+                        Attr _attr = new Attr(_ci.getColumnType(), StringUtils.uncapitalize(JdbcEntityMeta.buildFieldNameToClassAttribute(key.toLowerCase())), key, _ci.isAutoIncrement(), _ci.getNullable(), _ci.getDefaultValue());
 						_fieldList.add(_attr);
                         if (_attr.getNullable() == 0) {
                             _fieldListForNotNullable.add(_attr);
                         }
-						_allFieldList.add(new Attr("String", _ci.getColumnName().toUpperCase(), _ci.getColumnName(), _ci.isAutoIncrement(), _ci.getNullable()));
+						_allFieldList.add(new Attr("String", _ci.getColumnName().toUpperCase(), _ci.getColumnName(), _ci.isAutoIncrement(), _ci.getNullable(), _ci.getDefaultValue()));
 					}
 				}
 				_propMap.put("fieldList", _fieldList);
@@ -216,7 +217,7 @@ public class JdbcScaffold {
 						//
 						for (String pkey : _tableMeta.getPkSet()) {
 							ColumnInfo _ci = _tableMeta.getFieldMap().get(pkey);
-							_primaryKeyList.add(new Attr(_ci.getColumnType(), StringUtils.uncapitalize(JdbcEntityMeta.buildFieldNameToClassAttribute(pkey.toLowerCase())), pkey, _ci.isAutoIncrement(), _ci.getNullable()));
+							_primaryKeyList.add(new Attr(_ci.getColumnType(), StringUtils.uncapitalize(JdbcEntityMeta.buildFieldNameToClassAttribute(pkey.toLowerCase())), pkey, _ci.isAutoIncrement(), _ci.getNullable(), _ci.getDefaultValue()));
 						}
 					}
 					buildTargetFile("/model/" + _modelName + "PK.java", "/tmpl/model-pk.ftl", _propMap);
@@ -322,7 +323,8 @@ public class JdbcScaffold {
 		try {
 			_connHolder = JDBC.getConnectionHolder();
 			String _dbType = JDBC_SCAFFOLD_CONF.getProperty("ymp.scaffold.jbdc.db_type", "unknow");
-			_resultSet = _connHolder.getConnection().getMetaData().getPrimaryKeys(dbName, _dbType.equalsIgnoreCase("oracle") ? dbUserName.toUpperCase() : dbUserName, tableName);
+            DatabaseMetaData _dbMetaData = _connHolder.getConnection().getMetaData();
+			_resultSet = _dbMetaData.getPrimaryKeys(dbName, _dbType.equalsIgnoreCase("oracle") ? dbUserName.toUpperCase() : dbUserName, tableName);
 			if (_resultSet == null) {
 				_meta = null;
 				System.err.println("Database table \"" + tableName + "\" primaryKey resultSet is null, ignored");
@@ -337,14 +339,20 @@ public class JdbcScaffold {
 					_statement = _connHolder.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 					_resultSet = _statement.executeQuery("select * from " + _connHolder.getDialect().wapperQuotedIdent(tableName));
 					ResultSetMetaData _rsMetaData = _resultSet.getMetaData();
+                    //
 					for (int _idx = 1; _idx <= _rsMetaData.getColumnCount(); _idx++) {
-						_tableFields.put(_rsMetaData.getColumnName(_idx).toLowerCase(), new ColumnInfo(_rsMetaData.getColumnName(_idx).toLowerCase(), compressType(_rsMetaData.getColumnClassName(_idx)), _rsMetaData.isAutoIncrement(_idx), _rsMetaData.isNullable(_idx)));
+                        // 获取字段元数据对象
+                        ResultSet _column = _dbMetaData.getColumns(dbName, _dbType.equalsIgnoreCase("oracle") ? dbUserName.toUpperCase() : dbUserName, tableName, _rsMetaData.getColumnName(_idx));
+                        if (_column.next()) {
+                            // 提取字段定义及字段默认值
+                            _tableFields.put(_rsMetaData.getColumnName(_idx).toLowerCase(), new ColumnInfo(_rsMetaData.getColumnName(_idx).toLowerCase(), compressType(_rsMetaData.getColumnClassName(_idx)), _rsMetaData.isAutoIncrement(_idx), _rsMetaData.isNullable(_idx), _column.getString("COLUMN_DEF")));
+                        }
 					}
 					//
 					System.err.println("TABLE_NAME: " + tableName + " ---------------->>");
-					System.err.println("COLUMN_NAME\tPK\tCOLUMN_TYPE\tIS_AUTOINCREMENT\tIS_NULLABLE");
+					System.err.println("COLUMN_NAME\tPK\tCOLUMN_TYPE\tIS_AUTOINCREMENT\tIS_NULLABLE\tCOLUMN_DEF");
 					for (ColumnInfo _cInfo : _tableFields.values()) {
-						System.err.println(_cInfo.getColumnName() + "\t" + _pkFields.contains(_cInfo.getColumnName()) + "\t" + _cInfo.getColumnType() + "\t" + _cInfo.isAutoIncrement() + "\t" + _cInfo.getNullable());
+						System.err.println(_cInfo.getColumnName() + "\t" + _pkFields.contains(_cInfo.getColumnName()) + "\t" + _cInfo.getColumnType() + "\t" + _cInfo.isAutoIncrement() + "\t" + _cInfo.getNullable() + "\t" + _cInfo.getDefaultValue());
 					}
 				}
 			}
@@ -443,6 +451,7 @@ public class JdbcScaffold {
 		private String columnType;
 		private boolean autoIncrement;
         private int nullable;
+        private String defaultValue;
 
 		/**
 		 * 构造器
@@ -450,12 +459,14 @@ public class JdbcScaffold {
 		 * @param columnType
 		 * @param autoIncrement
          * @param nullable
+         * @param defaultValue
 		 */
-		public ColumnInfo(String columnName, String columnType, boolean autoIncrement, int nullable) {
+		public ColumnInfo(String columnName, String columnType, boolean autoIncrement, int nullable, String defaultValue) {
 			this.columnName = columnName;
 			this.autoIncrement = autoIncrement;
 			this.columnType = columnType;
             this.nullable = nullable;
+            this.defaultValue = defaultValue;
 		}
 
 		public String getColumnName() {
@@ -473,6 +484,10 @@ public class JdbcScaffold {
         public int getNullable() {
             return nullable;
         }
+
+        public String getDefaultValue() {
+            return defaultValue;
+        }
     }
 
 	public class Attr {
@@ -481,13 +496,15 @@ public class JdbcScaffold {
 		String columnName;
 		boolean autoIncrement;
         int nullable;
+        String defaultValue;
 		
-		public Attr(String varType, String varName, String columnName, boolean autoIncrement, int nullable) {
+		public Attr(String varType, String varName, String columnName, boolean autoIncrement, int nullable, String defaultValue) {
 			this.varName = varName;
 			this.varType = varType;
 			this.columnName = columnName;
 			this.autoIncrement = autoIncrement;
             this.nullable = nullable;
+            this.defaultValue = defaultValue;
 		}
 
 		public String getVarType() {
@@ -508,6 +525,10 @@ public class JdbcScaffold {
 
         public int getNullable() {
             return nullable;
+        }
+
+        public String getDefaultValue() {
+            return defaultValue;
         }
 
         @Override
