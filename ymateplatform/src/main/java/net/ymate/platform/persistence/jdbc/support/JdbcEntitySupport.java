@@ -754,7 +754,7 @@ public class JdbcEntitySupport {
 				_returnValue.put(fn, new AttributeInfo(_attrValue, _attrType));
 			} else {
                 Class<?> _attrType = _wrapperEntity.getFieldType(_attrFnName);
-                Object _attrValue = _wrapperId.getValue(_attrFnName);
+                Object _attrValue = _wrapperEntity.getValue(_attrFnName);
                 if (_attrValue == null) {
                     _attrValue = meta.getColumnMap().get(fn).getDefaultValue();
                 }
