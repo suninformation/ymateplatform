@@ -373,7 +373,7 @@ public class DefaultSession implements ISession {
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.ISession#getAmount(java.lang.String, java.lang.Object[])
 	 */
-	public <T> long getAmount(String sql, Object[] params) throws OperatorException {
+	public long getAmount(String sql, Object[] params) throws OperatorException {
 		IQueryOperator<Object[]> _query = new QueryOperator<Object[]>(new ArrayResultSetHandler());
 		_query.setConnection(this.getConnection());
 		if (params != null && params.length > 0) {

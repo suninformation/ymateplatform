@@ -320,12 +320,11 @@ public interface ISession {
 	public <T> long getAmount(Class<T> entityClass, String whereStr, Object[] params) throws OperatorException;
 
 	/**
-	 * @param <T> 指定实体类型
 	 * @param sql SQL语句
 	 * @param params SQL参数集合
 	 * @return 计算查询结果总记录数量
 	 * @throws OperatorException
 	 */
-	public <T> long getAmount(String sql, Object[] params) throws OperatorException;
+	public long getAmount(String sql, Object[] params) throws OperatorException;
 
 }
