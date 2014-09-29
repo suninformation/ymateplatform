@@ -220,7 +220,7 @@ public class DateTimeUtils {
             time = 0;
         }
         if (StringUtils.isBlank(pattern)) {
-            pattern = YYYY_MM_DD_HH_MM_SS_SSS;
+            pattern = YYYY_MM_DD_HH_MM_SS;
         }
         return getSimpleDateFormat(pattern, timeOffset).format(new Date(time));
     }
@@ -230,7 +230,7 @@ public class DateTimeUtils {
             time = 0;
         }
         if (StringUtils.isBlank(pattern)) {
-            pattern = YYYY_MM_DD_HH_MM_SS_SSS;
+            pattern = YYYY_MM_DD_HH_MM_SS;
         }
         return getSimpleDateFormat(pattern, timeoffset).format(new Date(time));
     }
