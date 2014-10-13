@@ -15,24 +15,22 @@
  */
 package net.ymate.platform.commons.lang;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import net.ymate.platform.commons.util.RuntimeUtils;
-
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * <p>
  * BlurObject
  * </p>
  * <p>
- * 模糊对象，不进行强制判断，只要能转换就转换，虽然使用时可能会出现类型不匹配的问题，但是会将类型装换可能带来的错误尽量缩小在一个类里面；
+ * 模糊对象，任意数据类型间转换；
  * </p>
- * 
+ *
  * @author 刘镇(suninformation@163.com)
  * @version 0.0.0
  *          <table style="border:1px solid gray;">
@@ -51,588 +49,487 @@ import org.apache.commons.logging.LogFactory;
  */
 public class BlurObject implements Serializable, Cloneable {
 
-	private static final Log _LOG = LogFactory.getLog(BlurObject.class);
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 4141840934670622411L;
+    private static final Log _LOG = LogFactory.getLog(BlurObject.class);
 
-	/** 对象 */
-	public static final int OBJECT = 1;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 4141840934670622411L;
 
-	/** 模糊对象 */
-	public static final int BLUR_OBJECT = 2;
+    /**
+     * 当前存储对象值
+     */
+    private Object attr;
 
-	/** 整数 */
-	public static final int INT = 3;
-
-	/** 长整数 */
-	public static final int LONG = 4;
-
-	/** 串 */
-	public static final int STRING = 5;
-
-	/** 浮点 */
-	public static final int FLOAT = 6;
-
-	/** 双精度 */
-	public static final int DOUBLE = 7;
-
-	/** 布尔 */
-	public static final int BOOLEAN = 8;
-
-	/** 映射 */
-	public static final int MAP = 9;
-
-	/** 列表 */
-	public static final int LIST = 10;
-
-	/** 集合 */
-	public static final int SET = 11;
-
-	/** 当前存储对象值 */
-	private Object attr;
-
-	/** 当前存储对象类型 */
-	private int attrType;
-
-	/** 如果是随意对象，那么需要提供类对象 */
-	private Class<?> attrClass;
-
-	/**
-	 * 构造器
-	 * 
-	 * @param o
-	 */
-	public BlurObject(Object o) {
-		attr = o;
-		attrType = OBJECT;
-		if (o != null) {
-			attrClass = o.getClass();
-		}
-	}
-
-	/**
-	 * 构造器
-	 * 
-	 * @param m
-	 */
-	public BlurObject(Map<?, ?> m) {
-		attr = m;
-		attrType = MAP;
-		attrClass = Map.class;
-	}
-
-	/**
-	 * 构造器
-	 * 
-	 * @param s
-	 */
-	public BlurObject(Set<?> s) {
-		attr = s;
-		attrType = SET;
-		attrClass = Set.class;
-	}
-
-	/**
-	 * 构造器
-	 * 
-	 * @param l
-	 */
-	public BlurObject(List<?> l) {
-		attr = l;
-		attrType = LIST;
-		attrClass = List.class;
-	}
-
-	/**
-	 * 构造器
-	 * 
-	 * @param bo
-	 */
-	public BlurObject(BlurObject bo) {
-		attr = bo;
-		attrType = BLUR_OBJECT;
-		if (bo != null) {
-			attrClass = BlurObject.class;
-		}
-	}
-
-	/**
-	 * 构造器
-	 * 
-	 * @param i
-	 */
-	public BlurObject(int i) {
-		attr = i;
-		attrType = INT;
-		attrClass = Integer.class;
-	}
-
-	/**
-	 * 构造器
-	 * 
-	 * @param s
-	 */
-	public BlurObject(String s) {
-		attr = s;
-		attrType = STRING;
-		attrClass = String.class;
-	}
-
-	/**
-	 * 构造器
-	 * 
-	 * @param f
-	 */
-	public BlurObject(float f) {
-		attr = f;
-		attrType = FLOAT;
-		attrClass = Float.class;
-	}
-
-	/**
-	 * 构造器
-	 * 
-	 * @param d
-	 */
-	public BlurObject(double d) {
-		attr = d;
-		attrType = DOUBLE;
-		attrClass = Double.class;
-	}
-
-	/**
-	 * 构造器
-	 * 
-	 * @param l
-	 */
-	public BlurObject(long l) {
-		attr = l;
-		attrType = LONG;
-		attrClass = Long.class;
-	}
-
-	/**
-	 * 构造器
-	 * 
-	 * @param o
-	 * @param c
-	 */
-	public BlurObject(Object o, Class<?> c) {
-		attr = o;
-		attrType = OBJECT;
-		attrClass = c;
-	}
-
-	/**
-	 * 构造器
-	 * 
-	 * @param b
-	 */
-	public BlurObject(boolean b) {
-		attr = b;
-		attrType = BOOLEAN;
-		attrClass = Boolean.class;
-	}
-
-	/**
-	 * 获取数据类型
-	 * 
-	 * @return
-	 */
-	public int getObjectType() {
-		return attrType;
-	}
-
-	/**
-	 * 输出对象
-	 * 
-	 * @return
-	 */
-	public Object toObjectValue() {
-		return attr;
-	}
-
-	/**
-	 * 输出模糊对象
-	 * 
-	 * @return
-	 */
-	public BlurObject toBlurObjectValue() {
-		if (attrType == BLUR_OBJECT) {
-			return (BlurObject) attr;
-		}
-		return new BlurObject(attr);
-	}
-
-	/**
-	 * 输出为映射
-	 * 
-	 * @return
-	 */
-	public Map<?, ?> toMapValue() {
-		if (attrType == MAP) {
-			return (Map<?, ?>) attr;
-		}
-		return null;
-	}
-
-	/**
-	 * 输出为列表
-	 * 
-	 * @return
-	 */
-	public List<?> toListValue() {
-		if (attrType == LIST) {
-			return (List<?>) attr;
-		}
-		return null;
-	}
-
-	/**
-	 * 输出为集合
-	 * 
-	 * @return
-	 */
-	public Set<?> toSetValue() {
-		if (attrType == SET) {
-			return (Set<?>) attr;
-		}
-		return null;
-	}
-
-	/**
-	 * 输出布尔值，如果当前类型非布尔值，那么尝试转换
-	 * 
-	 * @return
-	 */
-	public boolean toBooleanValue() {
-		if (attr == null) {
-			return false;
-		}
-		if (attrType == INT) {
-			return ((Integer) attr) > 0;
-		}
-		if (attrType == LONG) {
-			return ((Long) attr) > 0;
-		}
-		if (attrType == FLOAT) {
-			return ((Float) attr) > 0;
-		}
-		if (attrType == DOUBLE) {
-			return ((Double) attr) > 0;
-		}
-		if (attrType == STRING) {
-			return "true".equalsIgnoreCase(attr.toString()) || "on".equalsIgnoreCase(attr.toString()) || "1".equalsIgnoreCase(attr.toString());
-		}
-		if (attrType == OBJECT) {
-			if (attr instanceof Boolean) {
-				return (Boolean) attr;
-			}
-			if (attr instanceof String) {
-				String _value = (String) attr;
-				if (_value.equalsIgnoreCase("true") || _value.equalsIgnoreCase("on") || _value.equals("1")) {
-					return true;
-				} else if (_value.equalsIgnoreCase("false") || _value.equalsIgnoreCase("off") || _value.equals("0")) {
-					return false;
-				}
-			}
-			if (attr instanceof Number) {
-				Number _value = (Number) attr;
-                return _value.intValue() > 0;
-			}
-		}
-        return attrType == BLUR_OBJECT && ((BlurObject) attr).toBooleanValue();
+    /**
+     * 构造器
+     *
+     * @param o
+     */
+    public BlurObject(Object o) {
+        attr = o;
     }
 
-	/**
-	 * 输出整数
-	 * 
-	 * @return
-	 */
-	public int toIntValue() {
-		if (attr == null) {
-			return 0;
-		}
-		if (attrType == INT) {
-			return (Integer) attr;
-		}
-		if (attrType == LONG) {
-			return ((Long) attr).intValue();
-		}
-		if (attrType == FLOAT) {
-			return ((Float) attr).intValue();
-		}
-		if (attrType == DOUBLE) {
-			return ((Double) attr).intValue();
-		}
-		if (attrType == STRING || attrType == OBJECT) {
-			int ret = 0;
-			try {
-				ret = new Double(Double.parseDouble(attr.toString())).intValue();
-			} catch (NumberFormatException e) {
-				ret = 0;
-			}
-			return ret;
-		}
-		if (attrType == BLUR_OBJECT) {
-			return ((BlurObject) attr).toIntValue();
-		}
-		return 0;
-	}
-
-	/**
-	 * 输出串
-	 * 
-	 * @return
-	 */
-	public String toStringValue() {
-		if (attr == null) {
-			return null;
-		}
-		if (attrType == STRING || attrType == OBJECT) {
-			return attr.toString();
-		}
-		if (attrType == BLUR_OBJECT) {
-			return attr.toString();
-		}
-		if (attrType == INT) {
-			return attr + "";
-		}
-		if (attrType == LONG) {
-			return attr + "";
-		}
-		if (attrType == FLOAT) {
-			return attr + "";
-		}
-		if (attrType == DOUBLE) {
-			return attr + "";
-		}
-		if (attrType == BOOLEAN) {
-			return attr + "";
-		}
-		return "";
-	}
-
-	/**
-	 * 输出浮点数
-	 * 
-	 * @return
-	 */
-	public float toFloatValue() {
-		if (attr == null) {
-			return 0.0f;
-		}
-		if (attrType == INT) {
-			return ((Integer) attr).floatValue();
-		}
-		if (attrType == LONG) {
-			return ((Long) attr).floatValue();
-		}
-		if (attrType == FLOAT) {
-			return (Float) attr;
-		}
-		if (attrType == DOUBLE) {
-			return ((Double) attr).floatValue();
-		}
-		if (attrType == STRING || attrType == OBJECT) {
-			float ret;
-			try {
-				ret = new Double(Double.parseDouble(attr.toString())).floatValue();
-			} catch (NumberFormatException e) {
-				ret = 0.0f;
-			}
-			return ret;
-		}
-		if (attrType == BLUR_OBJECT) {
-			return ((BlurObject) attr).toFloatValue();
-		}
-		return 0.0f;
-	}
-
-	/**
-	 * 输出双精度
-	 * 
-	 * @return
-	 */
-	public double toDoubleValue() {
-		if (attr == null) {
-			return 0.0;
-		}
-		if (attrType == INT) {
-			return ((Integer) attr).doubleValue();
-		}
-		if (attrType == LONG) {
-			return ((Long) attr).doubleValue();
-		}
-		if (attrType == FLOAT) {
-			return ((Float) attr).doubleValue();
-		}
-		if (attrType == DOUBLE) {
-			return (Double) attr;
-		}
-		if (attrType == STRING || attrType == OBJECT) {
-			double ret;
-			try {
-				ret = Double.parseDouble(attr.toString());
-			} catch (NumberFormatException e) {
-				ret = 0.0;
-			}
-			return ret;
-		}
-		if (attrType == BLUR_OBJECT) {
-			return ((BlurObject) attr).toDoubleValue();
-		}
-		return 0.0;
-	}
-
-	/**
-	 * 输出长整形
-	 * 
-	 * @return
-	 */
-	public long toLongValue() {
-		if (attr == null) {
-			return 0l;
-		}
-		if (attrType == INT) {
-			return ((Integer) attr).longValue();
-		}
-		if (attrType == LONG) {
-			return (Long) attr;
-		}
-		if (attrType == FLOAT) {
-			return ((Float) attr).longValue();
-		}
-		if (attrType == DOUBLE) {
-			return ((Double) attr).longValue();
-		}
-		if (attrType == STRING || attrType == OBJECT) {
-			long ret = 0l;
-			try {
-				ret = new Double(Double.parseDouble(attr.toString())).longValue();
-			} catch (NumberFormatException e) {
-				ret = 0l;
-			}
-			return ret;
-		}
-		if (attrType == BLUR_OBJECT) {
-			return ((BlurObject) attr).toLongValue();
-		}
-		return 0l;
-	}
-
-	/**
-	 * 输出指定类的对象
-	 * 
-	 * @param clazz 指定类
-	 * @return 如果对象不能转换成指定类返回null，指定类是null，返回null。
-	 */
-	public Object toObjectValue(Class<?> clazz) {
-		Object object = null;
-		if (clazz.equals(String.class)) {
-			object = this.toStringValue();
-		} else if (clazz.equals(Double.class) || clazz.equals(double.class)) {
-			object = this.toDoubleValue();
-		} else if (clazz.equals(Float.class) || clazz.equals(float.class)) {
-			object = this.toFloatValue();
-		} else if (clazz.equals(Integer.class) || clazz.equals(int.class)) {
-			object = this.toIntValue();
-		} else if (clazz.equals(Long.class) || clazz.equals(long.class)) {
-			object = this.toLongValue();
-		} else if (clazz.equals(Boolean.class) || clazz.equals(boolean.class)) {
-			object = this.toBooleanValue();
-		} else if (clazz.equals(List.class)) {
-			object = this.toListValue();
-		} else if (clazz.equals(Map.class)) {
-			object = this.toMapValue();
-		} else if (clazz.equals(Set.class)) {
-			object = this.toSetValue();
-		}
-		if (object == null) {
-			try {
-				object = clazz.cast(attr);
-			} catch (ClassCastException e) {
-				_LOG.warn("", RuntimeUtils.unwrapThrow(e));
-			}
-		}
-		return object;
-	}
-
-	/**
-	 * 获得对象类
-	 * 
-	 * @return
-	 */
-	public Class<?> getObjectClass() {
-		if (attrClass != null) {
-			return attrClass;
-		} else {
-			if (attr != null) {
-				return attr.getClass();
-			}
-		}
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((attr == null) ? 0 : attr.hashCode());
-		result = prime * result + ((attrClass == null) ? 0 : attrClass.hashCode());
-		result = prime * result + attrType;
-		return result;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		BlurObject other = (BlurObject) obj;
-		if (this.attr == null) {
-			if (other.attr != null) {
-				return false;
-			}
-		} else if (!this.attr.equals(other.attr)) {
-			return false;
-		}
-		if (attrClass == null) {
-			if (other.attrClass != null) {
-				return false;
-			}
-		} else if (!attrClass.equals(other.attrClass)) {
-			return false;
-		}
-        return attrType == other.attrType;
+    /**
+     * 输出对象
+     *
+     * @return
+     */
+    public Object toObjectValue() {
+        return attr;
     }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString() {
-		if (attr != null) {
-			return attr.toString();
-		}
-		return "";
-	}
+    /**
+     * 输出模糊对象
+     *
+     * @return
+     */
+    public BlurObject toBlurObjectValue() {
+        if (attr instanceof BlurObject) {
+            return (BlurObject) attr;
+        }
+        return this;
+    }
+
+    /**
+     * 输出为映射
+     *
+     * @return
+     */
+    public Map<?, ?> toMapValue() {
+        if (attr == null) {
+            return null;
+        }
+        if (attr instanceof Map) {
+            return (Map<?, ?>) attr;
+        }
+        return Collections.emptyMap();
+    }
+
+    /**
+     * 输出为列表
+     *
+     * @return
+     */
+    public List<?> toListValue() {
+        if (attr == null) {
+            return null;
+        }
+        if (attr instanceof List) {
+            return (List<? extends Object>) attr;
+        }
+        List<Object> _returnValue = new LinkedList<Object>();
+        _returnValue.add(attr);
+        return _returnValue;
+    }
+
+    /**
+     * 输出为集合
+     *
+     * @return
+     */
+    public Set<?> toSetValue() {
+        if (attr == null) {
+            return null;
+        }
+        if (attr instanceof List) {
+            return (Set<? extends Object>) attr;
+        }
+        Set<Object> _returnValue = new LinkedHashSet<Object>();
+        _returnValue.add(attr);
+        return _returnValue;
+    }
+
+    /**
+     * 输出布尔值，如果当前类型非布尔值，那么尝试转换
+     *
+     * @return
+     */
+    public boolean toBooleanValue() {
+        if (attr == null) {
+            return false;
+        }
+        if (attr instanceof String) {
+            return "true".equalsIgnoreCase(this.attr.toString()) || "on".equalsIgnoreCase(this.attr.toString()) || "1".equalsIgnoreCase(this.attr.toString());
+        }
+        if (attr instanceof Boolean || boolean.class.isAssignableFrom(attr.getClass())) {
+            return (Boolean) attr ? true : false;
+        }
+        if (attr instanceof Float || float.class.isAssignableFrom(attr.getClass())) {
+            return ((Float) attr) > 0;
+        }
+        if (attr instanceof Integer || int.class.isAssignableFrom(attr.getClass())) {
+            return ((Integer) attr).floatValue() > 0;
+        }
+        if (attr instanceof Long || long.class.isAssignableFrom(attr.getClass())) {
+            return ((Long) attr).floatValue() > 0;
+        }
+        if (attr instanceof Double || double.class.isAssignableFrom(attr.getClass())) {
+            return ((Double) attr).floatValue() > 0;
+        }
+        if (attr instanceof List) {
+            return ((List) attr).size() > 0;
+        }
+        if (attr instanceof Map) {
+            return ((Map) attr).size() > 0;
+        }
+        if (attr instanceof BlurObject) {
+            return ((BlurObject) this.attr).toBooleanValue();
+        }
+        return false;
+    }
+
+    /**
+     * 输出整数
+     *
+     * @return
+     */
+    public int toIntValue() {
+        if (attr == null) {
+            return 0;
+        }
+        if (attr instanceof Integer || int.class.isAssignableFrom(attr.getClass())) {
+            return (Integer) attr;
+        }
+        if (attr instanceof String) {
+            if (StringUtils.isNotBlank(attr.toString())) {
+                return Integer.parseInt(attr.toString(), 10);
+            } else {
+                return 0;
+            }
+        }
+        if (attr instanceof Long || long.class.isAssignableFrom(attr.getClass())) {
+            return ((Long) attr).intValue();
+        }
+        if (attr instanceof Float || float.class.isAssignableFrom(attr.getClass())) {
+            return ((Float) attr).intValue();
+        }
+        if (attr instanceof Double || double.class.isAssignableFrom(attr.getClass())) {
+            return ((Double) attr).intValue();
+        }
+        if (attr instanceof Boolean || boolean.class.isAssignableFrom(attr.getClass())) {
+            return (Boolean) attr ? 1 : 0;
+        }
+        if (attr instanceof Map) {
+            return ((Map) attr).size();
+        }
+        if (attr instanceof List) {
+            return ((List) attr).size();
+        }
+        if (attr instanceof Short || short.class.isAssignableFrom(attr.getClass())) {
+            return ((Short) attr).intValue();
+        }
+        if (attr instanceof BlurObject) {
+            return ((BlurObject) this.attr).toIntValue();
+        }
+        return 0;
+    }
+
+    /**
+     * 输出串
+     *
+     * @return
+     */
+    public String toStringValue() {
+        if (attr == null) {
+            return "";
+        }
+        if (attr instanceof String) {
+            return (String) attr;
+        }
+        if (attr instanceof BlurObject) {
+            return ((BlurObject) this.attr).toStringValue();
+        }
+        return attr.toString();
+    }
+
+    /**
+     * 输出浮点数
+     *
+     * @return
+     */
+    public float toFloatValue() {
+        if (attr == null) {
+            return 0f;
+        }
+        if (attr instanceof Float || float.class.isAssignableFrom(attr.getClass())) {
+            return (Float) attr;
+        }
+        if (attr instanceof String) {
+            if (StringUtils.isNotBlank(attr.toString())) {
+                return Float.parseFloat(attr.toString());
+            } else {
+                return 0f;
+            }
+        }
+        if (attr instanceof Integer || int.class.isAssignableFrom(attr.getClass())) {
+            return ((Integer) attr).floatValue();
+        }
+        if (attr instanceof Long || long.class.isAssignableFrom(attr.getClass())) {
+            return ((Long) attr).floatValue();
+        }
+        if (attr instanceof Double || double.class.isAssignableFrom(attr.getClass())) {
+            return ((Double) attr).floatValue();
+        }
+        if (attr instanceof Boolean || boolean.class.isAssignableFrom(attr.getClass())) {
+            return (Boolean) attr ? 1f : 0f;
+        }
+        if (attr instanceof Map) {
+            return ((Map) attr).size();
+        }
+        if (attr instanceof List) {
+            return ((List) attr).size();
+        }
+        if (attr instanceof BlurObject) {
+            return ((BlurObject) this.attr).toFloatValue();
+        }
+        return 0f;
+    }
+
+    /**
+     * 输出双精度
+     *
+     * @return
+     */
+    public double toDoubleValue() {
+        if (attr == null) {
+            return 0d;
+        }
+        if (attr instanceof Double || double.class.isAssignableFrom(attr.getClass())) {
+            return (Double) attr;
+        }
+        if (attr instanceof String) {
+            if (StringUtils.isNotBlank(attr.toString())) {
+                return Double.parseDouble(attr.toString());
+            } else {
+                return 0d;
+            }
+        }
+        if (attr instanceof Integer || int.class.isAssignableFrom(attr.getClass())) {
+            return ((Integer) attr).doubleValue();
+        }
+        if (attr instanceof Long || long.class.isAssignableFrom(attr.getClass())) {
+            return ((Long) attr).doubleValue();
+        }
+        if (attr instanceof Float || float.class.isAssignableFrom(attr.getClass())) {
+            return ((Float) attr).doubleValue();
+        }
+        if (attr instanceof Boolean || boolean.class.isAssignableFrom(attr.getClass())) {
+            return (Boolean) attr ? 1d : 0d;
+        }
+        if (attr instanceof Map) {
+            return ((Map) attr).size();
+        }
+        if (attr instanceof List) {
+            return ((List) attr).size();
+        }
+        if (attr instanceof BlurObject) {
+            return ((BlurObject) this.attr).toDoubleValue();
+        }
+        return 0d;
+    }
+
+    /**
+     * 输出长整形
+     *
+     * @return
+     */
+    public long toLongValue() {
+        if (attr == null) {
+            return 0l;
+        }
+        if (attr instanceof Long || long.class.isAssignableFrom(attr.getClass())) {
+            return (Long) attr;
+        }
+        if (attr instanceof String) {
+            if (StringUtils.isNotBlank(attr.toString())) {
+                return Long.parseLong(attr.toString(), 10);
+            } else {
+                return 0l;
+            }
+        }
+        if (attr instanceof Integer || int.class.isAssignableFrom(attr.getClass())) {
+            return ((Integer) attr).longValue();
+        }
+        if (attr instanceof Float || float.class.isAssignableFrom(attr.getClass())) {
+            return ((Float) attr).longValue();
+        }
+        if (attr instanceof Double || double.class.isAssignableFrom(attr.getClass())) {
+            return ((Double) attr).longValue();
+        }
+        if (attr instanceof Boolean || boolean.class.isAssignableFrom(attr.getClass())) {
+            return (Boolean) attr ? 1 : 0;
+        }
+        if (attr instanceof Map) {
+            return ((Map) attr).size();
+        }
+        if (attr instanceof List) {
+            return ((List) attr).size();
+        }
+        if (attr instanceof BlurObject) {
+            return ((BlurObject) this.attr).toLongValue();
+        }
+        return 0l;
+    }
+
+    public byte toByteValue() {
+        if (attr == null) {
+            return 0;
+        }
+        if (attr instanceof Byte) {
+            return (Byte) attr;
+        }
+        if (attr instanceof BlurObject) {
+            return ((BlurObject) this.attr).toByteValue();
+        }
+        return Byte.parseByte(toStringValue());
+    }
+
+    public byte[] toBytesValue() {
+        if(attr instanceof byte[]) {
+            return (byte[]) attr;
+        }
+        if(attr instanceof Byte[]) {
+            Byte[] _bArr = (Byte[]) attr;
+            byte[] _returnBArr = new byte[_bArr.length];
+            for (int _idx = 0; _idx < _bArr.length; _idx++) {
+                _returnBArr[_idx] = _bArr[_idx];
+            }
+            return _returnBArr;
+        }
+        return null;
+    }
+
+    public short toShortValue() {
+        return (short) toIntValue();
+    }
+
+    public char toCharValue() {
+        if (attr == null) {
+            return Character.MIN_CODE_POINT;
+        }
+        if (attr instanceof Character) {
+            return (Character) attr;
+        }
+        if (attr instanceof BlurObject) {
+            return ((BlurObject) this.attr).toCharValue();
+        }
+        return Character.MIN_CODE_POINT;
+    }
+
+    /**
+     * 输出指定类的对象
+     *
+     * @param clazz 指定类
+     * @return 如果对象不能转换成指定类返回null，指定类是null，返回null。
+     */
+    public Object toObjectValue(Class<?> clazz) {
+        Object object = null;
+        if (clazz.equals(String.class)) {
+            object = this.toStringValue();
+        } else if (clazz.equals(Double.class) || clazz.equals(double.class)) {
+            object = this.toDoubleValue();
+        } else if (clazz.equals(Float.class) || clazz.equals(float.class)) {
+            object = this.toFloatValue();
+        } else if (clazz.equals(Integer.class) || clazz.equals(int.class)) {
+            object = this.toIntValue();
+        } else if (clazz.equals(Long.class) || clazz.equals(long.class)) {
+            object = this.toLongValue();
+        } else if (clazz.equals(Boolean.class) || clazz.equals(boolean.class)) {
+            object = this.toBooleanValue();
+        } else if (clazz.equals(Byte.class) || clazz.equals(byte.class)) {
+            object = this.toByteValue();
+        } else if (clazz.equals(Byte[].class) || clazz.equals(byte[].class)) {
+            object = this.toBytesValue();
+        } else if (clazz.equals(Character.class) || clazz.equals(char.class)) {
+            object = this.toCharValue();
+        } else if (clazz.equals(List.class)) {
+            object = this.toListValue();
+        } else if (clazz.equals(Map.class)) {
+            object = this.toMapValue();
+        } else if (clazz.equals(Set.class)) {
+            object = this.toSetValue();
+        }
+        if (object == null) {
+            try {
+                object = clazz.cast(attr);
+            } catch (ClassCastException e) {
+                _LOG.warn("", RuntimeUtils.unwrapThrow(e));
+            }
+        }
+        return object;
+    }
+
+    /**
+     * 获得对象类
+     *
+     * @return
+     */
+    public Class<?> getObjectClass() {
+        if (attr != null) {
+            return attr.getClass();
+        }
+        return null;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((attr == null) ? 0 : attr.hashCode());
+        Class<?> _attrClass = attr.getClass();
+        result = prime * result + ((_attrClass == null) ? 0 : _attrClass.hashCode());
+        result = prime * result;
+        return result;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        BlurObject other = (BlurObject) obj;
+        if (this.attr == null) {
+            if (other.attr != null) {
+                return false;
+            }
+        } else if (!this.attr.equals(other.attr)) {
+            return false;
+        }
+        Class<?> _attrClass = attr.getClass();
+        if (_attrClass == null) {
+            if (other.attr.getClass() != null) {
+                return false;
+            }
+        } else if (!_attrClass.equals(other.attr.getClass())) {
+            return false;
+        }
+        return attr == other.attr;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        if (attr != null) {
+            return attr.toString();
+        }
+        return "";
+    }
 }
