@@ -185,22 +185,22 @@ public class HttpRequestExecutor extends RequestExecutor {
 			for (Annotation _annotation : _fieldAnnotations) {
 				if (_annotation instanceof CookieValue) {
 					CookieValue _anno = (CookieValue) _annotation;
-					Object _value = this.parseCookieValueAnnotation(_anno.value(), _anno.defaultValue(), _anno.required(), _wrapper.getFieldType(_fName), _fName);
+					Object _value = this.parseCookieValueAnnotation(_anno.value(), StringUtils.defaultIfEmpty(_anno.defaultValue(), null), _anno.required(), _wrapper.getFieldType(_fName), _fName);
 					_wrapper.setValue(_fName, _value);
 					break;
 				} else if (_annotation instanceof PathVariable) {
 					PathVariable _anno = (PathVariable) _annotation;
-					Object _value = this.parsePathVariableAnnotation(_anno.value(), _anno.defaultValue(), _anno.required(), _wrapper.getFieldType(_fName), _fName);
+					Object _value = this.parsePathVariableAnnotation(_anno.value(), StringUtils.defaultIfEmpty(_anno.defaultValue(), null), _anno.required(), _wrapper.getFieldType(_fName), _fName);
 					_wrapper.setValue(_fName, _value);
 					break;
 				} else if (_annotation instanceof RequestHeader) {
 					RequestHeader _anno = (RequestHeader) _annotation;
-					Object _value = this.parseRequestHeaderAnnotation(_anno.value(), _anno.defaultValue(), _anno.required(), _wrapper.getFieldType(_fName), _fName);
+					Object _value = this.parseRequestHeaderAnnotation(_anno.value(), StringUtils.defaultIfEmpty(_anno.defaultValue(), null), _anno.required(), _wrapper.getFieldType(_fName), _fName);
 					_wrapper.setValue(_fName, _value);
 					break;
 				} else if (_annotation instanceof RequestParam) {
 					RequestParam _anno = (RequestParam) _annotation;
-					Object _value = this.parseRequestParamAnnotation(_anno.prefix(), _anno.value(), _anno.defaultValue(), _anno.required(), _wrapper.getFieldType(_fName), _fName);
+					Object _value = this.parseRequestParamAnnotation(_anno.prefix(), _anno.value(), StringUtils.defaultIfEmpty(_anno.defaultValue(), null), _anno.required(), _wrapper.getFieldType(_fName), _fName);
 					_wrapper.setValue(_fName, _value);
 					break;
 				} else if (_annotation instanceof ModelBind) {
@@ -225,19 +225,19 @@ public class HttpRequestExecutor extends RequestExecutor {
 				for (Annotation _annotation : _annotations) {
 					if (_annotation instanceof CookieValue) {
 						CookieValue _anno = (CookieValue) _annotation;
-						_params[_idx] = this.parseCookieValueAnnotation(_anno.value(), _anno.defaultValue(), _anno.required(), _paramTypes[_idx], this.requestMeta.getMethodParamNames()[_idx]);
+						_params[_idx] = this.parseCookieValueAnnotation(_anno.value(), StringUtils.defaultIfEmpty(_anno.defaultValue(), null), _anno.required(), _paramTypes[_idx], this.requestMeta.getMethodParamNames()[_idx]);
 						break;
 					} else if (_annotation instanceof PathVariable) {
 						PathVariable _anno = (PathVariable) _annotation;
-						_params[_idx] = this.parsePathVariableAnnotation(_anno.value(), _anno.defaultValue(), _anno.required(), _paramTypes[_idx], this.requestMeta.getMethodParamNames()[_idx]);
+						_params[_idx] = this.parsePathVariableAnnotation(_anno.value(), StringUtils.defaultIfEmpty(_anno.defaultValue(), null), _anno.required(), _paramTypes[_idx], this.requestMeta.getMethodParamNames()[_idx]);
 						break;
 					} else if (_annotation instanceof RequestHeader) {
 						RequestHeader _anno = (RequestHeader) _annotation;
-						_params[_idx] = this.parseRequestHeaderAnnotation(_anno.value(), _anno.defaultValue(), _anno.required(), _paramTypes[_idx], this.requestMeta.getMethodParamNames()[_idx]);
+						_params[_idx] = this.parseRequestHeaderAnnotation(_anno.value(), StringUtils.defaultIfEmpty(_anno.defaultValue(), null), _anno.required(), _paramTypes[_idx], this.requestMeta.getMethodParamNames()[_idx]);
 						break;
 					} else if (_annotation instanceof RequestParam) {
 						RequestParam _anno = (RequestParam) _annotation;
-						_params[_idx] = this.parseRequestParamAnnotation(_anno.prefix(), _anno.value(), _anno.defaultValue(), _anno.required(), _paramTypes[_idx], this.requestMeta.getMethodParamNames()[_idx]);
+						_params[_idx] = this.parseRequestParamAnnotation(_anno.prefix(), _anno.value(), StringUtils.defaultIfEmpty(_anno.defaultValue(), null), _anno.required(), _paramTypes[_idx], this.requestMeta.getMethodParamNames()[_idx]);
 						break;
 					} else if (_annotation instanceof ModelBind) {
 						_params[_idx] = this.parseModelBindAnnotation(_paramTypes[_idx]);
