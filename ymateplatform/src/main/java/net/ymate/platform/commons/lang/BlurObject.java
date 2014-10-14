@@ -232,7 +232,7 @@ public class BlurObject implements Serializable, Cloneable {
      */
     public String toStringValue() {
         if (attr == null) {
-            return "";
+            return null;
         }
         if (attr instanceof String) {
             return (String) attr;
@@ -426,22 +426,38 @@ public class BlurObject implements Serializable, Cloneable {
     public Object toObjectValue(Class<?> clazz) {
         Object object = null;
         if (clazz.equals(String.class)) {
-            object = this.toStringValue();
-        } else if (clazz.equals(Double.class) || clazz.equals(double.class)) {
+            object = attr == null ? null : this.toStringValue();
+        } else if (clazz.equals(Double.class)) {
+            object = attr == null ? null : this.toDoubleValue();
+        } else if (clazz.equals(double.class)) {
             object = this.toDoubleValue();
-        } else if (clazz.equals(Float.class) || clazz.equals(float.class)) {
+        } else if (clazz.equals(Float.class)) {
+            object = attr == null ? null : this.toFloatValue();
+        } else if (clazz.equals(float.class)) {
             object = this.toFloatValue();
-        } else if (clazz.equals(Integer.class) || clazz.equals(int.class)) {
+        } else if (clazz.equals(Integer.class)) {
+            object = attr == null ? null : this.toIntValue();
+        } else if (clazz.equals(int.class)) {
             object = this.toIntValue();
-        } else if (clazz.equals(Long.class) || clazz.equals(long.class)) {
+        } else if (clazz.equals(Long.class)) {
+            object = attr == null ? null : this.toLongValue();
+        } else if (clazz.equals(long.class)) {
             object = this.toLongValue();
-        } else if (clazz.equals(Boolean.class) || clazz.equals(boolean.class)) {
+        } else if (clazz.equals(Boolean.class)) {
+            object = attr == null ? null : this.toBooleanValue();
+        } else if (clazz.equals(boolean.class)) {
             object = this.toBooleanValue();
-        } else if (clazz.equals(Byte.class) || clazz.equals(byte.class)) {
+        } else if (clazz.equals(Byte.class)) {
+            object = attr == null ? null : this.toByteValue();
+        } else if (clazz.equals(byte.class)) {
             object = this.toByteValue();
-        } else if (clazz.equals(Byte[].class) || clazz.equals(byte[].class)) {
+        } else if (clazz.equals(Byte[].class)) {
+            object = attr == null ? null : this.toBytesValue();
+        } else if (clazz.equals(byte[].class)) {
             object = this.toBytesValue();
-        } else if (clazz.equals(Character.class) || clazz.equals(char.class)) {
+        } else if (clazz.equals(Character.class)) {
+            object = attr == null ? null : this.toCharValue();
+        } else if (clazz.equals(char.class)) {
             object = this.toCharValue();
         } else if (clazz.equals(List.class)) {
             object = this.toListValue();
