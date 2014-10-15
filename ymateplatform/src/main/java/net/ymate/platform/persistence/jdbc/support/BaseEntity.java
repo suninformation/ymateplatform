@@ -153,6 +153,15 @@ public abstract class BaseEntity<Entity extends IEntity<PK>, PK> implements IEnt
 		}
 	}
 
+    public Entity findFirst(String cond, Object[] params, String... fieldFilter) throws OperatorException, ConnectionException {
+        ISession _session = JDBC.openSession(this.getDataSourceName());
+        try {
+            return _session.findFirst(this.getEntityClass(), cond, fieldFilter, params);
+        } finally {
+            _session.close();
+        }
+    }
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
