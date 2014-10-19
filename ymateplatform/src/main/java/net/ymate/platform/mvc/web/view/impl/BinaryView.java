@@ -15,22 +15,20 @@
  */
 package net.ymate.platform.mvc.web.view.impl;
 
+import net.ymate.platform.commons.lang.PairObject;
+import net.ymate.platform.commons.util.FileUtils;
+import net.ymate.platform.mvc.web.context.WebContext;
+import net.ymate.platform.mvc.web.view.AbstractWebView;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URLEncoder;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import net.ymate.platform.commons.util.FileUtils;
-import net.ymate.platform.mvc.web.context.WebContext;
-import net.ymate.platform.mvc.web.support.HttpHeaders;
-import net.ymate.platform.mvc.web.view.AbstractWebView;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * <p>
@@ -39,7 +37,7 @@ import org.apache.commons.lang.StringUtils;
  * <p>
  * 二进制数据流视图实现类；
  * </p>
- * 
+ *
  * @author 刘镇(suninformation@163.com)
  * @version 0.0.0
  *          <table style="border:1px solid gray;">
@@ -58,113 +56,210 @@ import org.apache.commons.lang.StringUtils;
  */
 public class BinaryView extends AbstractWebView {
 
-	protected String fileName;
-	protected Object data;
+    protected String fileName;
+    protected Object data;
 
-	/**
-	 * 构造器
-	 */
-	public BinaryView() {
-	}
+    private long maxLength = -1;
 
-	/**
-	 * 构造器
-	 * @param data 数据对象
-	 */
-	public BinaryView(Object data) {
-		this.data = data;
-	}
+    /**
+     * 构造器
+     */
+    public BinaryView() {
+    }
 
-	/**
-	 * @param fileName 文件路径名称
-	 * @param attachment 是否采用档案下载的方式
-	 * @return 加载文件并转换成二进制视图类对象，若fileName文件不存在则返回NULL
-	 * @throws Exception 任何可能发生的异常
-	 */
-	public static BinaryView loadFromFile(String fileName, boolean attachment) throws Exception {
-		File _file = new File(fileName);
-		if (_file.exists() && _file.isFile() && _file.canRead()) {
-			BinaryView _view = new BinaryView(new FileInputStream(_file));
-			String _path = _file.getPath();
-			_view.setContentType(FileUtils.MIME_TYPE_MAPS.get(FileUtils.getExtName(_path)));
-			if (attachment) {
-				_view.setFileName(_file.getName());
-			}
-			return _view;
-		}
-		return null;
-	}
+    /**
+     * 构造器
+     *
+     * @param data 数据对象
+     */
+    public BinaryView(Object data) {
+        this.data = data;
+    }
 
-	/* (non-Javadoc)
-	 * @see net.ymate.platform.mvc.web.view.AbstractWebView#renderView()
-	 */
-	protected void renderView() throws Exception {
-		HttpServletResponse response = WebContext.getResponse();
-		HttpServletRequest request = WebContext.getRequest();
-		//
-		if (StringUtils.isBlank(getContentType())) {
-			this.setContentType("application/octet-stream");
-		}
-        response.setContentType(getContentType());
+    /**
+     * 构造器
+     *
+     * @param inputStream
+     * @param maxLength   输入流数据长度
+     */
+    public BinaryView(InputStream inputStream, long maxLength) {
+        this.data = inputStream;
+        if (maxLength > 0) {
+            this.maxLength = maxLength;
+        }
+    }
+
+    /**
+     * @param fileName   文件路径名称
+     * @param attachment 是否采用档案下载的方式
+     * @return 加载文件并转换成二进制视图类对象，若fileName文件不存在则返回NULL
+     * @throws Exception 任何可能发生的异常
+     */
+    public static BinaryView loadFromFile(String fileName, boolean attachment) throws Exception {
+        File _file = new File(fileName);
+        if (_file.exists() && _file.isFile() && _file.canRead()) {
+            BinaryView _view = new BinaryView(new FileInputStream(_file));
+            _view.setContentType(FileUtils.MIME_TYPE_MAPS.get(FileUtils.getExtName(_file.getPath())));
+            if (attachment) {
+                _view.setFileName(_file.getName());
+            }
+            return _view;
+        }
+        return null;
+    }
+
+    /* (non-Javadoc)
+     * @see net.ymate.platform.mvc.web.view.AbstractWebView#renderView()
+     */
+    protected void renderView() throws Exception {
+        HttpServletResponse response = WebContext.getResponse();
+        HttpServletRequest request = WebContext.getRequest();
         //
-        if (StringUtils.isBlank(fileName)) {
-            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "inline");
-        } else{
-            StringBuilder _contentDisposotionSB = new StringBuilder("attachment;filename=");
-            if (StringUtils.indexOfIgnoreCase(request.getHeader("User-Agent"), "firefox") > 0) {
-                _contentDisposotionSB.append(new String(fileName.getBytes("UTF-8"), "ISO8859-1"));
-			} else {
-                _contentDisposotionSB.append(URLEncoder.encode(fileName, "UTF-8"));
-			}
-            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, _contentDisposotionSB.toString());
+        response.setContentType(StringUtils.defaultIfBlank(getContentType(), "application/octet-stream"));
+        //
+        if (StringUtils.isNotBlank(fileName)) {
+            StringBuilder _dispositionSB = new StringBuilder("attachment;filename=");
+            if (request.getHeader("User-Agent").toLowerCase().contains("firefox")) {
+                _dispositionSB.append(new String(fileName.getBytes("UTF-8"), "ISO8859-1"));
+            } else {
+                _dispositionSB.append(URLEncoder.encode(fileName, "UTF-8"));
+            }
+            response.setHeader("Content-Disposition", _dispositionSB.toString());
         }
         //
         if (this.data == null) {
-			return;
+            return;
         }
         // 文件
         if (this.data instanceof File) {
-        	response.setContentLength((int) IOUtils.copyLarge(new FileInputStream((File) this.data), response.getOutputStream()));
+            // 读取文件数据长度
+            maxLength = ((File) this.data).length();
+            // 尝试计算Range以配合断点续传
+            PairObject<Long, Long> _rangePO = __doParseRange(maxLength);
+            // 若为断点续传
+            if (_rangePO != null) {
+                __doSetRangeHeader(request, response, _rangePO);
+                // 开始续传文件流
+                IOUtils.copyLarge(new FileInputStream((File) this.data), response.getOutputStream(), _rangePO.getKey(), _rangePO.getValue());
+            } else {
+                // 正常下载
+                response.setContentLength((int) IOUtils.copyLarge(new FileInputStream((File) this.data), response.getOutputStream()));
+            }
         }
-		// 字节数组
+        // 字节数组
         else if (this.data instanceof byte[]) {
-			byte[] _datas = (byte[]) this.data;
-			IOUtils.write(_datas, response.getOutputStream());
-			response.setContentLength(_datas.length);
-		}
-		// 字符数组
-		else if (this.data instanceof char[]) {
-			char[] _datas = (char[])this.data;
-			IOUtils.write(_datas, response.getOutputStream());
-			response.setContentLength(_datas.length);
-		}
-		// 文本流
-		else if (this.data instanceof Reader) {
-			Reader r = (Reader) this.data;
-			IOUtils.copy(r, response.getOutputStream());
-		}
-		// 二进制流
-		else if (this.data instanceof InputStream) {
-			response.setContentLength((int) IOUtils.copyLarge((InputStream) this.data, response.getOutputStream()));
-		}
-		// 普通对象
-		else {
-			IOUtils.write(String.valueOf(data), response.getOutputStream());
-		}
-	}
+            byte[] _datas = (byte[]) this.data;
+            IOUtils.write(_datas, response.getOutputStream());
+            response.setContentLength(_datas.length);
+        }
+        // 字符数组
+        else if (this.data instanceof char[]) {
+            char[] _datas = (char[]) this.data;
+            IOUtils.write(_datas, response.getOutputStream());
+            response.setContentLength(_datas.length);
+        }
+        // 文本流
+        else if (this.data instanceof Reader) {
+            Reader r = (Reader) this.data;
+            IOUtils.copy(r, response.getOutputStream());
+        }
+        // 二进制流
+        else if (this.data instanceof InputStream) {
+            PairObject<Long, Long> _rangePO = __doParseRange(maxLength);
+            if (_rangePO != null) {
+                __doSetRangeHeader(request, response, _rangePO);
+                IOUtils.copyLarge((InputStream) this.data, response.getOutputStream(), _rangePO.getKey(), _rangePO.getValue());
+            } else {
+                response.setContentLength((int) IOUtils.copyLarge((InputStream) this.data, response.getOutputStream()));
+            }
+        }
+        // 普通对象
+        else {
+            IOUtils.write(String.valueOf(data), response.getOutputStream());
+        }
+    }
 
-	/**
-	 * @param data the data to set
-	 */
-	public void setData(Object data) {
-		this.data = data;
-	}
+    private void __doSetRangeHeader(HttpServletRequest request, HttpServletResponse response, PairObject<Long, Long> range) {
+        // 表示使用了断点续传（默认是“none”，可以不指定）
+        response.setHeader("Accept-Ranges", "bytes");
+        // Content-Length: [文件的总大小] - [客户端请求的下载的文件块的开始字节]
+        long _totalLength = range.getValue() - range.getKey();
+        response.setHeader("Content-Length", _totalLength + "");
+        // Content-Range: bytes [文件块的开始字节]-[文件的总大小 - 1]/[文件的总大小]
+        response.setHeader("Content-Range", "bytes " + range.getKey() + "-" + (range.getValue() - 1) + "/" + maxLength);
+        // response.setHeader("Connection", "Close"); //如果有此句话不能用IE直接下载
+        // Status: 206
+        response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+    }
 
-	/**
-	 * @param fileName the fileName to set
-	 */
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
+    /**
+     * 分析请求头中的Range参数，计算并返回本次数据的开始和结束位置
+     *
+     * @param maxLength 数据大小
+     * @return 若非断点续传则返回null
+     */
+    private PairObject<Long, Long> __doParseRange(long maxLength) {
+        PairObject<Long, Long> _returnValue = null;
+        // 通过请求头Range参数判断是否采用断点续传
+        String _rangeStr = WebContext.getRequest().getHeader("Range");
+        if (_rangeStr != null && _rangeStr.startsWith("bytes=") && _rangeStr.length() >= 7) {
+            _rangeStr = StringUtils.substringAfter(_rangeStr, "bytes=");
+            String[] _ranges = StringUtils.split(_rangeStr, ",");
+            // 可能存在多个Range，目前仅处理第一个...
+            for (String _range : _ranges) {
+                if (StringUtils.isBlank(_range)) {
+                    return null;
+                }
+                try {
+                    // bytes=-100
+                    if (_range.startsWith("-")) {
+                        long _end = Long.parseLong(_range);
+                        long _start = maxLength + _end;
+                        if (_start < 0) {
+                            return null;
+                        }
+                        _returnValue = new PairObject<Long, Long>(_start, maxLength);
+                        break;
+                    }
+                    // bytes=1024-
+                    if (_range.endsWith("-")) {
+                        long _start = Long.parseLong(StringUtils.substringBefore(_range, "-"));
+                        if (_start < 0) {
+                            return null;
+                        }
+                        _returnValue = new PairObject<Long, Long>(_start, maxLength);
+                        break;
+                    }
+                    // bytes=10-1024
+                    if (_range.contains("-")) {
+                        String[] _tmp = _range.split("-");
+                        long _start = Long.parseLong(_tmp[0]);
+                        long _end = Long.parseLong(_tmp[1]);
+                        if (_start > _end) {
+                            return null;
+                        }
+                        _returnValue = new PairObject<Long, Long>(_start, _end + 1);
+                    }
+                } catch (Throwable e) {
+                    return null;
+                }
+            }
+        }
+        return _returnValue;
+    }
+
+    /**
+     * @param data the data to set
+     */
+    public void setData(Object data) {
+        this.data = data;
+    }
+
+    /**
+     * @param fileName the fileName to set
+     */
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
 }
