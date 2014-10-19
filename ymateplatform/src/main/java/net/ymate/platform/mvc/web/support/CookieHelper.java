@@ -219,7 +219,7 @@ public class CookieHelper {
 		if (this.__useAuthKey) {
 			String _key = WebMVC.getConfig().getCookieAuthKey();
 			if (StringUtils.isNotBlank(_key)) {
-				return DigestUtils.md5Hex(_key + this.__request.getHeader(HttpHeaders.USER_AGENT));
+				return DigestUtils.md5Hex(_key + this.__request.getHeader("User-Agent"));
 			}
 		}
 		return "";
