@@ -17,11 +17,7 @@ package net.ymate.platform.configuration.provider.impl;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import net.ymate.platform.base.YMP;
 import net.ymate.platform.commons.i18n.I18N;
@@ -312,5 +308,9 @@ public class JConfigProvider implements IConfigurationProvider {
 		}
 		return zeroSize ? new String[] {} : null;
 	}
+
+    public List<String> getCategoryNames() {
+        return Arrays.asList(config.getCategoryNames());
+    }
 
 }
