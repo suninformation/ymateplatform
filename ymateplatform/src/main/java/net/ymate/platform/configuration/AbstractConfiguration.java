@@ -218,6 +218,10 @@ public abstract class AbstractConfiguration implements IConfiguration {
 		return defaultValue;
 	}
 
+    public List<String> getCategoryNames() {
+        return __cfgProvider.getCategoryNames();
+    }
+
 	/* (non-Javadoc)
 	 * @see net.ymate.platform.configuration.IConfiguration#initialize(net.ymate.platform.configuration.provider.IConfigurationProvider)
 	 */

@@ -17,7 +17,6 @@ package net.ymate.platform.mvc.web;
 
 import net.ymate.platform.mvc.IErrorHandler;
 import net.ymate.platform.mvc.view.IView;
-import net.ymate.platform.mvc.web.support.ConventionMappingCfg;
 
 /**
  * <p>
@@ -49,9 +48,9 @@ public interface IWebErrorHandler extends IErrorHandler {
      * 自定义处理URL请求过程
      *
      * @param requestMapping URL请求路径
-     * @param mappingCfg 允许Convention请求访问的URL映射，需判断此配置是否初始化
      * @return 可用视图对象，若为空则采用系统默认
+     * @throws Exception
      */
-    public IView onConvention(String requestMapping, ConventionMappingCfg mappingCfg);
+    public IView onConvention(String requestMapping) throws Exception;
 
 }

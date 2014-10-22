@@ -16,7 +16,7 @@
 package net.ymate.platform.mvc;
 
 import net.ymate.platform.mvc.context.IRequestContext;
-
+import net.ymate.platform.mvc.view.IView;
 
 
 /**
@@ -50,16 +50,17 @@ public interface IEventHandler {
 	 */
 	public void onInitialized();
 
-	/**
-	 * 当接收到请求时将执行此事件回调 
-	 * 
-	 * @param context
-	 */
-	public void onRequestReceived(IRequestContext context);
+    /**
+     * 当接收到请求时将执行此事件回调，返回非空视图对象将改变本次请求的执行结果
+     *
+     * @param context
+     * @return 返回视图对象
+     */
+	public IView onRequestReceived(IRequestContext context);
 
 	/**
 	 * 当接收到的请求处理完毕时将执行此事件回调
-	 * 
+	 *
 	 * @param context
 	 */
 	public void onRequestCompleted(IRequestContext context);

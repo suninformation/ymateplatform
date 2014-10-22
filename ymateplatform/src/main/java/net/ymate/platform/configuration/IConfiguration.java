@@ -182,4 +182,9 @@ public interface IConfiguration {
 	 */
 	public boolean contains(String key);
 
+    /**
+     * @return 获取分类的名称集合
+     */
+    public List<String> getCategoryNames();
+
 }
