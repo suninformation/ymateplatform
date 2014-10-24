@@ -46,16 +46,18 @@ import net.ymate.platform.validation.ValidateResult;
  */
 public interface IRequestMethodHandler {
 
-	/**
-	 * @return 返回方法对象invoke时所需的参数集合
-	 */
-	public Object[] getMethodParams();
+    /**
+     * @return 返回方法对象invoke时所需的参数集合
+     * @throws Exception
+     */
+	public Object[] getMethodParams() throws Exception;
 
 	/**
 	 * @param targetMethod 目标控制器方法对象
 	 * @param params 方法对象参数集合
 	 * @return 执行参数的有效性验证
+     * @throws Exception
 	 */
-	public Set<ValidateResult> doValidation(Method targetMethod, Object[] params);
+	public Set<ValidateResult> doValidation(Method targetMethod, Object[] params) throws Exception;
 
 }
