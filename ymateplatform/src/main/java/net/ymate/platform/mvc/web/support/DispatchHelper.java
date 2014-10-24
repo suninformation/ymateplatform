@@ -39,6 +39,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -129,9 +131,21 @@ public class DispatchHelper {
             } else if (WebMVC.getConfig().isConventionModel()
                     && StringUtils.trimToEmpty(WebMVC.getConfig().getUrlSuffix()).endsWith(WebContext.getWebRequestContext().getSuffix())) {
 
+                String _requestMapping = context.getRequestMapping();
+                List<String> _urlParams = new ArrayList<String>();
+                if (WebMVC.getConfig().isConventionUrlrewrite()) {
+                    String[] _parts = StringUtils.split(_requestMapping, "-");
+                    if (_parts.length > 1) {
+                        _requestMapping = _parts[0];
+                        for (int _idx = 1; _idx < _parts.length; _idx++) {
+                            _urlParams.add(_parts[_idx]);
+                        }
+                        WebContext.getRequest().setAttribute("_UrlParams", _urlParams);
+                    }
+                }
                 // 先尝试调用自定义的约定优于配置的URL请求映射处理过程
                 if (WebMVC.getConfig().getErrorHandlerClassImpl() != null) {
-                    IView _view = WebMVC.getConfig().getErrorHandlerClassImpl().onConvention(context.getRequestMapping());
+                    IView _view = WebMVC.getConfig().getErrorHandlerClassImpl().onConvention(_requestMapping);
                     if (_view != null) {
                         _view.render();
                         return;
@@ -141,14 +155,14 @@ public class DispatchHelper {
                 String[] _fileTypes = {".jsp", ".ftl"};
                 File _targetFile = null;
                 for (String _fileType : _fileTypes) {
-                    _targetFile = new File(getBaseViewFilePath(), context.getRequestMapping() + _fileType);
+                    _targetFile = new File(getBaseViewFilePath(), _requestMapping + _fileType);
                     if (_targetFile != null && _targetFile.exists()) {
-                        _LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.mvc.convention_request_execute", context.getRequestMapping()));
+                        _LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.mvc.convention_request_execute", _requestMapping));
                         if (".jsp".equals(_fileType)) {
-                            new JspView().render();
+                            new JspView(_requestMapping.substring(1)).render();
                             return;
                         } else if (".ftl".equals(_fileType)) {
-                            new FreeMarkerView().render();
+                            new FreeMarkerView(_requestMapping.substring(1)).render();
                             return;
                         }
                     }

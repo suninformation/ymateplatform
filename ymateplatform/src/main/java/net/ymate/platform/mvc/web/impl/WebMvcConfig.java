@@ -57,6 +57,7 @@ public class WebMvcConfig extends DefaultMvcConfig implements IWebMvcConfig {
 	private IWebMultipartHandler __multipartHandler;
 	private List<Class<IFilter>> __extraFilters;
 	private boolean __restfulModel;
+    private boolean __conventionUrlrewrite;
 	private boolean __conventionModel;
 	private String __urlSuffix;
 	private String __viewPath;
@@ -151,9 +152,17 @@ public class WebMvcConfig extends DefaultMvcConfig implements IWebMvcConfig {
 		this.__restfulModel = restfulModel;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.ymate.platform.mvc.web.IWebMvcConfig#isConventionModel()
-	 */
+    public boolean isConventionUrlrewrite() {
+        return __conventionUrlrewrite;
+    }
+
+    public void setConventionUrlrewrite(boolean conventionUrlrewrite) {
+        this.__conventionUrlrewrite = conventionUrlrewrite;
+    }
+
+    /* (non-Javadoc)
+         * @see net.ymate.platform.mvc.web.IWebMvcConfig#isConventionModel()
+         */
 	public boolean isConventionModel() {
 		return __conventionModel;
 	}

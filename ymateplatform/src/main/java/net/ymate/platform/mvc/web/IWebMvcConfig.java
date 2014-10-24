@@ -76,6 +76,11 @@ public interface IWebMvcConfig extends IMvcConfig {
 	 */
 	public boolean isConventionModel();
 
+    /**
+     * @return Convention模式开启时是否采用URL伪静态
+     */
+    public boolean isConventionUrlrewrite();
+
 	/**
 	 * @return 返回请求的URL后缀名，如：.do
 	 */
