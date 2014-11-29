@@ -152,20 +152,23 @@ public class BlurObject implements Serializable, Cloneable {
         if (attr instanceof String) {
             return "true".equalsIgnoreCase(this.attr.toString()) || "on".equalsIgnoreCase(this.attr.toString()) || "1".equalsIgnoreCase(this.attr.toString());
         }
-        if (attr instanceof Boolean || boolean.class.isAssignableFrom(attr.getClass())) {
+        if (boolean.class.isAssignableFrom(attr.getClass())) {
             return (Boolean) attr ? true : false;
         }
-        if (attr instanceof Float || float.class.isAssignableFrom(attr.getClass())) {
+        if (float.class.isAssignableFrom(attr.getClass())) {
             return ((Float) attr) > 0;
         }
-        if (attr instanceof Integer || int.class.isAssignableFrom(attr.getClass())) {
+        if (int.class.isAssignableFrom(attr.getClass())) {
             return ((Integer) attr).floatValue() > 0;
         }
-        if (attr instanceof Long || long.class.isAssignableFrom(attr.getClass())) {
+        if (long.class.isAssignableFrom(attr.getClass())) {
             return ((Long) attr).floatValue() > 0;
         }
-        if (attr instanceof Double || double.class.isAssignableFrom(attr.getClass())) {
+        if (double.class.isAssignableFrom(attr.getClass())) {
             return ((Double) attr).floatValue() > 0;
+        }
+        if (attr instanceof Number) {
+            return ((Number) attr).floatValue() > 0;
         }
         if (attr instanceof List) {
             return ((List) attr).size() > 0;
@@ -198,14 +201,17 @@ public class BlurObject implements Serializable, Cloneable {
                 return 0;
             }
         }
-        if (attr instanceof Long || long.class.isAssignableFrom(attr.getClass())) {
+        if (long.class.isAssignableFrom(attr.getClass())) {
             return ((Long) attr).intValue();
         }
-        if (attr instanceof Float || float.class.isAssignableFrom(attr.getClass())) {
+        if (float.class.isAssignableFrom(attr.getClass())) {
             return ((Float) attr).intValue();
         }
-        if (attr instanceof Double || double.class.isAssignableFrom(attr.getClass())) {
+        if (double.class.isAssignableFrom(attr.getClass())) {
             return ((Double) attr).intValue();
+        }
+        if (attr instanceof Number) {
+            return ((Number) attr).intValue();
         }
         if (attr instanceof Boolean || boolean.class.isAssignableFrom(attr.getClass())) {
             return (Boolean) attr ? 1 : 0;
@@ -252,8 +258,20 @@ public class BlurObject implements Serializable, Cloneable {
         if (attr == null) {
             return 0f;
         }
-        if (attr instanceof Float || float.class.isAssignableFrom(attr.getClass())) {
+        if (float.class.isAssignableFrom(attr.getClass())) {
             return (Float) attr;
+        }
+        if (int.class.isAssignableFrom(attr.getClass())) {
+            return ((Integer) attr).floatValue();
+        }
+        if (long.class.isAssignableFrom(attr.getClass())) {
+            return ((Long) attr).floatValue();
+        }
+        if (double.class.isAssignableFrom(attr.getClass())) {
+            return ((Double) attr).floatValue();
+        }
+        if (attr instanceof Number) {
+            return ((Number) attr).floatValue();
         }
         if (attr instanceof String) {
             if (StringUtils.isNotBlank(attr.toString())) {
@@ -261,15 +279,6 @@ public class BlurObject implements Serializable, Cloneable {
             } else {
                 return 0f;
             }
-        }
-        if (attr instanceof Integer || int.class.isAssignableFrom(attr.getClass())) {
-            return ((Integer) attr).floatValue();
-        }
-        if (attr instanceof Long || long.class.isAssignableFrom(attr.getClass())) {
-            return ((Long) attr).floatValue();
-        }
-        if (attr instanceof Double || double.class.isAssignableFrom(attr.getClass())) {
-            return ((Double) attr).floatValue();
         }
         if (attr instanceof Boolean || boolean.class.isAssignableFrom(attr.getClass())) {
             return (Boolean) attr ? 1f : 0f;
@@ -295,8 +304,20 @@ public class BlurObject implements Serializable, Cloneable {
         if (attr == null) {
             return 0d;
         }
-        if (attr instanceof Double || double.class.isAssignableFrom(attr.getClass())) {
+        if (double.class.isAssignableFrom(attr.getClass())) {
             return (Double) attr;
+        }
+        if (int.class.isAssignableFrom(attr.getClass())) {
+            return ((Integer) attr).doubleValue();
+        }
+        if (long.class.isAssignableFrom(attr.getClass())) {
+            return ((Long) attr).doubleValue();
+        }
+        if (float.class.isAssignableFrom(attr.getClass())) {
+            return ((Float) attr).doubleValue();
+        }
+        if (attr instanceof Number) {
+            return ((Number) attr).doubleValue();
         }
         if (attr instanceof String) {
             if (StringUtils.isNotBlank(attr.toString())) {
@@ -304,15 +325,6 @@ public class BlurObject implements Serializable, Cloneable {
             } else {
                 return 0d;
             }
-        }
-        if (attr instanceof Integer || int.class.isAssignableFrom(attr.getClass())) {
-            return ((Integer) attr).doubleValue();
-        }
-        if (attr instanceof Long || long.class.isAssignableFrom(attr.getClass())) {
-            return ((Long) attr).doubleValue();
-        }
-        if (attr instanceof Float || float.class.isAssignableFrom(attr.getClass())) {
-            return ((Float) attr).doubleValue();
         }
         if (attr instanceof Boolean || boolean.class.isAssignableFrom(attr.getClass())) {
             return (Boolean) attr ? 1d : 0d;
@@ -338,8 +350,20 @@ public class BlurObject implements Serializable, Cloneable {
         if (attr == null) {
             return 0l;
         }
-        if (attr instanceof Long || long.class.isAssignableFrom(attr.getClass())) {
+        if (long.class.isAssignableFrom(attr.getClass())) {
             return (Long) attr;
+        }
+        if (int.class.isAssignableFrom(attr.getClass())) {
+            return ((Integer) attr).longValue();
+        }
+        if (float.class.isAssignableFrom(attr.getClass())) {
+            return ((Float) attr).longValue();
+        }
+        if (double.class.isAssignableFrom(attr.getClass())) {
+            return ((Double) attr).longValue();
+        }
+        if (attr instanceof Number) {
+            return ((Number) attr).longValue();
         }
         if (attr instanceof String) {
             if (StringUtils.isNotBlank(attr.toString())) {
@@ -347,15 +371,6 @@ public class BlurObject implements Serializable, Cloneable {
             } else {
                 return 0l;
             }
-        }
-        if (attr instanceof Integer || int.class.isAssignableFrom(attr.getClass())) {
-            return ((Integer) attr).longValue();
-        }
-        if (attr instanceof Float || float.class.isAssignableFrom(attr.getClass())) {
-            return ((Float) attr).longValue();
-        }
-        if (attr instanceof Double || double.class.isAssignableFrom(attr.getClass())) {
-            return ((Double) attr).longValue();
         }
         if (attr instanceof Boolean || boolean.class.isAssignableFrom(attr.getClass())) {
             return (Boolean) attr ? 1 : 0;
