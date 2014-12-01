@@ -15,8 +15,6 @@
  */
 package net.ymate.platform.persistence.jdbc.query;
 
-import java.util.List;
-
 import net.ymate.platform.commons.lang.BlurObject;
 import net.ymate.platform.persistence.base.OperatorException;
 import net.ymate.platform.persistence.jdbc.IConnectionHolder;
@@ -26,6 +24,8 @@ import net.ymate.platform.persistence.jdbc.operator.IResultSetHandler;
 import net.ymate.platform.persistence.jdbc.operator.impl.ArrayResultSetHandler;
 import net.ymate.platform.persistence.jdbc.operator.impl.QueryOperator;
 import net.ymate.platform.persistence.support.PageResultSet;
+
+import java.util.List;
 
 /**
  * <p>
@@ -211,22 +211,23 @@ public class PageQuery<T> {
 		IQueryOperator<Object[]> _query = new QueryOperator<Object[]>(new ArrayResultSetHandler());
 		_query.setConnection(this.getConnection());
 		_query.getParameters().addAll(this.getParameters());
-		_query.setSql("select count(1) from (" + __doRemoveOrderBy(sql) + ") c_t");
+//		_query.setSql("select count(1) from (" + __doRemoveOrderBy(sql) + ") c_t");
+		_query.setSql("select count(1) from (" + sql + ") c_t");
 		_query.execute();
 		Object[] _ct = (Object[]) _query.getResultSet().get(0)[0];
 		return new BlurObject(_ct[1]).toIntValue();
 	}
 
-	/**
-	 * @param sql 目标SQL语句
-	 * @return 移除 SQL 中的 order by 子句
-	 */
-	protected String __doRemoveOrderBy(String sql) {
-		int orderByIndex = sql.toLowerCase().lastIndexOf("order by");
-		if (orderByIndex > 0) {
-			return sql.substring(0, orderByIndex);
-		}
-		return sql;
-	}
+//	/**
+//	 * @param sql 目标SQL语句
+//	 * @return 移除 SQL 中的 order by 子句
+//	 */
+//	protected String __doRemoveOrderBy(String sql) {
+//		int orderByIndex = sql.toLowerCase().lastIndexOf("order by");
+//		if (orderByIndex > 0) {
+//			return sql.substring(0, orderByIndex);
+//		}
+//		return sql;
+//	}
 
 }
