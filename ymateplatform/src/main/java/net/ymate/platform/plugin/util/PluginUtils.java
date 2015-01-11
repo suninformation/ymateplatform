@@ -15,9 +15,6 @@
  */
 package net.ymate.platform.plugin.util;
 
-import java.io.File;
-import java.net.URL;
-
 import net.ymate.platform.commons.util.FileUtils;
 import net.ymate.platform.commons.util.ResourceUtils;
 import net.ymate.platform.configuration.Cfgs;
@@ -25,8 +22,10 @@ import net.ymate.platform.configuration.IConfiguration;
 import net.ymate.platform.configuration.annotation.Configuration;
 import net.ymate.platform.configuration.annotation.ConfigurationProvider;
 import net.ymate.platform.plugin.IPlugin;
-
 import org.apache.commons.lang.StringUtils;
+
+import java.io.File;
+import java.net.URL;
 
 
 /**
@@ -58,10 +57,14 @@ public class PluginUtils {
 	/**
 	 * @param cfgFile
 	 * @param plugin
-	 * @return 智能搜索插件所在类路径配置文件真实资源路径
+	 * @return 智能搜索插件所在类路径配置文件真实资源路径，若未找到则返回null
 	 */
 	public static String getResourcePath(String cfgFile, IPlugin plugin) {
-        return getResourceFile(cfgFile, plugin).getPath();
+        File _resFile = getResourceFile(cfgFile, plugin);
+		if (_resFile != null) {
+			return _resFile.getPath();
+		}
+		return null;
 	}
 
 	/**
