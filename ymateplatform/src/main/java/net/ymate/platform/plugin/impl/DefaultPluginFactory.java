@@ -15,17 +15,6 @@
  */
 package net.ymate.platform.plugin.impl;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import net.ymate.platform.base.YMP;
 import net.ymate.platform.commons.i18n.I18N;
 import net.ymate.platform.commons.logger.Logs;
@@ -33,21 +22,17 @@ import net.ymate.platform.commons.util.ClassUtils;
 import net.ymate.platform.commons.util.RuntimeUtils;
 import net.ymate.platform.configuration.Cfgs;
 import net.ymate.platform.configuration.IConfigurable;
-import net.ymate.platform.plugin.IPlugin;
-import net.ymate.platform.plugin.IPluginConfig;
-import net.ymate.platform.plugin.IPluginFactory;
-import net.ymate.platform.plugin.IPluginParser;
-import net.ymate.platform.plugin.PluginClassLoader;
-import net.ymate.platform.plugin.PluginContext;
-import net.ymate.platform.plugin.PluginException;
-import net.ymate.platform.plugin.PluginInstanceException;
-import net.ymate.platform.plugin.PluginMeta;
-import net.ymate.platform.plugin.PluginNotFoundException;
+import net.ymate.platform.plugin.*;
 import net.ymate.platform.plugin.util.PluginUtils;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -141,13 +126,13 @@ public class DefaultPluginFactory implements IPluginFactory {
 				_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.create_plugin_impl", _pluginMeta.getInitClass()));
 				IPlugin _pluginObj = (IPlugin) _pluginMeta.getClassLoader().loadClass(_pluginMeta.getInitClass()).newInstance();
 				if (_pluginObj != null) {
+					_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.plugin_impl_init", _pluginMeta.getInitClass()));
+					_pluginObj.doInit(new PluginContext(this, _pluginMeta)); // 注：执行初始化时，其config对象还没有被填充
 					// 判断当前组件类是否实现了配置接口
 					if (Cfgs.isInited() && _pluginObj instanceof IConfigurable) {
 						// 获取当前组件的配置对象并尝试直接加载组件配置
 						PluginUtils.fillCfg(((IConfigurable) _pluginObj).getConfig(), _pluginObj);
 					}
-					_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.plugin_impl_init", _pluginMeta.getInitClass()));
-					_pluginObj.doInit(new PluginContext(this, _pluginMeta));
 					_LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.plugin.plugin_impl_startup", _pluginMeta.getInitClass()));
 					_pluginObj.doStart();
 					__PLUGIN_MAPS.put(_pluginMeta.getId(), _pluginObj);
