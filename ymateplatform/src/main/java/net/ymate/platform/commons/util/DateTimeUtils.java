@@ -216,18 +216,12 @@ public class DateTimeUtils {
      * @return
      */
     public static String formatTime(long time, String pattern) {
-        if (time < 0) {
-            time = 0;
-        }
-        if (StringUtils.isBlank(pattern)) {
-            pattern = YYYY_MM_DD_HH_MM_SS;
-        }
-        return getSimpleDateFormat(pattern, timeOffset).format(new Date(time));
+        return formatTime(time, pattern, timeOffset);
     }
 
     public static String formatTime(long time, String pattern, String timeoffset) {
-        if (time < 0) {
-            time = 0;
+        if (String.valueOf(time).length() <= 10) {
+            time *= 1000;
         }
         if (StringUtils.isBlank(pattern)) {
             pattern = YYYY_MM_DD_HH_MM_SS;
