@@ -22,13 +22,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.NullArgumentException;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -227,6 +221,8 @@ public class TomcatServScaffold {
         __doWriterTargetFile("bin/uninstall.bat", "/tomcatserv/tmpl/uninstall-cmd.ftl", __properties);
         //
         __doWriterTargetFile("bin/manager.sh", "/tomcatserv/tmpl/manager-sh.ftl", __properties);
+        //
+        __doWriterTargetFile("webapps/ROOT/index.jsp", "/tomcatserv/tmpl/index-jsp.ftl", __properties);
     }
 
     private void __doWriterTargetFile(String targetFileName, String tmplFile, Map<String, Object> properties) {
