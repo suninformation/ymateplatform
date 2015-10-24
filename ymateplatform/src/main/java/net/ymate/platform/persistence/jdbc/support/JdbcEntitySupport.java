@@ -316,7 +316,7 @@ public class JdbcEntitySupport {
                     public PreparedStatement getPreparedStatement(Connection conn, String sql) throws SQLException {
                         return conn.prepareStatement(sql, _ids);
                     }
-                });whtwht
+                });
             } else {
                 _update.setAccessorCfgEvent(new EntitryAccessorCfgEvent(_meta, entityList));
             }
