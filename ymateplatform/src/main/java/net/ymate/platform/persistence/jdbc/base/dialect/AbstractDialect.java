@@ -62,11 +62,11 @@ public abstract class AbstractDialect implements IDialect {
 		// 检索由于执行此 Statement 对象而创建的所有自动生成的键
 		ResultSet _keyRSet = null;
 		try {
-			List<Long> _ids = new ArrayList<Long>();
+			List<Object> _ids = new ArrayList<Object>();
 			_keyRSet = statement.getGeneratedKeys();
 			while (_keyRSet.next()) {
 				// _keyRSet.getMetaData().getColumnClassName(0).............;
-				_ids.add(_keyRSet.getLong(1));
+				_ids.add(_keyRSet.getObject(1));
 			}
 			_returnValue = _ids.toArray();
 		} finally {

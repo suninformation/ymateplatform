@@ -53,14 +53,6 @@ public class OracleDialect extends AbstractDialect {
 	}
 
 	/* (non-Javadoc)
-	 * @see net.ymate.platform.persistence.jdbc.base.dialect.AbstractDialect#wapperQuotedIdent(java.lang.String)
-	 */
-	@Override
-	public String wapperQuotedIdent(String source) {
-		return "\"" + source + "\"";
-	}
-
-	/* (non-Javadoc)
 	 * @see net.ymate.platform.persistence.jdbc.base.IDialect#getPaginationSql(java.lang.String, int, int)
 	 */
 	public String getPaginationSql(String sql, int limit, int offset) {
@@ -78,7 +70,7 @@ public class OracleDialect extends AbstractDialect {
 	 * @see net.ymate.platform.persistence.jdbc.base.dialect.AbstractDialect#getSequenceNextValSql(java.lang.String)
 	 */
 	public String getSequenceNextValSql(String sequenceName) {
-		return "select " + sequenceName + ".nextval from dual";
+		return sequenceName + ".nextval";
 	}
 
 }

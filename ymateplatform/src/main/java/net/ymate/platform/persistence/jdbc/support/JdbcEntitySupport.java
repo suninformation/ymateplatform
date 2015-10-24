@@ -15,18 +15,6 @@
  */
 package net.ymate.platform.persistence.jdbc.support;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import net.ymate.platform.base.YMP;
 import net.ymate.platform.commons.i18n.I18N;
 import net.ymate.platform.commons.lang.BlurObject;
@@ -38,6 +26,7 @@ import net.ymate.platform.persistence.jdbc.base.AbstractAccessorCfgEvent;
 import net.ymate.platform.persistence.jdbc.base.AccessorEventContext;
 import net.ymate.platform.persistence.jdbc.base.SqlBatchParameter;
 import net.ymate.platform.persistence.jdbc.base.SqlParameter;
+import net.ymate.platform.persistence.jdbc.base.dialect.impl.OracleDialect;
 import net.ymate.platform.persistence.jdbc.operator.AbstractResultSetHandler;
 import net.ymate.platform.persistence.jdbc.operator.IQueryOperator;
 import net.ymate.platform.persistence.jdbc.operator.IUpdateBatchOperator;
@@ -47,11 +36,15 @@ import net.ymate.platform.persistence.jdbc.operator.impl.QueryOperator;
 import net.ymate.platform.persistence.jdbc.operator.impl.UpdateBatchOperator;
 import net.ymate.platform.persistence.jdbc.operator.impl.UpdateOperator;
 import net.ymate.platform.persistence.jdbc.query.PageQuery;
+import net.ymate.platform.persistence.support.EntityMeta;
 import net.ymate.platform.persistence.support.ISessionEvent;
 import net.ymate.platform.persistence.support.PageResultSet;
 import net.ymate.platform.persistence.support.SessionEventObject;
-
 import org.apache.commons.lang.StringUtils;
+
+import java.sql.*;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -61,7 +54,7 @@ import org.apache.commons.lang.StringUtils;
  * <p>
  * DAO 实体操作支持类；
  * </p>
- * 
+ *
  * @author 刘镇(suninformation@163.com)
  * @version 0.0.0
  *          <table style="border:1px solid gray;">
@@ -271,7 +264,17 @@ public class JdbcEntitySupport {
 		Map<String, AttributeInfo>  _entityMap = __doRenderEntityToMap(_meta, entity);
 		IUpdateOperator _update = new UpdateOperator(_meta.createInsertSql(__conn.getDialect()));
 		if (_meta.hasAutoIncrementColumn()) {
-			_update.setAccessorCfgEvent(new EntitryAccessorCfgEvent(_meta, entity));
+            if (__conn.getDialect() instanceof OracleDialect) {
+                final String[] _ids = _meta.getPrimaryKeys().toArray(new String[_meta.getPrimaryKeys().size()]);
+                _update.setAccessorCfgEvent(new EntitryAccessorCfgEvent(_meta, entity) {
+                    @Override
+                    public PreparedStatement getPreparedStatement(Connection conn, String sql) throws SQLException {
+                        return conn.prepareStatement(sql, _ids);
+                    }
+                });
+            } else {
+                _update.setAccessorCfgEvent(new EntitryAccessorCfgEvent(_meta, entity));
+            }
 		}
 		for (String _columnName : _meta.getColumnNames()) {
 			// 剔除自动生成的主键字段
@@ -306,13 +309,27 @@ public class JdbcEntitySupport {
 		final JdbcEntityMeta _meta = this.getEntityMeta(entityList.get(0).getClass());
 		IUpdateBatchOperator _update = new UpdateBatchOperator(_meta.createInsertSql(__conn.getDialect()));
 		if (_meta.hasAutoIncrementColumn()) {
-			_update.setAccessorCfgEvent(new EntitryAccessorCfgEvent(_meta, entityList));
+            if (__conn.getDialect() instanceof OracleDialect) {
+				final String[] _ids = _meta.getPrimaryKeys().toArray(new String[_meta.getPrimaryKeys().size()]);
+                _update.setAccessorCfgEvent(new EntitryAccessorCfgEvent(_meta, entityList) {
+                    @Override
+                    public PreparedStatement getPreparedStatement(Connection conn, String sql) throws SQLException {
+                        return conn.prepareStatement(sql, _ids);
+                    }
+                });whtwht
+            } else {
+                _update.setAccessorCfgEvent(new EntitryAccessorCfgEvent(_meta, entityList));
+            }
 		}
 		Map<String, AttributeInfo>  _entityMap = null;
 		for (T _entity : entityList) {
 			SqlBatchParameter _batchParam = new SqlBatchParameter();
 			_entityMap = __doRenderEntityToMap(_meta, _entity);
 			for (String _columnName : _meta.getColumnNames()) {
+                // 剔除自动生成的主键字段
+                if (_meta.hasAutoIncrementColumn() && _meta.isAutoIncrementColumn(_columnName)) {
+                    continue;
+                }
 				this.__addBatchParam(_batchParam, _entityMap.get(_columnName));
 			}
 			_update.addBatchParameter(_batchParam);
@@ -821,9 +838,9 @@ public class JdbcEntitySupport {
 	 * AttributeInfo
 	 * </p>
 	 * <p>
-	 * 
+	 *
 	 * </p>
-	 * 
+	 *
 	 * @author 刘镇(suninformation@163.com)
 	 * @version 0.0.0
 	 *          <table style="border:1px solid gray;">
@@ -865,7 +882,7 @@ public class JdbcEntitySupport {
 	 * <p>
 	 * 访问器配置事件处理接口EntitySupport实现类
 	 * </p>
-	 * 
+	 *
 	 * @author 刘镇(suninformation@163.com)
 	 * @version 0.0.0
 	 *          <table style="border:1px solid gray;">
@@ -886,7 +903,7 @@ public class JdbcEntitySupport {
 
 		private List<?> __entities;
 		private JdbcEntityMeta __meta;
-		
+
 		public EntitryAccessorCfgEvent(JdbcEntityMeta meta, Object...entity) {
 			this.__meta = meta;
 			this.__entities = Arrays.asList(entity);
@@ -897,26 +914,31 @@ public class JdbcEntitySupport {
 			this.__entities = entities;
 		}
 
-		public void afterStatementExecution(AccessorEventContext context) throws SQLException {
-			// 注意：自动主键生成仅支持每个数据表一个自动主键
-			Object[] _genKeyValue = getConnection().getDialect().getGeneratedKey(context.getStatement());
-			if (__meta.isCompositeKey()) {
-				for (int _idx = 0; _idx < this.__entities.size(); _idx++) {
-					ClassBeanWrapper<?> _wrapperEntity = ClassUtils.wrapper(this.__entities.get(_idx));
-					ClassBeanWrapper<?> _wrapperId = ClassUtils.wrapper(_wrapperEntity.getValue("id"));
-					// 若执行插入操作时已为自生成主键赋值则将不再自动填充
-					if (_wrapperId.getValue(__meta.getPrimaryKeys().get(0)) == null) {
-						_wrapperId.setValue(__meta.getPrimaryKeys().get(0), _genKeyValue[_idx]);
-					}
-				}
-			} else {
-				for (int _idx = 0; _idx < this.__entities.size(); _idx++) {
-					ClassBeanWrapper<?> _wrapperEntity = ClassUtils.wrapper(this.__entities.get(_idx));
-					if (_wrapperEntity.getValue("id") == null) {
-						_wrapperEntity.setValue("id", _genKeyValue[_idx]);
-					}
-				}
-			}
+        public void afterStatementExecution(AccessorEventContext context) throws SQLException {
+            if (__entities != null && __meta.hasAutoIncrementColumn()) {
+                // 获取返回的自动生成主键集合, 建议每个数据表最多一个自动生成主键
+                Object[] _genKeyValue = getConnection().getDialect().getGeneratedKey(context.getStatement());
+                if (_genKeyValue != null && _genKeyValue.length > 0) {
+                    for (int _idx = 0; _idx < this.__entities.size(); _idx++) {
+                        for (String _autoFieldName : __meta.getPrimaryKeys()) {
+                            EntityMeta.ColumnInfo _columnInfo = __meta.getColumnMap().get(_autoFieldName);
+                            if (__meta.isCompositeKey()) {
+                                ClassBeanWrapper<?> _wrapperEntity = ClassUtils.wrapper(this.__entities.get(_idx));
+                                ClassBeanWrapper<?> _wrapperId = ClassUtils.wrapper(_wrapperEntity.getValue("id"));
+                                // 若执行插入操作时已为自生成主键赋值则将不再自动填充
+                                if (_wrapperId.getValue(_columnInfo.getFieldName()) == null) {
+                                    _wrapperId.setValue(_columnInfo.getFieldName(), new BlurObject(_genKeyValue[_idx]).toObjectValue(_wrapperId.getFieldType(_columnInfo.getFieldName())));
+                                }
+                            } else {
+                                ClassBeanWrapper<?> _wrapperEntity = ClassUtils.wrapper(this.__entities.get(_idx));
+                                if (_wrapperEntity.getValue("id") == null) {
+                                    _wrapperEntity.setValue("id", new BlurObject(_genKeyValue[_idx]).toObjectValue(_wrapperEntity.getFieldType(_columnInfo.getFieldName())));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 		}
 
 		public PreparedStatement getPreparedStatement(Connection conn, String sql) throws SQLException {

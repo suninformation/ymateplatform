@@ -15,15 +15,14 @@
  */
 package net.ymate.platform.persistence.jdbc.support;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import net.ymate.platform.persistence.jdbc.JDBC;
 import net.ymate.platform.persistence.jdbc.base.dialect.IDialect;
 import net.ymate.platform.persistence.support.EntityMeta;
-
 import org.apache.commons.lang.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * <p>
@@ -32,7 +31,7 @@ import org.apache.commons.lang.StringUtils;
  * <p>
  * JDBC实体模型元数据描述类；
  * </p>
- * 
+ *
  * @author 刘镇(suninformation@163.com)
  * @version 0.0.0
  *          <table style="border:1px solid gray;">
@@ -53,7 +52,7 @@ public class JdbcEntityMeta extends EntityMeta {
 
 	/**
 	 * 构造器
-	 * 
+	 *
 	 * @param entityClass 实体类对象
 	 */
 	public JdbcEntityMeta(Class<?> entityClass) {
@@ -115,11 +114,14 @@ public class JdbcEntityMeta extends EntityMeta {
 			// 剔除自动生成的主键字段
 			List<String> _fieldFilter = new ArrayList<String>();
 			for (String _columnName : this.getColumnNames()) {
-				// 剔除自动生成的主键字段
-				if (this.isAutoIncrementColumn(_columnName)) {
-					continue;
-				}
-				_fieldFilter.add(_columnName);
+				// 剔除自动生成的主键字段, 如果指定的序列需要将序列添加到字段集合中
+                if (this.isAutoIncrementColumn(_columnName)) {
+                    String _seqName = this.getColumnMap().get(_columnName).getSequenceName();
+                    if (StringUtils.isBlank(_seqName)) {
+                        continue;
+                    }
+                }
+                _fieldFilter.add(_columnName);
 			}
 			return createInsertSql(dialect, _fieldFilter.toArray(new String[_fieldFilter.size()]));
 		}
@@ -134,7 +136,7 @@ public class JdbcEntityMeta extends EntityMeta {
 			sql = sql.replaceAll("#TABLENAME", dialect.wapperQuotedIdent(this.getTableName()));
 		}
 		sql = sql.replaceAll("#FIELDS", __doGenerateFieldsFormatStr(dialect, fieldFilter != null && fieldFilter.length > 0 ? Arrays.asList(fieldFilter) : this.getColumnNames()));
-		sql = sql.replaceAll("#VALUES",__doGenerateFieldsValueFormatStr(fieldFilter != null && fieldFilter.length > 0 ? Arrays.asList(fieldFilter) : this.getColumnNames()));
+		sql = sql.replaceAll("#VALUES",__doGenerateFieldsValueFormatStr(dialect, fieldFilter != null && fieldFilter.length > 0 ? Arrays.asList(fieldFilter) : this.getColumnNames()));
 		return sql;
 	}
 
@@ -194,10 +196,19 @@ public class JdbcEntityMeta extends EntityMeta {
 		return _fieldsSB.substring(0, _fieldsSB.length() - 1);
 	}
 
-	private String __doGenerateFieldsValueFormatStr(List<String> fields) {
+	private String __doGenerateFieldsValueFormatStr(IDialect dialect, List<String> fields) {
 		StringBuilder _returnValue = new StringBuilder();
 		for (int i = 0; i < fields.size(); i++) {
-			_returnValue.append("?");
+			String _columnName = fields.get(i);
+			if (this.isAutoIncrementColumn(_columnName)) {
+				String _seqName = this.getColumnMap().get(_columnName).getSequenceName();
+				if (StringUtils.isNotBlank(_seqName)) {
+					// 如果指定了序列值,需要将序列值拼装到SQL对应的位置
+					_returnValue.append(dialect.getSequenceNextValSql(_seqName));
+				}
+			} else {
+				_returnValue.append("?");
+			}
 			if (i < fields.size() - 1) {
 				_returnValue.append(",");
 			}
