@@ -15,22 +15,15 @@
  */
 package net.ymate.platform.mvc.web;
 
-import java.io.IOException;
-import java.util.regex.Pattern;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import net.ymate.platform.mvc.web.context.IWebRequestContext;
 import net.ymate.platform.mvc.web.support.DispatchHelper;
-
 import org.apache.commons.lang.StringUtils;
+
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.regex.Pattern;
 
 /**
  * <p>
@@ -39,7 +32,7 @@ import org.apache.commons.lang.StringUtils;
  * <p>
  * WebMVC请求分发调度过滤器；
  * </p>
- * 
+ *
  * @author 刘镇(suninformation@163.com)
  * @version 0.0.0
  *          <table style="border:1px solid gray;">
@@ -58,8 +51,8 @@ import org.apache.commons.lang.StringUtils;
  */
 public class DispatcherFilter implements Filter {
 
-	private static final String IGNORE = "^.+\\.(jsp|png|gif|jpg|js|css|jspx|jpeg|swf|ico)$";
-	
+	private static final String IGNORE = "^.+\\.(jsp|jspx|png|gif|jpg|jpeg|js|css|swf|ico|htm|html|eot|woff|woff2|ttf|svg)$";
+
 	private Pattern ignorePatern;
 
 	private FilterConfig __filterConfig;
@@ -85,10 +78,10 @@ public class DispatcherFilter implements Filter {
 		// 设置默认编码和内容类型
 		request.setCharacterEncoding(WebMVC.getConfig().getCharsetEncoding());
 		response.setCharacterEncoding(WebMVC.getConfig().getCharsetEncoding());
-		response.setContentType("text/html;charset=" + WebMVC.getConfig().getCharsetEncoding());
 		//
 		IWebRequestContext _context = __dispHelper.bindRequestContext((HttpServletRequest) request);
 		if (null == ignorePatern || !ignorePatern.matcher(_context.getUrl()).find()) {
+			response.setContentType("text/html;charset=" + WebMVC.getConfig().getCharsetEncoding());
 			__dispHelper.doRequestProcess(_context, __filterConfig.getServletContext(), (HttpServletRequest) request, (HttpServletResponse) response);
         } else {
         	chain.doFilter(request, response);
