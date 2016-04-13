@@ -15,11 +15,11 @@
  */
 package net.ymate.platform.commons.util;
 
-import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
+
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 
 /**
  * <p>
@@ -84,7 +84,7 @@ public class RuntimeUtils {
         } else {
             _isWeb = true;
         }
-        String _rootPath = _isWeb ? StringUtils.substringBefore(_rootURL.getPath(), safe ? "classes/" : "WEB-INF/") : _rootURL.getPath();
+        String _rootPath = StringUtils.replace(_isWeb ? StringUtils.substringBefore(_rootURL.getPath(), safe ? "classes/" : "WEB-INF/") : _rootURL.getPath(), "%20", " ");
         if (isWindows()) {
             if (_rootPath.startsWith("/")) {
                 _rootPath = _rootPath.substring(1);

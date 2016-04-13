@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -91,6 +92,7 @@ public class DispatchHelper {
         prefix = StringUtils.defaultIfEmpty(config.getInitParameter("prefix"), "");
         methodParam = StringUtils.defaultIfEmpty(config.getInitParameter("methodParam"), DEFAULT_METHOD_PARAM);
         baseViewFilePath = RuntimeUtils.getRootPath() + StringUtils.substringAfter(TemplateHelper.getRootViewPath(), "/WEB-INF/");
+        baseViewFilePath = StringUtils.replace(baseViewFilePath, "%20", " ");
     }
 
     /**
@@ -137,9 +139,7 @@ public class DispatchHelper {
                     String[] _parts = StringUtils.split(_requestMapping, "-");
                     if (_parts.length > 1) {
                         _requestMapping = _parts[0];
-                        for (int _idx = 1; _idx < _parts.length; _idx++) {
-                            _urlParams.add(_parts[_idx]);
-                        }
+                        _urlParams.addAll(Arrays.asList(_parts).subList(1, _parts.length));
                         WebContext.getRequest().setAttribute("_UrlParams", _urlParams);
                     }
                 }
@@ -156,7 +156,7 @@ public class DispatchHelper {
                 File _targetFile = null;
                 for (String _fileType : _fileTypes) {
                     _targetFile = new File(getBaseViewFilePath(), _requestMapping + _fileType);
-                    if (_targetFile != null && _targetFile.exists()) {
+                    if (_targetFile.exists()) {
                         _LOG.info(I18N.formatMessage(YMP.__LSTRING_FILE, null, null, "ymp.mvc.convention_request_execute", _requestMapping));
                         if (".jsp".equals(_fileType)) {
                             new JspView(_requestMapping.substring(1)).render();
