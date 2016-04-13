@@ -21,3 +21,27 @@ YMP开发框架是一套轻量级的JAVA应用开发框架，具有统一的配�
 * [框架快速搭建手册](https://github.com/suninformation/ymateplatform/wiki/YMP框架快速搭建手册)
 
 * [持久化代码生成器使用详解](https://github.com/suninformation/ymateplatform/wiki/YMP框架持久化代码生成器使用详解)
+
+## 重要提示
+
+> [YMP V2.0](https://github.com/suninformation/ymate-platform-v2) is HIGHLY **RECOMMENDED**.
+>
+> 推荐大家使用框架新版本, 更优化, 更简单, 文档更全, 代码地址如下:
+>
+> - [GIT@OSC](https://github.com/suninformation/ymate-platform-v2)
+> - [GITHub](http://git.oschina.net/suninformation/ymate-platform-v2)
+>
+> **相关阅读**:
+>
+> - [Quickstart——快速上手](http://git.oschina.net/suninformation/ymate-platform-v2/wikis/Quickstart)
+>
+> - [Quickstart_New——扩展工具篇](http://git.oschina.net/suninformation/ymate-platform-v2/wikis/Quickstart_New)
+>
+>
+> **One More Thing**:
+>
+> YMP不仅提供便捷的Web及其它Java项目的快速开发体验，也将不断提供更多丰富的项目实践经验。
+>
+> 感兴趣的小伙伴儿们可以加入 官方QQ群480374360，一起交流学习，帮助YMP成长！
+>
+> 了解更多有关YMP框架的内容，请访问官网：http://www.ymate.net/
