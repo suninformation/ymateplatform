@@ -15,23 +15,17 @@
  */
 package net.ymate.platform.commons.i18n;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ResourceBundle;
-import java.util.concurrent.ConcurrentHashMap;
-
 import net.ymate.platform.base.YMP;
 import net.ymate.platform.commons.util.RuntimeUtils;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <p>
@@ -40,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
  * <p>
  * 国际化资源管理器；
  * </p>
- * 
+ *
  * @author 刘镇(suninformation@163.com)
  * @version 0.0.0
  *          <table style="border:1px solid gray;">
@@ -73,7 +67,7 @@ public class I18N {
 
 	/**
 	 * 初始化
-	 * 
+	 *
 	 * @param defaultLocale 默认语言，若为空则采用JVM默认语言
 	 */
 	public static void initialize(Locale defaultLocale) {
@@ -107,6 +101,13 @@ public class I18N {
 		__EVENT_HANDLER = eventHandler;
 	}
 
+    /**
+     * 当前线程使用完毕切记一定要执行该方法进行清理
+     */
+    public static void cleanCurrent() {
+        __CURRENT_LOCALE.remove();
+    }
+
 	/**
 	 * @return 获取当前本地线程语言，若为空则返回默认
 	 */
@@ -137,7 +138,7 @@ public class I18N {
 
 	/**
 	 * 修改当前线程语言设置并触发onLocaleChanged事件
-	 * 
+	 *
 	 * @param locale
 	 */
 	public static void change(Locale locale) {

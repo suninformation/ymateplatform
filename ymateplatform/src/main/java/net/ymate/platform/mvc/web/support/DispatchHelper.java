@@ -184,6 +184,7 @@ public class DispatchHelper {
             }
             //
             WebContext.setContext(null);
+            I18N.cleanCurrent();
         }
     }
 
