@@ -1,3 +1,11 @@
+
+> # 请访问最新版本地址：[https://github.com/suninformation/ymate-platform-v2](https://github.com/suninformation/ymate-platform-v2).
+
+> [YMP V2.0](https://github.com/suninformation/ymate-platform-v2) is HIGHLY **RECOMMENDED**
+
+
+
+
 # Welcome to the yMatePlatform! #
 
 ![](https://github.com/suninformation/ymateplatform/wiki/images/ymp_logo.png)
@@ -28,8 +36,8 @@ YMP开发框架是一套轻量级的JAVA应用开发框架，具有统一的配�
 >
 > 推荐大家使用框架新版本, 更优化, 更简单, 文档更全, 代码地址如下:
 >
-> - [GIT@OSC](https://github.com/suninformation/ymate-platform-v2)
-> - [GITHub](http://git.oschina.net/suninformation/ymate-platform-v2)
+> - [GITHub](https://github.com/suninformation/ymate-platform-v2)
+> - [GIT@OSC](http://git.oschina.net/suninformation/ymate-platform-v2)
 >
 > **相关阅读**:
 >
