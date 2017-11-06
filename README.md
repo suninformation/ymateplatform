@@ -1,8 +1,21 @@
 
-> # 请访问最新版本地址：[https://github.com/suninformation/ymate-platform-v2](https://github.com/suninformation/ymate-platform-v2).
-
 > [YMP V2.0](https://github.com/suninformation/ymate-platform-v2) is HIGHLY **RECOMMENDED**
+## 重要提示
 
+> 请访问YMP框架新版本代码仓库：[YMP V2.0](https://github.com/suninformation/ymate-platform-v2).
+>
+> 推荐大家使用框架新版本, 更优化, 更简单, 文档更全, 代码地址如下:
+>
+> - [GitHub：https://github.com/suninformation/ymate-platform-v2](https://github.com/suninformation/ymate-platform-v2)
+> - [Git@OSC：http://git.oschina.net/suninformation/ymate-platform-v2](http://git.oschina.net/suninformation/ymate-platform-v2)
+>
+> **相关阅读**:
+>
+> - [Quickstart——快速上手](http://git.oschina.net/suninformation/ymate-platform-v2/wikis/Quickstart)
+>
+> - [Quickstart_New——扩展工具篇](http://git.oschina.net/suninformation/ymate-platform-v2/wikis/Quickstart_New)
+>
+>
 
 
 
@@ -30,22 +43,7 @@ YMP开发框架是一套轻量级的JAVA应用开发框架，具有统一的配�
 
 * [持久化代码生成器使用详解](https://github.com/suninformation/ymateplatform/wiki/YMP框架持久化代码生成器使用详解)
 
-## 重要提示
 
-> [YMP V2.0](https://github.com/suninformation/ymate-platform-v2) is HIGHLY **RECOMMENDED**.
->
-> 推荐大家使用框架新版本, 更优化, 更简单, 文档更全, 代码地址如下:
->
-> - [GITHub](https://github.com/suninformation/ymate-platform-v2)
-> - [GIT@OSC](http://git.oschina.net/suninformation/ymate-platform-v2)
->
-> **相关阅读**:
->
-> - [Quickstart——快速上手](http://git.oschina.net/suninformation/ymate-platform-v2/wikis/Quickstart)
->
-> - [Quickstart_New——扩展工具篇](http://git.oschina.net/suninformation/ymate-platform-v2/wikis/Quickstart_New)
->
->
 > **One More Thing**:
 >
 > YMP不仅提供便捷的Web及其它Java项目的快速开发体验，也将不断提供更多丰富的项目实践经验。
